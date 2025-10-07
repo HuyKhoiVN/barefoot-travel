@@ -4,16 +4,33 @@ using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Tour;
 using barefoot_travel.Models;
 using barefoot_travel.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace barefoot_travel.Services
 {
     public class TourService : ITourService
     {
         private readonly ITourRepository _tourRepository;
+        private readonly ITourImageRepository _tourImageRepository;
+        private readonly ITourCategoryRepository _tourCategoryRepository;
+        private readonly ITourPriceRepository _tourPriceRepository;
+        private readonly ITourPolicyRepository _tourPolicyRepository;
+        private readonly SysDbContext _context;
 
-        public TourService(ITourRepository tourRepository)
+        public TourService(
+            ITourRepository tourRepository,
+            ITourImageRepository tourImageRepository,
+            ITourCategoryRepository tourCategoryRepository,
+            ITourPriceRepository tourPriceRepository,
+            ITourPolicyRepository tourPolicyRepository,
+            SysDbContext context)
         {
             _tourRepository = tourRepository;
+            _tourImageRepository = tourImageRepository;
+            _tourCategoryRepository = tourCategoryRepository;
+            _tourPriceRepository = tourPriceRepository;
+            _tourPolicyRepository = tourPolicyRepository;
+            _context = context;
         }
 
         #region Tour CRUD Operations
@@ -63,6 +80,7 @@ namespace barefoot_travel.Services
 
         public async Task<ApiResponse> CreateTourAsync(CreateTourDto dto, string adminUsername)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // Validate title uniqueness
@@ -75,14 +93,17 @@ namespace barefoot_travel.Services
                 var tour = MapToTour(dto, adminUsername);
                 var createdTour = await _tourRepository.CreateAsync(tour);
 
-                // Create related data
+                // Create related data within transaction
                 await CreateTourRelatedDataAsync(createdTour.Id, dto, adminUsername);
+
+                await transaction.CommitAsync();
 
                 var tourDto = MapToTourDto(createdTour);
                 return new ApiResponse(true, "Tour created successfully", tourDto);
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return new ApiResponse(false, $"Error creating tour: {ex.Message}");
             }
         }
@@ -235,7 +256,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var marketingTagDto = await _tourRepository.CreateMarketingTagAsync(tourCategory);
+                var marketingTagDto = await _tourCategoryRepository.CreateMarketingTagAsync(tourCategory);
                 return new ApiResponse(true, "Marketing tag added successfully", marketingTagDto);
             }
             catch (Exception ex)
@@ -248,7 +269,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var success = await _tourRepository.DeleteMarketingTagAsync(tourId, categoryId);
+                var success = await _tourCategoryRepository.DeleteMarketingTagAsync(tourId, categoryId);
                 if (!success)
                 {
                     return new ApiResponse(false, "Marketing tag not found");
@@ -266,7 +287,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var marketingTags = await _tourRepository.GetMarketingTagsByTourIdAsync(tourId);
+                var marketingTags = await _tourCategoryRepository.GetMarketingTagsByTourIdAsync(tourId);
                 return new ApiResponse(true, "Marketing tags retrieved successfully", marketingTags);
             }
             catch (Exception ex)
@@ -298,7 +319,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var imageDto = await _tourRepository.CreateImageAsync(tourImage);
+                var imageDto = await _tourImageRepository.CreateAsync(tourImage);
                 return new ApiResponse(true, "Tour image created successfully", imageDto);
             }
             catch (Exception ex)
@@ -311,7 +332,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var tourImage = await _tourRepository.GetImageByIdAsync(id);
+                var tourImage = await _tourImageRepository.GetByIdAsync(id);
                 if (tourImage == null)
                 {
                     return new ApiResponse(false, "Tour image not found");
@@ -329,7 +350,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var imageDto = await _tourRepository.UpdateImageAsync(image);
+                var imageDto = await _tourImageRepository.UpdateAsync(image);
                 return new ApiResponse(true, "Tour image updated successfully", imageDto);
             }
             catch (Exception ex)
@@ -342,7 +363,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var success = await _tourRepository.DeleteImageAsync(id);
+                var success = await _tourImageRepository.DeleteAsync(id);
                 if (!success)
                 {
                     return new ApiResponse(false, "Tour image not found");
@@ -360,7 +381,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var images = await _tourRepository.GetImagesByTourIdAsync(tourId);
+                var images = await _tourImageRepository.GetByTourIdAsync(tourId);
                 return new ApiResponse(true, "Tour images retrieved successfully", images);
             }
             catch (Exception ex)
@@ -403,7 +424,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var categoryDto = await _tourRepository.CreateCategoryAsync(tourCategory);
+                var categoryDto = await _tourCategoryRepository.CreateAsync(tourCategory);
                 return new ApiResponse(true, "Tour category created successfully", categoryDto);
             }
             catch (Exception ex)
@@ -416,7 +437,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var success = await _tourRepository.DeleteCategoryAsync(id);
+                var success = await _tourCategoryRepository.DeleteAsync(id);
                 if (!success)
                 {
                     return new ApiResponse(false, "Tour category not found");
@@ -434,7 +455,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var tourCategories = await _tourRepository.GetCategoriesByTourIdAsync(tourId);
+                var tourCategories = await _tourCategoryRepository.GetByTourIdAsync(tourId);
                 return new ApiResponse(true, "Tour categories retrieved successfully", tourCategories);
             }
             catch (Exception ex)
@@ -472,7 +493,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var priceDto = await _tourRepository.CreatePriceAsync(tourPrice);
+                var priceDto = await _tourPriceRepository.CreateAsync(tourPrice);
                 return new ApiResponse(true, "Tour price created successfully", priceDto);
             }
             catch (Exception ex)
@@ -485,7 +506,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var tourPrice = await _tourRepository.GetPriceByIdAsync(id);
+                var tourPrice = await _tourPriceRepository.GetByIdAsync(id);
                 if (tourPrice == null)
                 {
                     return new ApiResponse(false, "Tour price not found");
@@ -503,7 +524,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var priceDto = await _tourRepository.UpdatePriceAsync(price);
+                var priceDto = await _tourPriceRepository.UpdateAsync(price);
                 return new ApiResponse(true, "Tour price updated successfully", priceDto);
             }
             catch (Exception ex)
@@ -516,7 +537,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var success = await _tourRepository.DeletePriceAsync(id);
+                var success = await _tourPriceRepository.DeleteAsync(id);
                 if (!success)
                 {
                     return new ApiResponse(false, "Tour price not found");
@@ -534,7 +555,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var tourPrices = await _tourRepository.GetPricesByTourIdAsync(tourId);
+                var tourPrices = await _tourPriceRepository.GetByTourIdAsync(tourId);
                 return new ApiResponse(true, "Tour prices retrieved successfully", tourPrices);
             }
             catch (Exception ex)
@@ -577,7 +598,7 @@ namespace barefoot_travel.Services
                     Active = true
                 };
 
-                var policyDto = await _tourRepository.CreatePolicyAsync(tourPolicy);
+                var policyDto = await _tourPolicyRepository.CreateAsync(tourPolicy);
                 return new ApiResponse(true, "Tour policy created successfully", policyDto);
             }
             catch (Exception ex)
@@ -590,7 +611,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var success = await _tourRepository.DeletePolicyAsync(id);
+                var success = await _tourPolicyRepository.DeleteAsync(id);
                 if (!success)
                 {
                     return new ApiResponse(false, "Tour policy not found");
@@ -608,7 +629,7 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var tourPolicies = await _tourRepository.GetPoliciesByTourIdAsync(tourId);
+                var tourPolicies = await _tourPolicyRepository.GetByTourIdAsync(tourId);
                 return new ApiResponse(true, "Tour policies retrieved successfully", tourPolicies);
             }
             catch (Exception ex)
@@ -636,7 +657,7 @@ namespace barefoot_travel.Services
                         CreatedTime = DateTime.UtcNow,
                         Active = true
                     };
-                    await _tourRepository.CreateImageAsync(tourImage);
+                    await _tourImageRepository.CreateAsync(tourImage);
                 }
             }
 
@@ -652,7 +673,7 @@ namespace barefoot_travel.Services
                         CreatedTime = DateTime.UtcNow,
                         Active = true
                     };
-                    await _tourRepository.CreateCategoryAsync(tourCategory);
+                    await _tourCategoryRepository.CreateAsync(tourCategory);
                 }
             }
 
@@ -669,7 +690,7 @@ namespace barefoot_travel.Services
                         CreatedTime = DateTime.UtcNow,
                         Active = true
                     };
-                    await _tourRepository.CreatePriceAsync(tourPrice);
+                    await _tourPriceRepository.CreateAsync(tourPrice);
                 }
             }
 
@@ -685,7 +706,7 @@ namespace barefoot_travel.Services
                         CreatedTime = DateTime.UtcNow,
                         Active = true
                     };
-                    await _tourRepository.CreatePolicyAsync(tourPolicy);
+                    await _tourPolicyRepository.CreateAsync(tourPolicy);
                 }
             }
         }

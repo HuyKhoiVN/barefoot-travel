@@ -21,14 +21,4 @@ namespace barefoot_travel.DTOs.Tour
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
     }
-
-    public class TourPriceResponseDto
-    {
-        public int Id { get; set; }
-        public int TourId { get; set; }
-        public int PriceTypeId { get; set; }
-        public string PriceTypeName { get; set; } = string.Empty;
-        public decimal Price { get; set; }
-        public DateTime CreatedTime { get; set; }
-    }
 }

@@ -115,12 +115,20 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddScoped<barefoot_travel.Repositories.IAccountRepository, barefoot_travel.Repositories.AccountRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IRoleRepository, barefoot_travel.Repositories.RoleRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.ITourRepository, barefoot_travel.Repositories.TourRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.ITourImageRepository, barefoot_travel.Repositories.TourImageRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.ITourCategoryRepository, barefoot_travel.Repositories.TourCategoryRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.ITourPriceRepository, barefoot_travel.Repositories.TourPriceRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.ITourPolicyRepository, barefoot_travel.Repositories.TourPolicyRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.ICategoryRepository, barefoot_travel.Repositories.CategoryRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IPolicyRepository, barefoot_travel.Repositories.PolicyRepository>();
 
 // Service Registration
 builder.Services.AddScoped<barefoot_travel.Services.IAuthService, barefoot_travel.Services.AuthService>();
 builder.Services.AddScoped<barefoot_travel.Services.IUserService, barefoot_travel.Services.UserService>();
 builder.Services.AddScoped<barefoot_travel.Services.IRoleService, barefoot_travel.Services.RoleService>();
 builder.Services.AddScoped<barefoot_travel.Services.ITourService, barefoot_travel.Services.TourService>();
+builder.Services.AddScoped<barefoot_travel.Services.ICategoryService, barefoot_travel.Services.CategoryService>();
+builder.Services.AddScoped<barefoot_travel.Services.IPolicyService, barefoot_travel.Services.PolicyService>();
 
 // JwtMiddleware is registered as middleware, not as a service
 

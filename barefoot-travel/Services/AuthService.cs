@@ -66,7 +66,7 @@ namespace barefoot_travel.Services
                 throw new UnauthorizedException("User has no assigned role");
             }
 
-            var accessToken = GenerateAccessToken(user.Id, new List<string> { roleName });
+            var accessToken = GenerateAccessToken(user.Id, user.Username, new List<string> { roleName });
             var refreshToken = GenerateRefreshToken();
 
             // Store refresh token in memory or database (simplified approach)
@@ -105,7 +105,7 @@ namespace barefoot_travel.Services
             await Task.CompletedTask;
         }
 
-        private string GenerateAccessToken(int userId, List<string> roles)
+        private string GenerateAccessToken(int userId, string username, List<string> roles)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
@@ -119,7 +119,8 @@ namespace barefoot_travel.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                 new Claim(ClaimTypes.Name, userId.ToString()),
-                new Claim("sub", userId.ToString())
+                new Claim("sub", userId.ToString()),
+                new Claim("username", username)
             };
 
             // Add role claims

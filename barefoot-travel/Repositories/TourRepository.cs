@@ -483,157 +483,31 @@ namespace barefoot_travel.Repositories
 
         #endregion
 
-        #region TourImage Operations with DTOs
+        #region Tour Image Operations (Basic)
 
-        public async Task<TourImageResponseDto?> GetImageByIdAsync(int id)
+        public async Task<bool> TourHasImagesAsync(int tourId)
         {
-            return await (from ti in _context.TourImages
-                         where ti.Id == id && ti.Active
-                         select new TourImageResponseDto
-                         {
-                             Id = ti.Id,
-                             TourId = ti.TourId,
-                             ImageUrl = ti.ImageUrl,
-                             IsBanner = ti.IsBanner,
-                             CreatedTime = ti.CreatedTime
-                         }).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<TourImageResponseDto>> GetImagesByTourIdAsync(int tourId)
-        {
-            // Optimized query with server-side filtering and ordering
             return await _context.TourImages
                 .Where(ti => ti.TourId == tourId && ti.Active)
-                .OrderBy(ti => ti.CreatedTime)
-                .Select(ti => new TourImageResponseDto
-                {
-                    Id = ti.Id,
-                    TourId = ti.TourId,
-                    ImageUrl = ti.ImageUrl,
-                    IsBanner = ti.IsBanner,
-                    CreatedTime = ti.CreatedTime
-                })
-                .ToListAsync();
+                .AnyAsync();
         }
 
-        public async Task<TourImageResponseDto> CreateImageAsync(TourImage image)
+        public async Task<int> GetImageCountByTourIdAsync(int tourId)
         {
-            image.CreatedTime = DateTime.UtcNow;
-            image.Active = true;
-            await _context.TourImages.AddAsync(image);
-            await _context.SaveChangesAsync();
-            
-            return new TourImageResponseDto
-            {
-                Id = image.Id,
-                TourId = image.TourId,
-                ImageUrl = image.ImageUrl,
-                IsBanner = image.IsBanner,
-                CreatedTime = image.CreatedTime
-            };
-        }
-
-        public async Task<TourImageResponseDto> UpdateImageAsync(TourImage image)
-        {
-            image.UpdatedTime = DateTime.UtcNow;
-            _context.TourImages.Update(image);
-            await _context.SaveChangesAsync();
-            
-            return new TourImageResponseDto
-            {
-                Id = image.Id,
-                TourId = image.TourId,
-                ImageUrl = image.ImageUrl,
-                IsBanner = image.IsBanner,
-                CreatedTime = image.CreatedTime
-            };
-        }
-
-        public async Task<bool> DeleteImageAsync(int id)
-        {
-            var image = await _context.TourImages
-                .Where(ti => ti.Id == id && ti.Active)
-                .FirstOrDefaultAsync();
-
-            if (image == null) return false;
-
-            image.Active = false;
-            image.UpdatedTime = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return true;
+            return await _context.TourImages
+                .Where(ti => ti.TourId == tourId && ti.Active)
+                .CountAsync();
         }
 
         #endregion
 
-        #region TourCategory Operations with DTOs
+        #region Tour Category Operations (Basic)
 
-        public async Task<TourCategoryResponseDto?> GetCategoryByIdAsync(int id)
+        public async Task<bool> TourHasCategoriesAsync(int tourId)
         {
-            return await (from tc in _context.TourCategories
-                         join c in _context.Categories on tc.CategoryId equals c.Id
-                         where tc.Id == id && tc.Active && c.Active
-                         select new TourCategoryResponseDto
-                         {
-                             Id = tc.Id,
-                             TourId = tc.TourId,
-                             CategoryId = tc.CategoryId,
-                             CategoryName = c.CategoryName,
-                             CreatedTime = tc.CreatedTime
-                         }).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<TourCategoryResponseDto>> GetCategoriesByTourIdAsync(int tourId)
-        {
-            // Optimized query with efficient join and server-side processing
-            return await (from tc in _context.TourCategories
-                         join c in _context.Categories on tc.CategoryId equals c.Id
-                         where tc.TourId == tourId && tc.Active && c.Active
-                         orderby tc.CreatedTime
-                         select new TourCategoryResponseDto
-                         {
-                             Id = tc.Id,
-                             TourId = tc.TourId,
-                             CategoryId = tc.CategoryId,
-                             CategoryName = c.CategoryName,
-                             CreatedTime = tc.CreatedTime
-                         }).ToListAsync();
-        }
-
-        public async Task<TourCategoryResponseDto> CreateCategoryAsync(TourCategory category)
-        {
-            category.CreatedTime = DateTime.UtcNow;
-            category.Active = true;
-            await _context.TourCategories.AddAsync(category);
-            await _context.SaveChangesAsync();
-
-            // Get category name for response
-            var categoryName = await _context.Categories
-                .Where(c => c.Id == category.CategoryId)
-                .Select(c => c.CategoryName)
-                .FirstOrDefaultAsync() ?? "";
-
-            return new TourCategoryResponseDto
-            {
-                Id = category.Id,
-                TourId = category.TourId,
-                CategoryId = category.CategoryId,
-                CategoryName = categoryName,
-                CreatedTime = category.CreatedTime
-            };
-        }
-
-        public async Task<bool> DeleteCategoryAsync(int id)
-        {
-            var category = await _context.TourCategories
-                .Where(tc => tc.Id == id && tc.Active)
-                .FirstOrDefaultAsync();
-
-            if (category == null) return false;
-
-            category.Active = false;
-            category.UpdatedTime = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return true;
+            return await _context.TourCategories
+                .Where(tc => tc.TourId == tourId && tc.Active)
+                .AnyAsync();
         }
 
         public async Task<bool> CategoryLinkExistsAsync(int tourId, int categoryId)
@@ -645,174 +519,38 @@ namespace barefoot_travel.Repositories
 
         #endregion
 
-        #region TourPrice Operations with DTOs
+        #region Tour Price Operations (Basic)
 
-        public async Task<TourPriceResponseDto?> GetPriceByIdAsync(int id)
+        public async Task<bool> TourHasPricesAsync(int tourId)
         {
-            return await (from tp in _context.TourPrices
-                         join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
-                         where tp.Id == id && tp.Active && pt.Active
-                         select new TourPriceResponseDto
-                         {
-                             Id = tp.Id,
-                             TourId = tp.TourId,
-                             PriceTypeId = tp.PriceTypeId,
-                             PriceTypeName = pt.PriceTypeName,
-                             Price = tp.Price,
-                             CreatedTime = tp.CreatedTime
-                         }).FirstOrDefaultAsync();
+            return await _context.TourPrices
+                .Where(tp => tp.TourId == tourId && tp.Active)
+                .AnyAsync();
         }
 
-        public async Task<List<TourPriceResponseDto>> GetPricesByTourIdAsync(int tourId)
+        public async Task<decimal> GetMinPriceByTourIdAsync(int tourId)
         {
-            // Optimized query with efficient join and server-side processing
-            return await (from tp in _context.TourPrices
-                         join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
-                         where tp.TourId == tourId && tp.Active && pt.Active
-                         orderby tp.CreatedTime
-                         select new TourPriceResponseDto
-                         {
-                             Id = tp.Id,
-                             TourId = tp.TourId,
-                             PriceTypeId = tp.PriceTypeId,
-                             PriceTypeName = pt.PriceTypeName,
-                             Price = tp.Price,
-                             CreatedTime = tp.CreatedTime
-                         }).ToListAsync();
+            return await _context.TourPrices
+                .Where(tp => tp.TourId == tourId && tp.Active)
+                .MinAsync(tp => tp.Price);
         }
 
-        public async Task<TourPriceResponseDto> CreatePriceAsync(TourPrice price)
+        public async Task<decimal> GetMaxPriceByTourIdAsync(int tourId)
         {
-            price.CreatedTime = DateTime.UtcNow;
-            price.Active = true;
-            await _context.TourPrices.AddAsync(price);
-            await _context.SaveChangesAsync();
-
-            // Get price type name for response
-            var priceTypeName = await _context.PriceTypes
-                .Where(pt => pt.Id == price.PriceTypeId)
-                .Select(pt => pt.PriceTypeName)
-                .FirstOrDefaultAsync() ?? "";
-
-            return new TourPriceResponseDto
-            {
-                Id = price.Id,
-                TourId = price.TourId,
-                PriceTypeId = price.PriceTypeId,
-                PriceTypeName = priceTypeName,
-                Price = price.Price,
-                CreatedTime = price.CreatedTime
-            };
-        }
-
-        public async Task<TourPriceResponseDto> UpdatePriceAsync(TourPrice price)
-        {
-            price.UpdatedTime = DateTime.UtcNow;
-            _context.TourPrices.Update(price);
-            await _context.SaveChangesAsync();
-
-            // Get price type name for response
-            var priceTypeName = await _context.PriceTypes
-                .Where(pt => pt.Id == price.PriceTypeId)
-                .Select(pt => pt.PriceTypeName)
-                .FirstOrDefaultAsync() ?? "";
-
-            return new TourPriceResponseDto
-            {
-                Id = price.Id,
-                TourId = price.TourId,
-                PriceTypeId = price.PriceTypeId,
-                PriceTypeName = priceTypeName,
-                Price = price.Price,
-                CreatedTime = price.CreatedTime
-            };
-        }
-
-        public async Task<bool> DeletePriceAsync(int id)
-        {
-            var price = await _context.TourPrices
-                .Where(tp => tp.Id == id && tp.Active)
-                .FirstOrDefaultAsync();
-
-            if (price == null) return false;
-
-            price.Active = false;
-            price.UpdatedTime = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return true;
+            return await _context.TourPrices
+                .Where(tp => tp.TourId == tourId && tp.Active)
+                .MaxAsync(tp => tp.Price);
         }
 
         #endregion
 
-        #region TourPolicy Operations with DTOs
+        #region Tour Policy Operations (Basic)
 
-        public async Task<TourPolicyResponseDto?> GetPolicyByIdAsync(int id)
+        public async Task<bool> TourHasPoliciesAsync(int tourId)
         {
-            return await (from tp in _context.TourPolicies
-                         join p in _context.Policies on tp.PolicyId equals p.Id
-                         where tp.Id == id && tp.Active && p.Active
-                         select new TourPolicyResponseDto
-                         {
-                             Id = tp.Id,
-                             TourId = tp.TourId,
-                             PolicyId = tp.PolicyId,
-                             PolicyType = p.PolicyType,
-                             CreatedTime = tp.CreatedTime
-                         }).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<TourPolicyResponseDto>> GetPoliciesByTourIdAsync(int tourId)
-        {
-            // Optimized query with efficient join and server-side processing
-            return await (from tp in _context.TourPolicies
-                         join p in _context.Policies on tp.PolicyId equals p.Id
-                         where tp.TourId == tourId && tp.Active && p.Active
-                         orderby tp.CreatedTime
-                         select new TourPolicyResponseDto
-                         {
-                             Id = tp.Id,
-                             TourId = tp.TourId,
-                             PolicyId = tp.PolicyId,
-                             PolicyType = p.PolicyType,
-                             CreatedTime = tp.CreatedTime
-                         }).ToListAsync();
-        }
-
-        public async Task<TourPolicyResponseDto> CreatePolicyAsync(TourPolicy policy)
-        {
-            policy.CreatedTime = DateTime.UtcNow;
-            policy.Active = true;
-            await _context.TourPolicies.AddAsync(policy);
-            await _context.SaveChangesAsync();
-
-            // Get policy type for response
-            var policyType = await _context.Policies
-                .Where(p => p.Id == policy.PolicyId)
-                .Select(p => p.PolicyType)
-                .FirstOrDefaultAsync() ?? "";
-
-            return new TourPolicyResponseDto
-            {
-                Id = policy.Id,
-                TourId = policy.TourId,
-                PolicyId = policy.PolicyId,
-                PolicyType = policyType,
-                CreatedTime = policy.CreatedTime
-            };
-        }
-
-        public async Task<bool> DeletePolicyAsync(int id)
-        {
-            var policy = await _context.TourPolicies
-                .Where(tp => tp.Id == id && tp.Active)
-                .FirstOrDefaultAsync();
-
-            if (policy == null) return false;
-
-            policy.Active = false;
-            policy.UpdatedTime = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return true;
+            return await _context.TourPolicies
+                .Where(tp => tp.TourId == tourId && tp.Active)
+                .AnyAsync();
         }
 
         public async Task<bool> PolicyLinkExistsAsync(int tourId, int policyId)
@@ -824,60 +562,14 @@ namespace barefoot_travel.Repositories
 
         #endregion
 
-        #region Marketing Tag Operations with DTOs
+        #region Marketing Tag Operations (Basic)
 
-        public async Task<List<MarketingTagDto>> GetMarketingTagsByTourIdAsync(int tourId)
+        public async Task<bool> TourHasMarketingTagsAsync(int tourId)
         {
-            // Optimized query with efficient join and server-side filtering
             return await (from tc in _context.TourCategories
                          join c in _context.Categories on tc.CategoryId equals c.Id
                          where tc.TourId == tourId && tc.Active && c.Active && c.Type == "Marketing"
-                         orderby tc.CreatedTime
-                         select new MarketingTagDto
-                         {
-                             Id = tc.Id,
-                             TourId = tc.TourId,
-                             CategoryId = tc.CategoryId,
-                             CategoryName = c.CategoryName,
-                             CreatedTime = tc.CreatedTime
-                         }).ToListAsync();
-        }
-
-        public async Task<MarketingTagDto> CreateMarketingTagAsync(TourCategory category)
-        {
-            category.CreatedTime = DateTime.UtcNow;
-            category.Active = true;
-            await _context.TourCategories.AddAsync(category);
-            await _context.SaveChangesAsync();
-
-            // Get category name for response
-            var categoryName = await _context.Categories
-                .Where(c => c.Id == category.CategoryId)
-                .Select(c => c.CategoryName)
-                .FirstOrDefaultAsync() ?? "";
-
-            return new MarketingTagDto
-            {
-                Id = category.Id,
-                TourId = category.TourId,
-                CategoryId = category.CategoryId,
-                CategoryName = categoryName,
-                CreatedTime = category.CreatedTime
-            };
-        }
-
-        public async Task<bool> DeleteMarketingTagAsync(int tourId, int categoryId)
-        {
-            var tourCategory = await _context.TourCategories
-                .Where(tc => tc.TourId == tourId && tc.CategoryId == categoryId && tc.Active)
-                .FirstOrDefaultAsync();
-
-            if (tourCategory == null) return false;
-
-            tourCategory.Active = false;
-            tourCategory.UpdatedTime = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return true;
+                         select tc).AnyAsync();
         }
 
         #endregion

@@ -1,0 +1,185 @@
+using barefoot_travel.DTOs;
+using barefoot_travel.DTOs.Category;
+using barefoot_travel.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace barefoot_travel.Repositories
+{
+    public class CategoryRepository : ICategoryRepository
+    {
+        private readonly SysDbContext _context;
+
+        public CategoryRepository(SysDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Category?> GetByIdAsync(int id)
+        {
+            return await _context.Categories
+                .Where(c => c.Id == id && c.Active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Category>> GetAllAsync()
+        {
+            return await _context.Categories
+                .Where(c => c.Active)
+                .OrderBy(c => c.Type).ThenBy(c => c.Priority).ThenBy(c => c.CategoryName)
+                .ToListAsync();
+        }
+
+        public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? type = null, bool? active = null)
+        {
+            var query = _context.Categories.AsQueryable();
+
+            // Filter by active status
+            if (active.HasValue)
+            {
+                query = query.Where(c => c.Active == active.Value);
+            }
+            else
+            {
+                query = query.Where(c => c.Active);
+            }
+
+            // Filter by type
+            if (!string.IsNullOrEmpty(type))
+            {
+                query = query.Where(c => c.Type == type);
+            }
+
+            // Apply sorting
+            var sortedQuery = sortBy?.ToLower() switch
+            {
+                "categoryname" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CategoryName)
+                    : query.OrderBy(c => c.CategoryName),
+                "type" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Type)
+                    : query.OrderBy(c => c.Type),
+                "priority" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Priority)
+                    : query.OrderBy(c => c.Priority),
+                "createdtime" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CreatedTime)
+                    : query.OrderBy(c => c.CreatedTime),
+                _ => query.OrderBy(c => c.CategoryName)
+            };
+
+            var totalItems = await sortedQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            var items = await sortedQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Category>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<Category> CreateAsync(Category category)
+        {
+            category.CreatedTime = DateTime.UtcNow;
+            category.Active = true;
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
+            return category;
+        }
+
+        public async Task<Category> UpdateAsync(Category category)
+        {
+            category.UpdatedTime = DateTime.UtcNow;
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return category;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var category = await _context.Categories
+                .Where(c => c.Id == id && c.Active)
+                .FirstOrDefaultAsync();
+
+            if (category == null) return false;
+
+            category.Active = false;
+            category.UpdatedTime = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Categories
+                .Where(c => c.Id == id && c.Active)
+                .AnyAsync();
+        }
+
+        public async Task<bool> NameExistsAsync(string categoryName, int? excludeId = null)
+        {
+            var query = _context.Categories.Where(c => c.CategoryName == categoryName && c.Active);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(c => c.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
+        public async Task<bool> HasChildrenAsync(int id)
+        {
+            return await _context.Categories
+                .Where(c => c.ParentId == id && c.Active)
+                .AnyAsync();
+        }
+
+        public async Task<List<Category>> GetByTypeAsync(string type)
+        {
+            return await _context.Categories
+                .Where(c => c.Type == type && c.Active).OrderBy(c => c.Priority)
+                .OrderBy(c => c.CategoryName)
+                .ToListAsync();
+        }
+
+        public async Task<List<Category>> GetByParentIdAsync(int? parentId)
+        {
+            return await _context.Categories
+                .Where(c => c.ParentId == parentId && c.Active).OrderBy(c => c.Priority)
+                .OrderBy(c => c.CategoryName)
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateStatusAsync(int id, bool active, string updatedBy)
+        {
+            var category = await _context.Categories
+                .Where(c => c.Id == id).OrderBy(c => c.Priority)
+                .FirstOrDefaultAsync();
+
+            if (category == null) return false;
+
+            category.Active = active;
+            category.UpdatedTime = DateTime.UtcNow;
+            category.UpdatedBy = updatedBy;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<string>> GetAllType()
+        {
+            return await _context.Categories
+                .Where(c => c.Active).OrderBy(c => c.Priority)
+                .Select(c => c.Type)
+                .Distinct()
+                .ToListAsync();
+        }
+    }
+}

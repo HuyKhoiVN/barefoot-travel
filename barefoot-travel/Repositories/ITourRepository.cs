@@ -30,38 +30,25 @@ namespace barefoot_travel.Repositories
         Task<bool> UpdateStatusAsync(int id, bool active, string updatedBy);
         Task<bool> HasActiveBookingsAsync(int tourId);
 
-        // TourImage operations with DTOs
-        Task<TourImageResponseDto?> GetImageByIdAsync(int id);
-        Task<List<TourImageResponseDto>> GetImagesByTourIdAsync(int tourId);
-        Task<TourImageResponseDto> CreateImageAsync(TourImage image);
-        Task<TourImageResponseDto> UpdateImageAsync(TourImage image);
-        Task<bool> DeleteImageAsync(int id);
+        // Tour Image Operations (Basic)
+        Task<bool> TourHasImagesAsync(int tourId);
+        Task<int> GetImageCountByTourIdAsync(int tourId);
 
-        // TourCategory operations with DTOs
-        Task<TourCategoryResponseDto?> GetCategoryByIdAsync(int id);
-        Task<List<TourCategoryResponseDto>> GetCategoriesByTourIdAsync(int tourId);
-        Task<TourCategoryResponseDto> CreateCategoryAsync(TourCategory category);
-        Task<bool> DeleteCategoryAsync(int id);
+        // Tour Category Operations (Basic)
+        Task<bool> TourHasCategoriesAsync(int tourId);
         Task<bool> CategoryLinkExistsAsync(int tourId, int categoryId);
 
-        // TourPrice operations with DTOs
-        Task<TourPriceResponseDto?> GetPriceByIdAsync(int id);
-        Task<List<TourPriceResponseDto>> GetPricesByTourIdAsync(int tourId);
-        Task<TourPriceResponseDto> CreatePriceAsync(TourPrice price);
-        Task<TourPriceResponseDto> UpdatePriceAsync(TourPrice price);
-        Task<bool> DeletePriceAsync(int id);
+        // Tour Price Operations (Basic)
+        Task<bool> TourHasPricesAsync(int tourId);
+        Task<decimal> GetMinPriceByTourIdAsync(int tourId);
+        Task<decimal> GetMaxPriceByTourIdAsync(int tourId);
 
-        // TourPolicy operations with DTOs
-        Task<TourPolicyResponseDto?> GetPolicyByIdAsync(int id);
-        Task<List<TourPolicyResponseDto>> GetPoliciesByTourIdAsync(int tourId);
-        Task<TourPolicyResponseDto> CreatePolicyAsync(TourPolicy policy);
-        Task<bool> DeletePolicyAsync(int id);
+        // Tour Policy Operations (Basic)
+        Task<bool> TourHasPoliciesAsync(int tourId);
         Task<bool> PolicyLinkExistsAsync(int tourId, int policyId);
 
-        // Marketing tag operations with DTOs
-        Task<List<MarketingTagDto>> GetMarketingTagsByTourIdAsync(int tourId);
-        Task<MarketingTagDto> CreateMarketingTagAsync(TourCategory category);
-        Task<bool> DeleteMarketingTagAsync(int tourId, int categoryId);
+        // Marketing Tag Operations (Basic)
+        Task<bool> TourHasMarketingTagsAsync(int tourId);
 
         // Validation methods
         Task<bool> TourExistsAsync(int id);

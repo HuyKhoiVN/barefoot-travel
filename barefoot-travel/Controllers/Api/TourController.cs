@@ -391,12 +391,7 @@ namespace barefoot_travel.Controllers.Api
 
         private string GetAdminUsername()
         {
-            var usernameClaim = User.FindFirst("username")?.Value;
-            if (string.IsNullOrEmpty(usernameClaim))
-            {
-                throw new UnauthorizedAccessException("Username not found in token");
-            }
-            return usernameClaim;
+            return GetUserIdFromClaims.GetUsername(User);
         }
 
         #endregion
