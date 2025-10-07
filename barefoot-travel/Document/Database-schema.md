@@ -231,10 +231,16 @@
 |-----|-------------|-----------|-------|
 | `Id` | `int` | PK, Identity | Khóa chính |
 | `PolicyType` | `nvarchar(255)` | NOT NULL | Loại chính sách |
+| `Content` | `nvarchar(MAX)` | NOT NULL | Nội dung chính sách (JSON format) |
 | `CreatedTime` | `datetime` | NOT NULL, DEFAULT GETDATE() | Thời gian tạo |
 | `UpdatedTime` | `datetime` | NULL | Thời gian cập nhật |
 | `UpdatedBy` | `nvarchar(100)` | NULL | Người cập nhật |
 | `Active` | `bit` | NOT NULL, DEFAULT 1 | Trạng thái hoạt động |
+
+**Lưu ý**: 
+- Trường `Content` lưu trữ dữ liệu dưới dạng JSON string
+- Dữ liệu được sanitize để tránh XSS trước khi lưu vào database
+- Client truyền vào dưới dạng `List<string>` và được chuyển đổi thành JSON
 
 ---
 

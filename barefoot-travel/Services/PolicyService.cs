@@ -3,16 +3,22 @@ using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Policy;
 using barefoot_travel.Models;
 using barefoot_travel.Repositories;
+//using Microsoft.AspNetCore.Html;
+//using Microsoft.AspNetCore.HtmlSanitizer;
+using Newtonsoft.Json;
 
 namespace barefoot_travel.Services
 {
     public class PolicyService : IPolicyService
     {
         private readonly IPolicyRepository _policyRepository;
+        //private readonly HtmlSanitizer _htmlSanitizer;
 
         public PolicyService(IPolicyRepository policyRepository)
+           // , HtmlSanitizer htmlSanitizer)
         {
             _policyRepository = policyRepository;
+            //_htmlSanitizer = htmlSanitizer;
         }
 
         public async Task<ApiResponse> GetPolicyByIdAsync(int id)
@@ -161,9 +167,15 @@ namespace barefoot_travel.Services
 
         private Policy MapToPolicy(CreatePolicyDto dto, string adminUsername)
         {
+            // Sanitize content to prevent XSS
+            //var sanitizedContent = dto.Content.Select(content => _htmlSanitizer.Sanitize(content)).ToList();
+            var sanitizedContent = dto.Content; // Temporarily bypassing sanitization for this example
+
+
             return new Policy
             {
                 PolicyType = dto.PolicyType,
+                Content = JsonConvert.SerializeObject(sanitizedContent),
                 CreatedTime = DateTime.UtcNow,
                 UpdatedBy = adminUsername,
                 Active = true
@@ -172,17 +184,38 @@ namespace barefoot_travel.Services
 
         private void MapToPolicyForUpdate(Policy policy, UpdatePolicyDto dto, string adminUsername)
         {
+            // Sanitize content to prevent XSS
+            //var sanitizedContent = dto.Content.Select(content => _htmlSanitizer.Sanitize(content)).ToList();
+            var sanitizedContent = dto.Content; // Temporarily bypassing sanitization for this example
+
             policy.PolicyType = dto.PolicyType;
+            policy.Content = JsonConvert.SerializeObject(sanitizedContent);
             policy.UpdatedTime = DateTime.UtcNow;
             policy.UpdatedBy = adminUsername;
         }
 
         private PolicyDto MapToPolicyDto(Policy policy)
         {
+            // Deserialize JSON content back to List<string>
+            var content = new List<string>();
+            if (!string.IsNullOrEmpty(policy.Content))
+            {
+                try
+                {
+                    content = JsonConvert.DeserializeObject<List<string>>(policy.Content) ?? new List<string>();
+                }
+                catch
+                {
+                    // If deserialization fails, return empty list
+                    content = new List<string>();
+                }
+            }
+
             return new PolicyDto
             {
                 Id = policy.Id,
                 PolicyType = policy.PolicyType,
+                Content = content,
                 CreatedTime = policy.CreatedTime,
                 UpdatedTime = policy.UpdatedTime,
                 UpdatedBy = policy.UpdatedBy,

@@ -143,5 +143,15 @@ namespace barefoot_travel.Controllers.Api
             var result = await _categoryService.GetAllType();
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get category tree
+        /// </summary>
+        [HttpGet("tree")]
+        public async Task<IActionResult> GetCategoryTree()
+        {
+            var result = await _categoryService.GetCategoryTreeAsync();
+            return Ok(result);
+        }
     }
 }

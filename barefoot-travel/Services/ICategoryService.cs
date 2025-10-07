@@ -17,5 +17,6 @@ namespace barefoot_travel.Services
         Task<ApiResponse> GetCategoriesByTypeAsync(string type);
         Task<ApiResponse> GetCategoriesByParentIdAsync(int? parentId);
         Task<ApiResponse> GetAllType();
+        Task<ApiResponse> GetCategoryTreeAsync();
     }
 }

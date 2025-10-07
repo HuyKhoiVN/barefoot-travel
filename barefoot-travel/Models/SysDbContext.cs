@@ -99,6 +99,7 @@ public partial class SysDbContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");

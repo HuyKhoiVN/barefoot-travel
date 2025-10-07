@@ -222,6 +222,21 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<ApiResponse> GetCategoryTreeAsync()
+        {
+            try
+            {
+                var categories = await _categoryRepository.GetAllAsync();
+                var categoryDtos = categories.Select(MapToCategoryDto).ToList();
+                var categoryTree = BuildCategoryTree(categoryDtos, null);
+                return new ApiResponse(true, "Category tree retrieved successfully", categoryTree);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving category tree: {ex.Message}");
+            }
+        }
+
         #region Private Helper Methods
 
         private Category MapToCategory(CreateCategoryDto dto, string adminUsername)
@@ -265,6 +280,27 @@ namespace barefoot_travel.Services
                 UpdatedBy = category.UpdatedBy,
                 Active = category.Active
             };
+        }
+
+        private List<CategoryTreeDto> BuildCategoryTree(List<CategoryDto> categories, int? parentId)
+        {
+            return categories
+                .Where(c => c.ParentId == parentId)
+                .Select(c => new CategoryTreeDto
+                {
+                    Id = c.Id,
+                    ParentId = c.ParentId,
+                    CategoryName = c.CategoryName,
+                    Enable = c.Enable,
+                    Type = c.Type,
+                    Priority = c.Priority,
+                    CreatedTime = c.CreatedTime,
+                    UpdatedTime = c.UpdatedTime,
+                    UpdatedBy = c.UpdatedBy,
+                    Active = c.Active,
+                    Children = BuildCategoryTree(categories, c.Id)
+                })
+                .ToList();
         }
 
         #endregion
