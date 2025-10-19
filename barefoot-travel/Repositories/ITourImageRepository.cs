@@ -14,5 +14,7 @@ namespace barefoot_travel.Repositories
         Task<bool> ExistsAsync(int id);
         Task<bool> TourHasImagesAsync(int tourId);
         Task<int> GetImageCountByTourIdAsync(int tourId);
+        Task<bool> UpdateBanner(int id);
+        Task<bool> RemoveBanner(int id);
     }
 }

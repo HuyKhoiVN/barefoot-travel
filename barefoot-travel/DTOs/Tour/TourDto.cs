@@ -15,6 +15,7 @@ namespace barefoot_travel.DTOs.Tour
         public DateTime? UpdatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public bool Active { get; set; }
+        public List<TourImageDto> Images { get; set; } = new List<TourImageDto>();
     }
 
     public class TourDetailDto : TourDto
@@ -32,6 +33,9 @@ namespace barefoot_travel.DTOs.Tour
         public string ImageUrl { get; set; } = string.Empty;
         public bool IsBanner { get; set; }
         public DateTime CreatedTime { get; set; }
+        public DateTime? UpdatedTime { get; set; }
+        public string? UpdatedBy { get; set; }
+        public bool Active { get; set; }
     }
 
     public class CategoryDto

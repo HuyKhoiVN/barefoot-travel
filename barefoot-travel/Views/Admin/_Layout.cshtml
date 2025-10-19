@@ -50,24 +50,88 @@
         baseUrl += "/";
     }
     
-    // Global AJAX setup
-    $.ajaxSetup({
-      beforeSend: function(xhr) {
-        // Add JWT token to all requests
-        var token = localStorage.getItem('jwt_token');
-        if (token) {
-          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      // Global AJAX setup
+    let isRefreshing = false;
+    let failedQueue = [];
+
+    function processQueue(error, token = null) {
+      failedQueue.forEach(prom => {
+        if (error) {
+          prom.reject(error);
+        } else {
+          prom.resolve(token);
         }
-      },
-      error: function(xhr, status, error) {
-        if (xhr.status === 401) {
-          // Handle unauthorized access
-          localStorage.removeItem('jwt_token');
-          localStorage.removeItem('refresh_token');
-          window.location.href = '/Home/Login';
+      });
+      
+      failedQueue = [];
+    }
+
+    function retryRequest(originalRequest) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then(token => {
+        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+        return originalRequest;
+      }).catch(err => {
+        return Promise.reject(err);
+      });
+    }
+      $.ajaxSetup({
+        beforeSend: function(xhr) {
+          // Add JWT token to all requests
+          var token = localStorage.getItem('jwt_token');
+          if (token) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+          }
+        },
+        error: function(xhr, status, error) {
+          if (xhr.status === 401 && !isRefreshing) {
+            isRefreshing = true;
+            
+            const refreshToken = localStorage.getItem('refresh_token');
+            if (refreshToken) {
+              // Try to refresh token
+              $.ajax({
+                url: baseUrl + 'api/auth/refresh',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ refreshToken: refreshToken }),
+                success: function(response) {
+                  if (response.success && response.data) {
+                    localStorage.setItem('jwt_token', response.data.accessToken);
+                    if (response.data.refreshToken) {
+                      localStorage.setItem('refresh_token', response.data.refreshToken);
+                    }
+                    console.log('Token refreshed successfully');
+                    processQueue(null, response.data.accessToken);
+                  } else {
+                    // Refresh failed, redirect to login
+                    localStorage.removeItem('jwt_token');
+                    localStorage.removeItem('refresh_token');
+                    processQueue(new Error('Token refresh failed'), null);
+                    window.location.href = '/Home/Login';
+                  }
+                },
+                error: function() {
+                  // Refresh failed, redirect to login
+                  localStorage.removeItem('jwt_token');
+                  localStorage.removeItem('refresh_token');
+                  processQueue(new Error('Token refresh failed'), null);
+                  window.location.href = '/Home/Login';
+                },
+                complete: function() {
+                  isRefreshing = false;
+                }
+              });
+            } else {
+              // No refresh token, redirect to login
+              localStorage.removeItem('jwt_token');
+              localStorage.removeItem('refresh_token');
+              window.location.href = '/Home/Login';
+            }
+          }
         }
-      }
-    });
+      });
 
     // Logout function
     window.logout = function() {
@@ -85,24 +149,139 @@
         return;
       }
 
+      // Check if token is about to expire (within 5 minutes)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const exp = payload.exp * 1000; // Convert to milliseconds
+        const now = Date.now();
+        const timeUntilExpiry = exp - now;
+        
+        // If token expires within 5 minutes, try to refresh
+        if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > 0) {
+          refreshToken();
+          return;
+        }
+        
+        // If token is already expired, redirect to login
+        if (timeUntilExpiry <= 0) {
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/Home/Login';
+          return;
+        }
+      } catch (error) {
+        console.warn('Error parsing token:', error);
+        // If we can't parse the token, try to verify it with the server
+      }
+
       // Verify token is still valid
       $.ajax({
         url: baseUrl + 'api/auth/profile',
         type: 'GET',
         success: function(response) {
           if (!response.success) {
-            // Token is invalid, redirect to login
+            // Token is invalid, try to refresh
+            refreshToken();
+          }
+        },
+        error: function(xhr) {
+          if (xhr.status === 401) {
+            // Token is invalid, try to refresh
+            refreshToken();
+          } else {
+            // Other error, redirect to login
             localStorage.removeItem('jwt_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/Home/Login';
+          }
+        }
+      });
+    };
+
+    // Refresh token function
+    function refreshToken() {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) {
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/Home/Login';
+        return;
+      }
+
+      $.ajax({
+        url: baseUrl + 'api/auth/refresh',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ refreshToken: refreshToken }),
+        success: function(response) {
+          if (response.success && response.data) {
+            localStorage.setItem('jwt_token', response.data.accessToken);
+            if (response.data.refreshToken) {
+              localStorage.setItem('refresh_token', response.data.refreshToken);
+            }
+            console.log('Token refreshed successfully');
+          } else {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('refresh_token');
             window.location.href = '/Home/Login';
           }
         },
         error: function() {
-          // Token is invalid, redirect to login
           localStorage.removeItem('jwt_token');
+          localStorage.removeItem('refresh_token');
           window.location.href = '/Home/Login';
         }
       });
-    };
+    }
+
+    // Helper function to make authenticated AJAX calls
+    function makeAuthenticatedRequest(options) {
+      const originalError = options.error;
+      
+      options.error = function(xhr, status, error) {
+        if (xhr.status === 401) {
+          // Try to refresh token
+          const refreshToken = localStorage.getItem('refresh_token');
+          if (refreshToken) {
+            $.ajax({
+              url: baseUrl + 'api/auth/refresh',
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify({ refreshToken: refreshToken }),
+              success: function(response) {
+                if (response.success && response.data) {
+                  localStorage.setItem('jwt_token', response.data.accessToken);
+                  if (response.data.refreshToken) {
+                    localStorage.setItem('refresh_token', response.data.refreshToken);
+                  }
+                  // Retry the original request
+                  options.beforeSend = function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + response.data.accessToken);
+                  };
+                  $.ajax(options);
+                } else {
+                  localStorage.removeItem('jwt_token');
+                  localStorage.removeItem('refresh_token');
+                  window.location.href = '/Home/Login';
+                }
+              },
+              error: function() {
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = '/Home/Login';
+              }
+            });
+          } else {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/Home/Login';
+          }
+        } else if (originalError) {
+          originalError(xhr, status, error);
+        }
+      };
+      
+      return $.ajax(options);
+    }
 
     // Check authentication on page load
     $(document).ready(function() {

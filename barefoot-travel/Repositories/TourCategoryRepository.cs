@@ -81,6 +81,24 @@ namespace barefoot_travel.Repositories
             return true;
         }
 
+        public async Task<bool> DeleteByTourIdAsync(int tourId)
+        {
+            var categories = await _context.TourCategories
+                .Where(tc => tc.TourId == tourId && tc.Active)
+                .ToListAsync();
+
+            if (!categories.Any()) return false;
+
+            foreach (var category in categories)
+            {
+                category.Active = false;
+                category.UpdatedTime = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> ExistsAsync(int id)
         {
             return await _context.TourCategories

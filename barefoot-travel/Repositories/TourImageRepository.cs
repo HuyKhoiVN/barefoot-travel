@@ -111,5 +111,39 @@ namespace barefoot_travel.Repositories
                 .Where(ti => ti.TourId == tourId && ti.Active)
                 .CountAsync();
         }
+
+        public async Task<bool> UpdateBanner(int id)
+        {
+            var image = await _context.TourImages
+                .Where(ti => ti.Id == id && ti.Active)
+                .FirstOrDefaultAsync();
+            if (image == null) return false;
+
+            var imagelist = await _context.TourImages
+                .Where(ti => ti.TourId == image.TourId && ti.Id != id && ti.Active && ti.IsBanner)
+                .ToListAsync();
+            foreach (var img in imagelist)
+            {
+                img.IsBanner = false;
+                img.UpdatedTime = DateTime.UtcNow;
+            }
+
+            image.IsBanner = true;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveBanner(int id)
+        {
+            var image = await _context.TourImages
+                .Where(ti => ti.Id == id && ti.Active)
+                .FirstOrDefaultAsync();
+            if (image == null) return false;
+            image.IsBanner = false;
+            image.UpdatedTime = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

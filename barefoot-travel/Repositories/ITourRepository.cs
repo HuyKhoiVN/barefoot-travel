@@ -19,7 +19,7 @@ namespace barefoot_travel.Repositories
         // Tour with related data - DTO methods with joins
         Task<TourDetailDto?> GetTourDetailByIdAsync(int id);
         Task<List<TourDto>> GetToursWithBasicInfoAsync();
-        Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", int? categoryId = null, bool? active = null);
+        Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null);
         Task<List<TourDto>> GetToursByCategoryAsync(int categoryId);
 
         // Optimized bulk operations

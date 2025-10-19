@@ -233,7 +233,7 @@ namespace barefoot_travel.Repositories
                          }).ToListAsync();
         }
 
-        public async Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", int? categoryId = null, bool? active = null)
+        public async Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null)
         {
             // Build base query with optimized filtering
             var baseQuery = _context.Tours.AsQueryable();
@@ -248,11 +248,17 @@ namespace barefoot_travel.Repositories
                 baseQuery = baseQuery.Where(t => t.Active);
             }
 
+            // Apply search filter by title
+            if (!string.IsNullOrEmpty(search))
+            {
+                baseQuery = baseQuery.Where(t => t.Title.Contains(search));
+            }
+
             // Apply category filter with optimized join
-            if (categoryId.HasValue)
+            if (categoryIds != null && categoryIds.Any())
             {
                 baseQuery = baseQuery.Where(t => _context.TourCategories
-                    .Any(tc => tc.TourId == t.Id && tc.CategoryId == categoryId && tc.Active));
+                    .Any(tc => tc.TourId == t.Id && categoryIds.Contains(tc.CategoryId) && tc.Active));
             }
 
             // Apply sorting with server-side processing
@@ -274,7 +280,7 @@ namespace barefoot_travel.Repositories
             var totalItems = await sortedQuery.CountAsync();
             var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-            // Execute paginated query with projection to DTO
+            // Execute paginated query with projection to DTO including images
             var items = await sortedQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -292,7 +298,21 @@ namespace barefoot_travel.Repositories
                     CreatedTime = t.CreatedTime,
                     UpdatedTime = t.UpdatedTime,
                     UpdatedBy = t.UpdatedBy,
-                    Active = t.Active
+                    Active = t.Active,
+                    Images = _context.TourImages
+                        .Where(ti => ti.TourId == t.Id && ti.Active)
+                        .Select(ti => new TourImageDto
+                        {
+                            Id = ti.Id,
+                            TourId = ti.TourId,
+                            ImageUrl = ti.ImageUrl,
+                            IsBanner = ti.IsBanner,
+                            CreatedTime = ti.CreatedTime,
+                            UpdatedTime = ti.UpdatedTime,
+                            UpdatedBy = ti.UpdatedBy,
+                            Active = ti.Active
+                        })
+                        .ToList()
                 })
                 .ToListAsync();
 

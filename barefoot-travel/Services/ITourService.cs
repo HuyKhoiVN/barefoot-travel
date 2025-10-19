@@ -9,7 +9,7 @@ namespace barefoot_travel.Services
         // Tour CRUD operations
         Task<ApiResponse> GetTourByIdAsync(int id);
         Task<ApiResponse> GetAllToursAsync();
-        Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", int? categoryId = null, bool? active = null);
+        Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null);
         Task<ApiResponse> CreateTourAsync(CreateTourDto dto, string adminUsername);
         Task<ApiResponse> UpdateTourAsync(int id, UpdateTourDto dto, string adminUsername);
         Task<ApiResponse> DeleteTourAsync(int id, string adminUsername);
@@ -30,6 +30,9 @@ namespace barefoot_travel.Services
         Task<ApiResponse> UpdateTourImageAsync(int id, UpdateTourImageDto dto, string adminUsername);
         Task<ApiResponse> DeleteTourImageAsync(int id, string adminUsername);
         Task<ApiResponse> GetTourImagesAsync(int tourId);
+        Task<ApiResponse> UploadTourImageAsync(CreateTourImageDto dto, IFormFile file, string adminUsername);
+        Task<ApiResponse> SetTourImageAsBannerAsync(int imageId, string adminUsername);
+        Task<ApiResponse> RemoveTourImageBannerAsync(int imageId, string adminUsername);
 
         // TourCategory operations
         Task<ApiResponse> CreateTourCategoryAsync(CreateTourCategoryDto dto, string adminUsername);

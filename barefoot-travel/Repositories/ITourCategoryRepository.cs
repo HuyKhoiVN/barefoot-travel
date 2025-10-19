@@ -10,6 +10,7 @@ namespace barefoot_travel.Repositories
         Task<List<TourCategoryResponseDto>> GetByTourIdAsync(int tourId);
         Task<TourCategoryResponseDto> CreateAsync(TourCategory category);
         Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteByTourIdAsync(int tourId);
         Task<bool> ExistsAsync(int id);
         Task<bool> LinkExistsAsync(int tourId, int categoryId);
         Task<List<MarketingTagDto>> GetMarketingTagsByTourIdAsync(int tourId);

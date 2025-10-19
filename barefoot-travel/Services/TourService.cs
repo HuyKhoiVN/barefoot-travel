@@ -5,6 +5,8 @@ using barefoot_travel.DTOs.Tour;
 using barefoot_travel.Models;
 using barefoot_travel.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace barefoot_travel.Services
 {
@@ -66,11 +68,11 @@ namespace barefoot_travel.Services
             }
         }
 
-        public async Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", int? categoryId = null, bool? active = null)
+        public async Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null)
         {
             try
             {
-                return await _tourRepository.GetToursPagedWithBasicInfoAsync(page, pageSize, sortBy, sortOrder, categoryId, active);
+                return await _tourRepository.GetToursPagedWithBasicInfoAsync(page, pageSize, sortBy, sortOrder, categoryIds, search, active);
             }
             catch (Exception ex)
             {
@@ -110,6 +112,7 @@ namespace barefoot_travel.Services
 
         public async Task<ApiResponse> UpdateTourAsync(int id, UpdateTourDto dto, string adminUsername)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var tour = await _tourRepository.GetByIdAsync(id);
@@ -124,14 +127,21 @@ namespace barefoot_travel.Services
                     return new ApiResponse(false, "Tour title already exists");
                 }
 
+                // Update tour basic info
                 MapToTourForUpdate(tour, dto, adminUsername);
                 await _tourRepository.UpdateAsync(tour);
+
+                // Update related data within transaction
+                await UpdateTourRelatedDataAsync(id, dto, adminUsername);
+
+                await transaction.CommitAsync();
 
                 var tourDto = MapToTourDto(tour);
                 return new ApiResponse(true, "Tour updated successfully", tourDto);
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return new ApiResponse(false, $"Error updating tour: {ex.Message}");
             }
         }
@@ -661,10 +671,11 @@ namespace barefoot_travel.Services
                 }
             }
 
-            // Create categories
+            // Create categories with parent-child logic
             if (dto.Categories.Any())
             {
-                foreach (var categoryId in dto.Categories)
+                var categoriesToAdd = await GetCategoriesWithParentsAsync(dto.Categories);
+                foreach (var categoryId in categoriesToAdd)
                 {
                     var tourCategory = new TourCategory
                     {
@@ -709,6 +720,78 @@ namespace barefoot_travel.Services
                     await _tourPolicyRepository.CreateAsync(tourPolicy);
                 }
             }
+        }
+
+        private async Task UpdateTourRelatedDataAsync(int tourId, UpdateTourDto dto, string adminUsername)
+        {
+            // Update categories with parent-child logic
+            if (dto.Categories != null)
+            {
+                // Remove existing categories
+                await _tourCategoryRepository.DeleteByTourIdAsync(tourId);
+                
+                // Add new categories with parent logic
+                if (dto.Categories.Any())
+                {
+                    var categoriesToAdd = await GetCategoriesWithParentsAsync(dto.Categories);
+                    foreach (var categoryId in categoriesToAdd)
+                    {
+                        var tourCategory = new TourCategory
+                        {
+                            TourId = tourId,
+                            CategoryId = categoryId,
+                            CreatedTime = DateTime.UtcNow,
+                            Active = true
+                        };
+                        await _tourCategoryRepository.CreateAsync(tourCategory);
+                    }
+                }
+            }
+
+            // Update policies
+            if (dto.Policies != null)
+            {
+                // Remove existing policies
+                await _tourPolicyRepository.DeleteByTourIdAsync(tourId);
+                
+                // Add new policies
+                if (dto.Policies.Any())
+                {
+                    foreach (var policyId in dto.Policies)
+                    {
+                        var tourPolicy = new TourPolicy
+                        {
+                            TourId = tourId,
+                            PolicyId = policyId,
+                            CreatedTime = DateTime.UtcNow,
+                            Active = true
+                        };
+                        await _tourPolicyRepository.CreateAsync(tourPolicy);
+                    }
+                }
+            }
+        }
+
+        private async Task<List<int>> GetCategoriesWithParentsAsync(List<int> selectedCategoryIds)
+        {
+            var allCategories = await _context.Categories.ToListAsync();
+            var categoriesToAdd = new HashSet<int>();
+
+            foreach (var categoryId in selectedCategoryIds)
+            {
+                // Add the selected category
+                categoriesToAdd.Add(categoryId);
+                
+                // Add all parent categories
+                var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
+                while (category?.ParentId != null)
+                {
+                    categoriesToAdd.Add(category.ParentId.Value);
+                    category = allCategories.FirstOrDefault(c => c.Id == category.ParentId.Value);
+                }
+            }
+
+            return categoriesToAdd.ToList();
         }
 
         private Tour MapToTour(CreateTourDto dto, string adminUsername)
@@ -761,6 +844,139 @@ namespace barefoot_travel.Services
                 UpdatedBy = tour.UpdatedBy,
                 Active = tour.Active
             };
+        }
+
+        #endregion
+
+        #region Enhanced TourImage Operations
+
+        public async Task<ApiResponse> UploadTourImageAsync(CreateTourImageDto dto, IFormFile file, string adminUsername)
+        {
+            try
+            {
+                // Upload file first
+                var uploadResult = await UploadFileAsync(file);
+                if (!uploadResult.Success)
+                {
+                    return uploadResult;
+                }
+
+                // Update DTO with uploaded file URL
+                dto.ImageUrl = uploadResult.Data?.ToString() ?? "";
+
+                // Create tour image record
+                return await CreateTourImageAsync(dto, adminUsername);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error uploading tour image: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> SetTourImageAsBannerAsync(int imageId, string adminUsername)
+        {
+            try
+            {
+                var image = await _tourImageRepository.GetByIdAsync(imageId);
+                if (image == null)
+                {
+                    return new ApiResponse(false, "Image not found");
+                }
+
+                await _tourImageRepository.UpdateBanner(imageId);
+
+                return new ApiResponse(true, "Image set as banner successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error setting image as banner: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> RemoveTourImageBannerAsync(int imageId, string adminUsername)
+        {
+            try
+            {
+                await _tourImageRepository.RemoveBanner(imageId);
+                return new ApiResponse(true, "Banner status removed successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error removing banner status: {ex.Message}");
+            }
+        }
+
+        private async Task<ApiResponse> UploadFileAsync(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return new ApiResponse(false, "No file provided");
+                }
+
+                // Validate file type
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return new ApiResponse(false, "Invalid file type. Only JPG, JPEG, PNG, GIF, and WebP files are allowed");
+                }
+
+                // Validate file size (max 10MB)
+                if (file.Length > 10 * 1024 * 1024)
+                {
+                    return new ApiResponse(false, "File size too large. Maximum size is 10MB");
+                }
+
+                // Generate unique filename
+                var fileName = GenerateUniqueFileName(file.FileName);
+
+                // Create directory if it doesn't exist
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+
+                // Save file
+                var filePath = Path.Combine(uploadPath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Generate URL
+                var fileUrl = $"/uploads/{fileName}";
+
+                return new ApiResponse(true, "File uploaded successfully", fileUrl);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error uploading file: {ex.Message}");
+            }
+        }
+
+        private string GenerateUniqueFileName(string originalFileName)
+        {
+            var extension = Path.GetExtension(originalFileName);
+            var nameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+
+            // Generate hash from original name and timestamp
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            var hash = ComputeHash(nameWithoutExtension + timestamp);
+
+            return $"{hash}{extension}";
+        }
+
+        private string ComputeHash(string input)
+        {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+                return Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
+            }
         }
 
         #endregion

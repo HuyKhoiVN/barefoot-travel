@@ -133,7 +133,7 @@ namespace barefoot_travel.Services
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: credentials
             );
 

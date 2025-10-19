@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Tour Management";
     Layout = "~/Views/Admin/_Layout.cshtml";
 }
@@ -29,20 +29,10 @@
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label class="form-label">Category</label>
-                            <select class="form-select" id="categoryFilter">
-                                <option value="">All Categories</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="statusFilter">
-                                <option value="">All Status</option>
-                                <option value="true">Active</option>
-                                <option value="false">Inactive</option>
-                            </select>
+                            <label class="form-label">Categories</label>
+                            <div id="categoryFilter" class="border rounded p-3" style="max-height: 100px; overflow-y: auto;">
+                                <!-- Categories will be loaded here -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -65,7 +55,6 @@
                                 <th scope="col" class="px-0 text-muted">Price</th>
                                 <th scope="col" class="px-0 text-muted">Duration</th>
                                 <th scope="col" class="px-0 text-muted">Max People</th>
-                                <th scope="col" class="px-0 text-muted">Status</th>
                                 <th scope="col" class="px-0 text-muted text-end">Actions</th>
                             </tr>
                         </thead>
@@ -144,23 +133,88 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="createDescription" rows="4" required></textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Use rich text editor for better formatting</span>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openDescriptionEditor('create')">
+                                <i class="ti ti-edit me-1"></i>Edit Description
+                            </button>
+                        </div>
+                        <div id="createDescriptionPreview" class="border rounded p-3 bg-light" style="min-height: 100px; max-height: 300px; overflow-y: auto;">
+                            <p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>
+                        </div>
+                        <style>
+                            #createDescriptionPreview img, #editDescriptionPreview img {
+                                max-width: 100% !important;
+                                height: auto !important;
+                                max-height: 200px !important;
+                                object-fit: contain !important;
+                                display: block !important;
+                                margin: 5px auto !important;
+                                border-radius: 4px !important;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+                            }
+                            
+                            /* Ensure tour images are not affected by description styles */
+                            .image-card img {
+                                max-width: 100% !important;
+                                height: 150px !important;
+                                object-fit: cover !important;
+                                display: block !important;
+                                margin: 0 !important;
+                                border-radius: 0.375rem 0.375rem 0 0 !important;
+                                box-shadow: none !important;
+                            }
+                            
+                            /* Custom scrollbar for description preview */
+                            #createDescriptionPreview::-webkit-scrollbar,
+                            #editDescriptionPreview::-webkit-scrollbar {
+                                width: 8px;
+                            }
+                            
+                            #createDescriptionPreview::-webkit-scrollbar-track,
+                            #editDescriptionPreview::-webkit-scrollbar-track {
+                                background: #f1f1f1;
+                                border-radius: 4px;
+                            }
+                            
+                            #createDescriptionPreview::-webkit-scrollbar-thumb,
+                            #editDescriptionPreview::-webkit-scrollbar-thumb {
+                                background: #c1c1c1;
+                                border-radius: 4px;
+                            }
+                            
+                            #createDescriptionPreview::-webkit-scrollbar-thumb:hover,
+                            #editDescriptionPreview::-webkit-scrollbar-thumb:hover {
+                                background: #a8a8a8;
+                            }
+                            
+                            /* Ensure modal doesn't get too tall */
+                            .modal-xl {
+                                max-height: 90vh;
+                            }
+                            
+                            .modal-body {
+                                max-height: 70vh;
+                                overflow-y: auto;
+                            }
+                        </style>
+                        <textarea class="form-control d-none" id="createDescription" required></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Categories</label>
-                                <select class="form-select" id="createCategories" multiple>
+                                <div id="createCategories" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
                                     <!-- Categories will be loaded here -->
-                                </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Policies</label>
-                                <select class="form-select" id="createPolicies" multiple>
+                                <div id="createPolicies" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
                                     <!-- Policies will be loaded here -->
-                                </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -233,23 +287,32 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="editDescription" rows="4" required></textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Use rich text editor for better formatting</span>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openDescriptionEditor('edit')">
+                                <i class="ti ti-edit me-1"></i>Edit Description
+                            </button>
+                        </div>
+                        <div id="editDescriptionPreview" class="border rounded p-3 bg-light" style="min-height: 100px; max-height: 300px; overflow-y: auto;">
+                            <p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>
+                        </div>
+                        <textarea class="form-control d-none" id="editDescription" required></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Categories</label>
-                                <select class="form-select" id="editCategories" multiple>
+                                <div id="editCategories" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
                                     <!-- Categories will be loaded here -->
-                                </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Policies</label>
-                                <select class="form-select" id="editPolicies" multiple>
+                                <div id="editPolicies" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
                                     <!-- Policies will be loaded here -->
-                                </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -281,6 +344,129 @@
     </div>
 </div>
 
+<!-- Tour Images Management Modal -->
+<div class="modal fade" id="tourImagesModal" tabindex="-1" aria-labelledby="tourImagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tourImagesModalLabel">Manage Tour Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label">Upload New Images</label>
+                            <div class="border rounded p-3 text-center">
+                                <input type="file" id="tourImageUpload" class="form-control" accept="image/*" multiple>
+                                <small class="text-muted">Select multiple images to upload</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tour Images</label>
+                            <div id="tourImagesList" class="border rounded p-3" style="min-height: 300px;">
+                                <div class="text-center text-muted">
+                                    <i class="ti ti-image fs-1"></i>
+                                    <p class="mt-2">No images uploaded yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Image Preview</label>
+                            <div id="imagePreview" class="border rounded p-3 text-center" style="min-height: 200px;">
+                                <p class="text-muted">Select an image to preview</p>
+                            </div>
+                        </div>
+                        
+                                    <div class="mb-3">
+                                        <label class="form-label">Image Actions</label>
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-success" id="setBannerBtn" disabled>
+                                                <i class="ti ti-star me-1"></i>Set as Banner
+                                            </button>
+                                            <button type="button" class="btn btn-warning" id="removeBannerBtn" disabled>
+                                                <i class="ti ti-star-off me-1"></i>Remove Banner
+                                            </button>
+                                            <button type="button" class="btn btn-danger" id="deleteImageBtn" disabled>
+                                                <i class="ti ti-trash me-1"></i>Delete Image
+                                            </button>
+                                        </div>
+                                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description Editor Modal -->
+<div class="modal fade" id="descriptionEditorModal" tabindex="-1" aria-labelledby="descriptionEditorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="descriptionEditorModalLabel">Edit Tour Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label">Description Content</label>
+                            <div id="richTextEditor" style="min-height: 400px; max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;"></div>
+                        </div>
+                        <style>
+                            #richTextEditor .ql-editor img {
+                                max-width: 100% !important;
+                                height: auto !important;
+                                max-height: 300px !important;
+                                object-fit: contain !important;
+                                display: block !important;
+                                margin: 10px auto !important;
+                                cursor: pointer !important;
+                                border: 2px solid transparent !important;
+                                transition: border-color 0.3s ease !important;
+                            }
+                            
+                            #richTextEditor .ql-editor img:hover {
+                                border-color: #007bff !important;
+                            }
+                            
+                            #richTextEditor .ql-editor img.resizing {
+                                border-color: #28a745 !important;
+                            }
+                        </style>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Upload Images</label>
+                            <div class="border rounded p-3 text-center">
+                                <input type="file" id="imageUpload" class="form-control" accept="image/*" multiple>
+                                <small class="text-muted">Upload images to use in description</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Uploaded Images</label>
+                            <div id="uploadedImages" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                <p class="text-muted text-center">No images uploaded</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveDescriptionBtn">Save Description</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -301,28 +487,909 @@
 </div>
 
 @section Scripts {
+<!-- Include Quill.js for rich text editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
 <script>
 $(document).ready(function() {
     let currentPage = 1;
     let pageSize = 10;
     let currentFilters = {};
+    let currentEditorMode = ''; // 'create' or 'edit'
+    let quillEditor = null;
+    let uploadedImages = [];
+    let currentTourId = null;
+    let tourImages = [];
+    let selectedImageId = null;
+    let isLoading = false;
+
+    // Get JWT token and create headers
+    function getAuthHeaders() {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            return {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            };
+        }
+        return {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    // Get JWT token for form data requests
+    function getAuthHeadersForFormData() {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            return {
+                'Authorization': 'Bearer ' + token
+            };
+        }
+        return {};
+    }
+
+    // Handle authentication errors
+    function handleAuthError(xhr) {
+        if (xhr.status === 401) {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/Home/Login';
+            return true;
+        }
+        return false;
+    }
+
+    // Loading animation functions
+    function showLoading() {
+        if (!isLoading) {
+            isLoading = true;
+            $('body').append(`
+                <div id="loadingOverlay" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 9999;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                ">
+                    <div class="text-center text-white">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Loading...</div>
+                    </div>
+                </div>
+            `);
+        }
+    }
+
+    function hideLoading() {
+        if (isLoading) {
+            isLoading = false;
+            $('#loadingOverlay').remove();
+        }
+    }
 
     // Initialize page
     loadTours();
     loadCategories();
     loadPolicies();
 
+    // Reload tours when modals are closed (only if changes were made)
+    let tourDataChanged = false;
+
+    $('#createTourModal').on('hidden.bs.modal', function() {
+        if (tourDataChanged) {
+            loadTours();
+            tourDataChanged = false;
+        }
+    });
+
+    $('#editTourModal').on('hidden.bs.modal', function() {
+        if (tourDataChanged) {
+            loadTours();
+            tourDataChanged = false;
+        }
+    });
+
+    $('#tourImagesModal').on('hidden.bs.modal', function() {
+        if (tourDataChanged) {
+            loadTours();
+            tourDataChanged = false;
+        }
+    });
+
+    $('#confirmModal').on('hidden.bs.modal', function() {
+        if (tourDataChanged) {
+            loadTours();
+            tourDataChanged = false;
+        }
+    });
+
+    // Handle image upload
+    $('#imageUpload').on('change', function(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            uploadImages(files);
+        }
+    });
+
+    // Handle save description
+    $('#saveDescriptionBtn').on('click', function() {
+        saveDescription();
+    });
+
+    // Handle tour image upload
+    $('#tourImageUpload').on('change', function(e) {
+        const files = e.target.files;
+        if (files.length > 0 && currentTourId) {
+            uploadTourImages(files);
+        }
+    });
+
+    // Handle image actions
+    $('#setBannerBtn').on('click', function() {
+        if (selectedImageId) {
+            setImageAsBanner(selectedImageId);
+        }
+    });
+
+    $('#removeBannerBtn').on('click', function() {
+        if (selectedImageId) {
+            removeImageBanner(selectedImageId);
+        }
+    });
+
+    $('#deleteImageBtn').on('click', function() {
+        if (selectedImageId) {
+            deleteTourImage(selectedImageId);
+        }
+    });
+
+    // Function to open description editor
+    window.openDescriptionEditor = function(mode) {
+        currentEditorMode = mode;
+        
+        // Show modal first
+        $('#descriptionEditorModal').modal('show');
+        
+        // Use setTimeout to ensure modal is fully shown before loading content
+        setTimeout(function() {
+            // Ensure Quill editor is initialized
+            if (!quillEditor) {
+                quillEditor = new Quill('#richTextEditor', {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],
+                            [{ 'align': [] }],
+                            ['link', 'image'],
+                            ['clean']
+                        ]
+                    }
+                });
+
+                // Handle image toolbar button click
+                quillEditor.getModule('toolbar').addHandler('image', function() {
+                    // Trigger file input for image upload
+                    $('#imageUpload').click();
+                });
+
+                // Handle paste event to remove base64 images only
+                quillEditor.root.addEventListener('paste', function(e) {
+                    // Get clipboard data
+                    const clipboardData = e.clipboardData || window.clipboardData;
+                    const htmlData = clipboardData.getData('text/html');
+                    const textData = clipboardData.getData('text/plain');
+                    
+                    if (htmlData && htmlData.includes('<img')) {
+                        // Check if HTML contains base64 images
+                        const hasBase64Images = htmlData.includes('data:image/');
+                        
+                        if (hasBase64Images) {
+                            // If HTML contains base64 images, prevent default and handle manually
+                            e.preventDefault();
+                            
+                            // Clean HTML and remove only base64 images
+                            const cleanedHtml = cleanBase64ImagesFromHtml(htmlData);
+                            
+                            // Insert the cleaned content
+                            const range = quillEditor.getSelection();
+                            if (range) {
+                                quillEditor.clipboard.dangerouslyPasteHTML(range.index, cleanedHtml);
+                            } else {
+                                quillEditor.clipboard.dangerouslyPasteHTML(cleanedHtml);
+                            }
+                            
+                            // Show info message
+                            showAlert('Base64 images have been removed from pasted content. Please use the upload button to add images.', 'info');
+                        }
+                        // If no base64 images, let Quill handle normally
+                    }
+                    // If no images, let Quill handle normally
+                });
+
+                // Monitor text changes to remove any base64 images that might have been pasted
+                quillEditor.on('text-change', function() {
+                    // Use debounced cleaning for base64 images only
+                    cleanBase64ImagesFromEditor();
+                });
+
+                // Add image resize functionality
+                addImageResizeHandlers();
+            }
+
+            // Load existing content if editing
+            if (mode === 'edit') {
+                const existingContent = $('#editDescription').val();
+                if (existingContent && quillEditor) {
+                    quillEditor.root.innerHTML = existingContent;
+                    // Ensure images are properly styled after loading
+                    setTimeout(() => {
+                        const images = quillEditor.root.querySelectorAll('img');
+                        images.forEach(img => {
+                            img.style.maxWidth = '100%';
+                            img.style.height = 'auto';
+                            img.style.maxHeight = '300px';
+                            img.style.objectFit = 'contain';
+                            img.style.display = 'block';
+                            img.style.margin = '10px auto';
+                            img.style.cursor = 'pointer';
+                            img.style.border = '2px solid transparent';
+                            img.style.transition = 'border-color 0.3s ease';
+                        });
+                    }, 100);
+                } else if (quillEditor) {
+                    quillEditor.setContents([]);
+                }
+            } else if (mode === 'create') {
+                // Clear editor for create mode
+                if (quillEditor) {
+                    quillEditor.setContents([]);
+                }
+            }
+        }, 500); // Increased timeout to ensure modal and editor are ready
+    };
+
+    let cleanImagesTimeout = null;
+
+    // Function to clean base64 images from editor after paste
+    function cleanBase64ImagesFromEditor() {
+        if (!quillEditor) return;
+        
+        // Clear existing timeout
+        if (cleanImagesTimeout) {
+            clearTimeout(cleanImagesTimeout);
+        }
+        
+        // Debounce the cleaning to avoid too many calls
+        cleanImagesTimeout = setTimeout(() => {
+            try {
+                const images = quillEditor.root.querySelectorAll('img');
+                if (images.length > 0) {
+                    let removedCount = 0;
+                    images.forEach(img => {
+                        // Only remove base64 images, keep uploaded images from wwwroot
+                        const src = img.src || img.getAttribute('src') || '';
+                        if (src.startsWith('data:image/')) {
+                            img.remove();
+                            removedCount++;
+                        }
+                    });
+                    
+                    // Show a message to user only if images were actually removed
+                    if (removedCount > 0) {
+                        showAlert(`${removedCount} base64 image(s) have been removed from pasted content. Please use the upload button to add images.`, 'info');
+                    }
+                }
+            } catch (error) {
+                console.warn('Error cleaning base64 images from editor:', error);
+            }
+        }, 100);
+    }
+
+    // Function to clean HTML and remove only base64 images
+    function cleanBase64ImagesFromHtml(html) {
+        try {
+            // Create a temporary div to parse HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // Remove only base64 images, keep uploaded images from wwwroot
+            const images = tempDiv.querySelectorAll('img');
+            images.forEach(img => {
+                const src = img.src || img.getAttribute('src') || '';
+                // Only remove base64 images
+                if (src.startsWith('data:image/')) {
+                    // If image is in a paragraph or div by itself, remove the container too
+                    const parent = img.parentElement;
+                    if (parent && (parent.tagName === 'P' || parent.tagName === 'DIV')) {
+                        // Check if parent only contains the image and whitespace
+                        const textContent = parent.textContent.trim();
+                        if (textContent === '' || textContent === img.alt) {
+                            parent.remove();
+                        } else {
+                            img.remove();
+                        }
+                    } else {
+                        img.remove();
+                    }
+                }
+            });
+            
+            // Clean up any remaining empty elements
+            const emptyElements = tempDiv.querySelectorAll('p, div, span');
+            emptyElements.forEach(element => {
+                if (element.children.length === 0 && element.textContent.trim() === '') {
+                    element.remove();
+                }
+            });
+            
+            return tempDiv.innerHTML;
+        } catch (error) {
+            console.warn('Error cleaning HTML:', error);
+            // Fallback: return original HTML
+            return html;
+        }
+    }
+
+    // Function to add image resize handlers
+    function addImageResizeHandlers() {
+        if (!quillEditor) return;
+
+        // Add event listener for image clicks
+        quillEditor.root.addEventListener('click', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Add resizing class
+                e.target.classList.add('resizing');
+                
+                // Create resize handles
+                createResizeHandles(e.target);
+            }
+        });
+
+        // Remove resize handles when clicking elsewhere
+        quillEditor.root.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'IMG') {
+                removeResizeHandles();
+            }
+        });
+    }
+
+    // Function to create resize handles
+    function createResizeHandles(img) {
+        removeResizeHandles(); // Remove existing handles
+        
+        const rect = img.getBoundingClientRect();
+        const editorRect = quillEditor.root.getBoundingClientRect();
+        
+        const handle = document.createElement('div');
+        handle.className = 'resize-handle';
+        handle.style.cssText = `
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #007bff;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: se-resize;
+            z-index: 1000;
+            left: ${rect.right - editorRect.left - 5}px;
+            top: ${rect.bottom - editorRect.top - 5}px;
+        `;
+        
+        quillEditor.root.style.position = 'relative';
+        quillEditor.root.appendChild(handle);
+        
+        // Add resize functionality
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+        
+        handle.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = img.offsetWidth;
+            startHeight = img.offsetHeight;
+            
+            document.addEventListener('mousemove', handleResize);
+            document.addEventListener('mouseup', stopResize);
+            e.preventDefault();
+        });
+        
+        function handleResize(e) {
+            if (!isResizing) return;
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            const newWidth = Math.max(50, startWidth + deltaX);
+            const newHeight = Math.max(50, startHeight + deltaY);
+            
+            img.style.width = newWidth + 'px';
+            img.style.height = newHeight + 'px';
+            img.style.maxWidth = 'none';
+            img.style.maxHeight = 'none';
+            
+            // Update handle position
+            const newRect = img.getBoundingClientRect();
+            const editorRect = quillEditor.root.getBoundingClientRect();
+            handle.style.left = (newRect.right - editorRect.left - 5) + 'px';
+            handle.style.top = (newRect.bottom - editorRect.top - 5) + 'px';
+        }
+        
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+    }
+
+    // Function to remove resize handles
+    function removeResizeHandles() {
+        const existingHandle = quillEditor.root.querySelector('.resize-handle');
+        if (existingHandle) {
+            existingHandle.remove();
+        }
+        
+        // Remove resizing class from all images
+        const images = quillEditor.root.querySelectorAll('img');
+        images.forEach(img => img.classList.remove('resizing'));
+    }
+
+    // Function to upload images
+    function uploadImages(files) {
+        const formData = new FormData();
+        
+        Array.from(files).forEach(file => {
+            formData.append('file', file);
+        });
+
+        $.ajax({
+            url: baseUrl + 'api/fileupload/image',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: getAuthHeadersForFormData(),
+            success: function(response) {
+                if (response.success) {
+                    const imageUrl = response.data.fileUrl;
+                    uploadedImages.push({
+                        fileName: response.data.fileName,
+                        fileUrl: imageUrl,
+                        originalName: response.data.originalName
+                    });
+                    
+                    // Insert image into editor with proper styling
+                    if (quillEditor) {
+                        const range = quillEditor.getSelection();
+                        if (range) {
+                            quillEditor.insertEmbed(range.index, 'image', imageUrl);
+                            // Move cursor after the image
+                            quillEditor.setSelection(range.index + 1);
+                        } else {
+                            // If no selection, insert at the end
+                            const length = quillEditor.getLength();
+                            quillEditor.insertEmbed(length - 1, 'image', imageUrl);
+                            quillEditor.setSelection(length);
+                        }
+                        
+                        // Ensure the image is properly displayed
+                        setTimeout(() => {
+                            const images = quillEditor.root.querySelectorAll('img');
+                            images.forEach(img => {
+                                if (img.src === imageUrl) {
+                                    img.style.maxWidth = '100%';
+                                    img.style.height = 'auto';
+                                    img.style.maxHeight = '300px';
+                                    img.style.objectFit = 'contain';
+                                    img.style.display = 'block';
+                                    img.style.margin = '10px auto';
+                                    img.style.cursor = 'pointer';
+                                    img.style.border = '2px solid transparent';
+                                    img.style.transition = 'border-color 0.3s ease';
+                                }
+                            });
+                        }, 100);
+                    }
+                    
+                    // Update uploaded images display
+                    updateUploadedImagesDisplay();
+                    
+                    showAlert('Images uploaded successfully!', 'success');
+                } else {
+                    showAlert('Error uploading images: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error uploading images: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    // Function to update uploaded images display
+    function updateUploadedImagesDisplay() {
+        const container = $('#uploadedImages');
+        container.empty();
+        
+        if (uploadedImages.length === 0) {
+            container.html('<p class="text-muted text-center">No images uploaded</p>');
+            return;
+        }
+
+        uploadedImages.forEach((image, index) => {
+            const imageHtml = `
+                <div class="d-flex align-items-center mb-2 p-2 border rounded">
+                    <img src="${image.fileUrl}" class="rounded me-2" width="40" height="40" style="object-fit: cover;">
+                    <div class="flex-grow-1">
+                        <small class="d-block text-truncate">${image.originalName}</small>
+                        <small class="text-muted">${image.fileName}</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeUploadedImage(${index})">
+                        <i class="ti ti-x"></i>
+                    </button>
+                </div>
+            `;
+            container.append(imageHtml);
+        });
+    }
+
+    // Function to remove uploaded image
+    window.removeUploadedImage = function(index) {
+        const image = uploadedImages[index];
+        
+        // Delete from server
+        $.ajax({
+            url: baseUrl + 'api/fileupload/image',
+            type: 'DELETE',
+            data: { fileName: image.fileName },
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    uploadedImages.splice(index, 1);
+                    updateUploadedImagesDisplay();
+                    showAlert('Image removed successfully!', 'success');
+                } else {
+                    showAlert('Error removing image: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error removing image: ' + errorMessage, 'danger');
+            }
+        });
+    };
+
+    // Function to save description
+    function saveDescription() {
+        if (!quillEditor) {
+            showAlert('Editor not initialized', 'danger');
+            return;
+        }
+        
+        const htmlContent = quillEditor.root.innerHTML;
+        
+        if (currentEditorMode === 'create') {
+            $('#createDescription').val(htmlContent);
+            $('#createDescriptionPreview').html(htmlContent || '<p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>');
+            // Ensure images in preview are properly styled
+            setTimeout(() => {
+                const previewImages = $('#createDescriptionPreview img');
+                previewImages.each(function() {
+                    $(this).css({
+                        'max-width': '100%',
+                        'height': 'auto',
+                        'max-height': '200px',
+                        'object-fit': 'contain',
+                        'display': 'block',
+                        'margin': '5px auto',
+                        'border-radius': '4px',
+                        'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'
+                    });
+                });
+            }, 100);
+        } else if (currentEditorMode === 'edit') {
+            $('#editDescription').val(htmlContent);
+            $('#editDescriptionPreview').html(htmlContent || '<p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>');
+            // Ensure images in preview are properly styled
+            setTimeout(() => {
+                const previewImages = $('#editDescriptionPreview img');
+                previewImages.each(function() {
+                    $(this).css({
+                        'max-width': '100%',
+                        'height': 'auto',
+                        'max-height': '200px',
+                        'object-fit': 'contain',
+                        'display': 'block',
+                        'margin': '5px auto',
+                        'border-radius': '4px',
+                        'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'
+                    });
+                });
+            }, 100);
+        }
+        
+        // Clean up unused images
+        cleanupUnusedImages(htmlContent);
+        
+        $('#descriptionEditorModal').modal('hide');
+        showAlert('Description saved successfully!', 'success');
+    }
+
+    // Function to cleanup unused images (only from description, not tour images)
+    function cleanupUnusedImages(htmlContent) {
+        // Only cleanup if we have HTML content and it's from description editor
+        if (!htmlContent || !quillEditor) {
+            return;
+        }
+        
+        $.ajax({
+            url: baseUrl + 'api/fileupload/cleanup-unused-description-images',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: getAuthHeaders(),
+            data: JSON.stringify({
+                htmlContent: htmlContent,
+                folder: 'uploads'
+            }),
+            success: function(response) {
+                if (response.success && response.data.deletedCount > 0) {
+                    console.log(`Cleaned up ${response.data.deletedCount} unused description images`);
+                    // Don't show alert to user as this is background cleanup
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                console.error('Error cleaning up unused description images:', xhr.responseText);
+            }
+        });
+    }
+
+    // Function to manage tour images
+    window.manageTourImages = function(tourId) {
+        currentTourId = tourId;
+        selectedImageId = null;
+        
+        // Update modal title
+        $('#tourImagesModalLabel').text(`Manage Images - Tour ${tourId}`);
+        
+        // Load tour images
+        loadTourImages(tourId);
+        
+        // Show modal
+        $('#tourImagesModal').modal('show');
+    };
+
+    // Function to load tour images
+    function loadTourImages(tourId) {
+        $.ajax({
+            url: baseUrl + 'api/tourimage/tour/' + tourId,
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    tourImages = response.data || [];
+                    displayTourImages();
+                } else {
+                    showAlert('Error loading tour images: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error loading tour images: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    // Function to display tour images
+    function displayTourImages() {
+        const container = $('#tourImagesList');
+        container.empty();
+        
+        if (tourImages.length === 0) {
+            container.html(`
+                <div class="text-center text-muted">
+                    <i class="ti ti-image fs-1"></i>
+                    <p class="mt-2">No images uploaded yet</p>
+                </div>
+            `);
+            return;
+        }
+        
+        // Create a row container for proper grid layout
+        const rowHtml = '<div class="row"></div>';
+        container.html(rowHtml);
+        const rowContainer = container.find('.row');
+        
+        tourImages.forEach(image => {
+            const bannerBadge = image.isBanner ? '<span class="badge bg-warning">Banner</span>' : '';
+            const imageHtml = `
+                <div class="col-md-3 mb-3">
+                    <div class="card image-card ${image.isBanner ? 'border-warning' : ''}" data-image-id="${image.id}">
+                        <img src="${image.imageUrl}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Tour image">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${image.id}</small>
+                                ${bannerBadge}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            rowContainer.append(imageHtml);
+        });
+        
+        // Add click handlers
+        $('.image-card').on('click', function() {
+            $('.image-card').removeClass('border-primary');
+            $(this).addClass('border-primary');
+            selectedImageId = $(this).data('image-id');
+            showImagePreview(selectedImageId);
+            updateActionButtons();
+        });
+    }
+
+    // Function to show image preview
+    function showImagePreview(imageId) {
+        const image = tourImages.find(img => img.id === imageId);
+        if (image) {
+            $('#imagePreview').html(`
+                <img src="${image.imageUrl}" class="img-fluid rounded" alt="Preview">
+                <div class="mt-2">
+                    <small class="text-muted">ID: ${image.id}</small><br>
+                    <small class="text-muted">Banner: ${image.isBanner ? 'Yes' : 'No'}</small>
+                </div>
+            `);
+        }
+    }
+
+    // Function to update action buttons
+    function updateActionButtons() {
+        const image = tourImages.find(img => img.id === selectedImageId);
+        if (image) {
+            $('#setBannerBtn').prop('disabled', image.isBanner);
+            $('#removeBannerBtn').prop('disabled', !image.isBanner);
+            $('#deleteImageBtn').prop('disabled', false);
+        } else {
+            $('#setBannerBtn').prop('disabled', true);
+            $('#removeBannerBtn').prop('disabled', true);
+            $('#deleteImageBtn').prop('disabled', true);
+        }
+    }
+
+    // Function to upload tour images
+    function uploadTourImages(files) {
+        const formData = new FormData();
+        
+        Array.from(files).forEach(file => {
+            formData.append('file', file);
+        });
+
+        $.ajax({
+            url: baseUrl + 'api/tourimage/tour/' + currentTourId,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: getAuthHeadersForFormData(),
+            success: function(response) {
+                if (response.success) {
+                    showAlert('Images uploaded successfully!', 'success');
+                    tourDataChanged = true;
+                    loadTourImages(currentTourId);
+                } else {
+                    showAlert('Error uploading images: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error uploading images: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    // Function to set image as banner
+    function setImageAsBanner(imageId) {
+        $.ajax({
+            url: baseUrl + 'api/tourimage/' + imageId + '/set-banner',
+            type: 'PUT',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    showAlert('Image set as banner successfully!', 'success');
+                    tourDataChanged = true;
+                    loadTourImages(currentTourId);
+                } else {
+                    showAlert('Error setting banner: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error setting banner: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    // Function to remove image banner
+    function removeImageBanner(imageId) {
+        $.ajax({
+            url: baseUrl + 'api/tourimage/' + imageId + '/remove-banner',
+            type: 'PUT',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    showAlert('Banner status removed successfully!', 'success');
+                    tourDataChanged = true;
+                    loadTourImages(currentTourId);
+                } else {
+                    showAlert('Error removing banner: ' + response.message, 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error removing banner: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    // Function to delete tour image
+    function deleteTourImage(imageId) {
+        if (confirm('Are you sure you want to delete this image?')) {
+            $.ajax({
+                url: baseUrl + 'api/tourimage/' + imageId,
+                type: 'DELETE',
+                headers: getAuthHeaders(),
+                success: function(response) {
+                    if (response.success) {
+                        showAlert('Image deleted successfully!', 'success');
+                        tourDataChanged = true;
+                        loadTourImages(currentTourId);
+                        selectedImageId = null;
+                        $('#imagePreview').html('<p class="text-muted">Select an image to preview</p>');
+                        updateActionButtons();
+                    } else {
+                        showAlert('Error deleting image: ' + response.message, 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    if (handleAuthError(xhr)) return;
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                    showAlert('Error deleting image: ' + errorMessage, 'danger');
+                }
+            });
+        }
+    }
+
     // Search functionality
     $('#searchInput').on('input', debounce(function() {
-        currentFilters.search = $(this).val();
+                const searchValue = $('#searchInput').val() || '';
+        currentFilters.search = searchValue;
         currentPage = 1;
         loadTours();
     }, 500));
 
     // Filter functionality
-    $('#categoryFilter, #statusFilter').on('change', function() {
-        currentFilters.categoryId = $('#categoryFilter').val();
-        currentFilters.active = $('#statusFilter').val();
+    $('#categoryFilter').on('change', 'input[type="checkbox"]', function() {
+        currentFilters.categoryIds = getSelectedCategoryIds();
         currentPage = 1;
         loadTours();
     });
@@ -330,8 +1397,7 @@ $(document).ready(function() {
     // Clear filters
     $('#clearFilters').on('click', function() {
         $('#searchInput').val('');
-        $('#categoryFilter').val('');
-        $('#statusFilter').val('');
+        $('#categoryFilter input[type="checkbox"]').prop('checked', false);
         currentFilters = {};
         currentPage = 1;
         loadTours();
@@ -339,6 +1405,7 @@ $(document).ready(function() {
 
     // Load tours with pagination and filters
     function loadTours() {
+        showLoading();
         const params = {
             page: currentPage,
             pageSize: pageSize,
@@ -347,25 +1414,29 @@ $(document).ready(function() {
             ...currentFilters
         };
 
+        // Convert categoryIds array to comma-separated string
+        if (currentFilters.categoryIds && Array.isArray(currentFilters.categoryIds)) {
+            params.categoryIds = currentFilters.categoryIds.join(',');
+            delete currentFilters.categoryIds; // Remove the array version from currentFilters
+        }
+
         $.ajax({
             url: baseUrl + 'api/tour/paged',
             type: 'GET',
             data: params,
+            headers: getAuthHeaders(),
             success: function(response) {
                 // Handle both direct response and wrapped response
                 const tours = response.items || response.data?.items || [];
-                const paginationData = response.totalPages ? response : response.data;
+                        const paginationData = response.totalPages ? response : response.items;
                 displayTours(tours);
                 displayPagination(paginationData);
+                hideLoading();
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
-                    // Unauthorized, redirect to login
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/Home/Login';
-                } else {
-                    showAlert('Error loading tours: ' + (xhr.responseJSON?.message || xhr.responseText), 'danger');
-                }
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                showAlert('Error loading tours: ' + (xhr.responseJSON?.message || xhr.responseText), 'danger');
             }
         });
     }
@@ -389,10 +1460,6 @@ $(document).ready(function() {
         }
 
         tours.forEach(tour => {
-            const statusBadge = tour.active ? 
-                '<span class="badge bg-success">Active</span>' : 
-                '<span class="badge bg-secondary">Inactive</span>';
-            
             const imageUrl = tour.images && tour.images.length > 0 ? 
                 tour.images[0].imageUrl : 
                 '/assets/images/products/s1.jpg';
@@ -404,16 +1471,17 @@ $(document).ready(function() {
                     </td>
                     <td class="px-0">
                         <h6 class="mb-0 fw-bolder">${tour.title}</h6>
-                        <span class="text-muted">${tour.description.substring(0, 50)}...</span>
                     </td>
-                    <td class="px-0">$${tour.pricePerPerson}</td>
+                            <td class="px-0">${formatCurrencyVND(tour.pricePerPerson)}</td>
                     <td class="px-0">${tour.duration}</td>
                     <td class="px-0">${tour.maxPeople}</td>
-                    <td class="px-0">${statusBadge}</td>
                     <td class="px-0 text-end">
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewTour(${tour.id})" title="View Details">
                                 <i class="ti ti-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="manageTourImages(${tour.id})" title="Manage Images">
+                                <i class="ti ti-photo"></i>
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-warning" onclick="editTour(${tour.id})" title="Edit">
                                 <i class="ti ti-edit"></i>
@@ -468,8 +1536,9 @@ $(document).ready(function() {
     // Load categories for filters and forms
     function loadCategories() {
         $.ajax({
-            url: baseUrl + 'api/category',
+            url: baseUrl + 'api/category/tree',
             type: 'GET',
+            headers: getAuthHeaders(),
             success: function(response) {
                 // Handle both direct response and wrapped response
                 const categories = response.success ? response.data : response;
@@ -478,17 +1547,134 @@ $(document).ready(function() {
                 const editCategories = $('#editCategories');
 
                 if (Array.isArray(categories)) {
-                    categories.forEach(category => {
-                        categoryFilter.append(`<option value="${category.id}">${category.categoryName}</option>`);
-                        createCategories.append(`<option value="${category.id}">${category.categoryName}</option>`);
-                        editCategories.append(`<option value="${category.id}">${category.categoryName}</option>`);
-                    });
+                    // For filter, use tree structure with checkboxes
+                    categoryFilter.html(buildCategoryCheckboxes(categories, 'filter'));
+                    
+                    // For forms, use tree structure with checkboxes
+                    createCategories.html(buildCategoryCheckboxes(categories, 'create'));
+                    editCategories.html(buildCategoryCheckboxes(categories, 'edit'));
                 }
             },
             error: function(xhr) {
+                if (handleAuthError(xhr)) return;
                 console.error('Error loading categories:', xhr.responseText);
             }
         });
+    }
+
+    // Helper function to flatten category tree for dropdown
+    function flattenCategoryTree(categories, result = []) {
+        categories.forEach(category => {
+            result.push(category);
+            if (category.children && category.children.length > 0) {
+                flattenCategoryTree(category.children, result);
+            }
+        });
+        return result;
+    }
+
+    // Helper function to build category checkboxes with tree structure
+    function buildCategoryCheckboxes(categories, prefix, level = 0) {
+        let html = '';
+        categories.forEach(category => {
+            const indent = '&nbsp;'.repeat(level * 4);
+            const checkboxId = `${prefix}Category_${category.id}`;
+            
+            // For filter, don't add parent-child logic
+            if (prefix === 'filter') {
+                html += `
+                    <div class="form-check" style="margin-left: ${level * 20}px;">
+                        <input class="form-check-input" type="checkbox" 
+                               id="${checkboxId}" value="${category.id}">
+                        <label class="form-check-label" for="${checkboxId}">
+                            ${indent}${category.categoryName}
+                        </label>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="form-check" style="margin-left: ${level * 20}px;">
+                        <input class="form-check-input category-checkbox" type="checkbox" 
+                               id="${checkboxId}" value="${category.id}" 
+                               data-parent-id="${category.parentId || ''}"
+                               data-prefix="${prefix}"
+                               onchange="handleCategoryChange('${prefix}', ${category.id}, this.checked)">
+                        <label class="form-check-label" for="${checkboxId}">
+                            ${indent}${category.categoryName}
+                        </label>
+                    </div>
+                `;
+            }
+            
+            if (category.children && category.children.length > 0) {
+                html += buildCategoryCheckboxes(category.children, prefix, level + 1);
+            }
+        });
+        return html;
+    }
+
+    // Handle category checkbox change with parent-child logic
+    function handleCategoryChange(prefix, categoryId, isChecked) {
+        const checkboxes = $(`.category-checkbox[data-prefix="${prefix}"]`);
+        
+        if (isChecked) {
+            // When checking a category, also check all its parent categories
+            checkParentCategories(prefix, categoryId, checkboxes);
+        } else {
+            // When unchecking a category, also uncheck all its child categories
+            uncheckChildCategories(prefix, categoryId, checkboxes);
+        }
+    }
+
+    // Check parent categories when a child is selected
+    function checkParentCategories(prefix, categoryId, checkboxes) {
+        const currentCheckbox = checkboxes.filter(`[value="${categoryId}"]`);
+        const parentId = currentCheckbox.data('parent-id');
+        
+        if (parentId) {
+            const parentCheckbox = checkboxes.filter(`[value="${parentId}"]`);
+            if (parentCheckbox.length > 0 && !parentCheckbox.is(':checked')) {
+                parentCheckbox.prop('checked', true);
+                checkParentCategories(prefix, parentId, checkboxes);
+            }
+        }
+    }
+
+    // Uncheck child categories when a parent is unchecked
+    function uncheckChildCategories(prefix, categoryId, checkboxes) {
+        const childCheckboxes = checkboxes.filter(`[data-parent-id="${categoryId}"]`);
+        childCheckboxes.each(function() {
+            if ($(this).is(':checked')) {
+                $(this).prop('checked', false);
+                uncheckChildCategories(prefix, $(this).val(), checkboxes);
+            }
+        });
+    }
+
+    // Get selected category IDs for filter
+    function getSelectedCategoryIds() {
+        const selectedIds = [];
+        $('#categoryFilter input[type="checkbox"]:checked').each(function() {
+            selectedIds.push(parseInt($(this).val()));
+        });
+        return selectedIds;
+    }
+
+    // Get selected category IDs
+    function getSelectedCategories(prefix) {
+        const selected = [];
+        $(`.category-checkbox[data-prefix="${prefix}"]:checked`).each(function() {
+            selected.push(parseInt($(this).val()));
+        });
+        return selected;
+    }
+
+    function getSelectedPolicies(modal) {
+        const policyIds = [];
+        $(`#${modal}Policies input[type="checkbox"]:checked`).each(function() {
+            policyIds.push(parseInt($(this).val()));
+        });
+        return policyIds;
     }
 
     // Load policies for forms
@@ -496,6 +1682,7 @@ $(document).ready(function() {
         $.ajax({
             url: baseUrl + 'api/policy',
             type: 'GET',
+            headers: getAuthHeaders(),
             success: function(response) {
                 // Handle both direct response and wrapped response
                 const policies = response.success ? response.data : response;
@@ -504,12 +1691,27 @@ $(document).ready(function() {
 
                 if (Array.isArray(policies)) {
                     policies.forEach(policy => {
-                        createPolicies.append(`<option value="${policy.id}">${policy.policyType}</option>`);
-                        editPolicies.append(`<option value="${policy.id}">${policy.policyType}</option>`);
+                        createPolicies.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${policy.id}" id="createPolicy${policy.id}">
+                                <label class="form-check-label" for="createPolicy${policy.id}">
+                                    ${policy.policyType}
+                                </label>
+                            </div>
+                        `);
+                        editPolicies.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${policy.id}" id="editPolicy${policy.id}">
+                                <label class="form-check-label" for="editPolicy${policy.id}">
+                                    ${policy.policyType}
+                                </label>
+                            </div>
+                        `);
                     });
                 }
             },
             error: function(xhr) {
+                if (handleAuthError(xhr)) return;
                 console.error('Error loading policies:', xhr.responseText);
             }
         });
@@ -533,34 +1735,36 @@ $(document).ready(function() {
             startTime: $('#createStartTime').val() || null,
             returnTime: $('#createReturnTime').val() || null,
             images: [], // Will be handled separately if needed
-            categories: $('#createCategories').val() || [],
+            categories: getSelectedCategories('create'),
             prices: [], // Will be handled separately if needed
-            policies: $('#createPolicies').val() || []
+            policies: getSelectedPolicies('create')
         };
 
         $.ajax({
             url: baseUrl + 'api/tour',
             type: 'POST',
             contentType: 'application/json',
+            headers: getAuthHeaders(),
             data: JSON.stringify(tourData),
+            beforeSend: function() {
+                showLoading();
+            },
             success: function(response) {
+                hideLoading();
                 if (response.success) {
                     showAlert('Tour created successfully!', 'success');
+                    tourDataChanged = true;
                     $('#createTourModal').modal('hide');
                     $('#createTourForm')[0].reset();
-                    loadTours();
                 } else {
                     showAlert('Error creating tour: ' + (response.message || 'Unknown error'), 'danger');
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/Home/Login';
-                } else {
-                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
-                    showAlert('Error creating tour: ' + errorMessage, 'danger');
-                }
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error creating tour: ' + errorMessage, 'danger');
             }
         });
     });
@@ -584,32 +1788,34 @@ $(document).ready(function() {
             duration: $('#editDuration').val(),
             startTime: $('#editStartTime').val() || null,
             returnTime: $('#editReturnTime').val() || null,
-            categories: $('#editCategories').val() || [],
-            policies: $('#editPolicies').val() || []
+            categories: getSelectedCategories('edit'),
+            policies: getSelectedPolicies('edit')
         };
 
         $.ajax({
             url: baseUrl + 'api/tour/' + tourId,
             type: 'PUT',
             contentType: 'application/json',
+            headers: getAuthHeaders(),
             data: JSON.stringify(tourData),
+            beforeSend: function() {
+                showLoading();
+            },
             success: function(response) {
+                hideLoading();
                 if (response.success) {
                     showAlert('Tour updated successfully!', 'success');
+                    tourDataChanged = true;
                     $('#editTourModal').modal('hide');
-                    loadTours();
                 } else {
                     showAlert('Error updating tour: ' + (response.message || 'Unknown error'), 'danger');
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/Home/Login';
-                } else {
-                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
-                    showAlert('Error updating tour: ' + errorMessage, 'danger');
-                }
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error updating tour: ' + errorMessage, 'danger');
             }
         });
     });
@@ -624,6 +1830,7 @@ $(document).ready(function() {
         $.ajax({
             url: baseUrl + 'api/tour/' + tourId,
             type: 'GET',
+            headers: getAuthHeaders(),
             success: function(response) {
                 // Handle both direct response and wrapped response
                 const tour = response.success ? response.data : response;
@@ -635,13 +1842,9 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/Home/Login';
-                } else {
-                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
-                    showAlert('Error loading tour details: ' + errorMessage, 'danger');
-                }
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error loading tour details: ' + errorMessage, 'danger');
             }
         });
     };
@@ -650,6 +1853,7 @@ $(document).ready(function() {
         $.ajax({
             url: baseUrl + 'api/tour/' + tourId,
             type: 'GET',
+            headers: getAuthHeaders(),
             success: function(response) {
                 // Handle both direct response and wrapped response
                 const tour = response.success ? response.data : response;
@@ -661,13 +1865,9 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/Home/Login';
-                } else {
-                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
-                    showAlert('Error loading tour: ' + errorMessage, 'danger');
-                }
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error loading tour: ' + errorMessage, 'danger');
             }
         });
     };
@@ -678,23 +1878,25 @@ $(document).ready(function() {
             $.ajax({
                 url: baseUrl + 'api/tour/' + tourId,
                 type: 'DELETE',
+                headers: getAuthHeaders(),
+                beforeSend: function() {
+                    showLoading();
+                },
                 success: function(response) {
+                    hideLoading();
                     if (response.success) {
                         showAlert('Tour deleted successfully!', 'success');
+                        tourDataChanged = true;
                         $('#confirmModal').modal('hide');
-                        loadTours();
                     } else {
                         showAlert('Error deleting tour: ' + (response.message || 'Unknown error'), 'danger');
                     }
                 },
                 error: function(xhr) {
-                    if (xhr.status === 401) {
-                        localStorage.removeItem('jwt_token');
-                        window.location.href = '/Home/Login';
-                    } else {
-                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
-                        showAlert('Error deleting tour: ' + errorMessage, 'danger');
-                    }
+                    hideLoading();
+                    if (handleAuthError(xhr)) return;
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                    showAlert('Error deleting tour: ' + errorMessage, 'danger');
                 }
             });
         });
@@ -703,10 +1905,6 @@ $(document).ready(function() {
 
     // Helper functions
     function displayTourDetails(tour) {
-        const statusBadge = tour.active ? 
-            '<span class="badge bg-success">Active</span>' : 
-            '<span class="badge bg-secondary">Inactive</span>';
-
         const categories = tour.categories ? tour.categories.map(c => c.categoryName).join(', ') : 'None';
         const policies = tour.policies ? tour.policies.map(p => p.policyType).join(', ') : 'None';
 
@@ -724,7 +1922,6 @@ $(document).ready(function() {
                         <div class="col-md-6">
                             <p><strong>Start Time:</strong> ${tour.startTime || 'Not specified'}</p>
                             <p><strong>Return Time:</strong> ${tour.returnTime || 'Not specified'}</p>
-                            <p><strong>Status:</strong> ${statusBadge}</p>
                         </div>
                     </div>
                     ${tour.mapLink ? `<p><strong>Map Link:</strong> <a href="${tour.mapLink}" target="_blank">View Map</a></p>` : ''}
@@ -742,7 +1939,8 @@ $(document).ready(function() {
     function populateEditForm(tour) {
         $('#editTourId').val(tour.id);
         $('#editTitle').val(tour.title);
-        $('#editDescription').val(tour.description);
+        $('#editDescription').val(tour.description || '');
+        $('#editDescriptionPreview').html(tour.description || '<p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>');
         $('#editMapLink').val(tour.mapLink || '');
         $('#editPricePerPerson').val(tour.pricePerPerson);
         $('#editMaxPeople').val(tour.maxPeople);
@@ -750,16 +1948,37 @@ $(document).ready(function() {
         $('#editStartTime').val(tour.startTime || '');
         $('#editReturnTime').val(tour.returnTime || '');
 
+        // Ensure images in description preview are properly styled
+        setTimeout(() => {
+            const previewImages = $('#editDescriptionPreview img');
+            previewImages.each(function() {
+                $(this).css({
+                    'max-width': '100%',
+                    'height': 'auto',
+                    'max-height': '200px',
+                    'object-fit': 'contain',
+                    'display': 'block',
+                    'margin': '5px auto',
+                    'border-radius': '4px',
+                    'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'
+                });
+            });
+        }, 100);
+
         // Set selected categories
         if (tour.categories) {
-            const categoryIds = tour.categories.map(c => c.id.toString());
-            $('#editCategories').val(categoryIds);
+            const categoryIds = tour.categories.map(c => c.id);
+            categoryIds.forEach(id => {
+                $(`#editCategory_${id}`).prop('checked', true);
+            });
         }
 
         // Set selected policies
         if (tour.policies) {
-            const policyIds = tour.policies.map(p => p.id.toString());
-            $('#editPolicies').val(policyIds);
+            const policyIds = tour.policies.map(p => p.id);
+            policyIds.forEach(id => {
+                $(`#editPolicy${id}`).prop('checked', true);
+            });
         }
     }
 
@@ -796,6 +2015,11 @@ $(document).ready(function() {
             timeout = setTimeout(later, wait);
         };
     }
+
+            function formatCurrencyVND(value) {
+            if (!value) return "0 ₫";
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        }
 });
 </script>
 }

@@ -147,6 +147,7 @@ builder.Services.AddScoped<barefoot_travel.Services.ICategoryService, barefoot_t
 builder.Services.AddScoped<barefoot_travel.Services.IPolicyService, barefoot_travel.Services.PolicyService>();
 builder.Services.AddScoped<barefoot_travel.Services.IBookingService, barefoot_travel.Services.BookingService>();
 builder.Services.AddScoped<barefoot_travel.Services.IPriceTypeService, barefoot_travel.Services.PriceTypeService>();
+builder.Services.AddScoped<barefoot_travel.Services.IFileUploadService, barefoot_travel.Services.FileUploadService>();
 
 // HTML Sanitizer for XSS protection
 //builder.Services.AddHtmlSanitizer();

@@ -29,5 +29,9 @@ namespace barefoot_travel.DTOs.Tour
         public TimeOnly? StartTime { get; set; }
 
         public TimeOnly? ReturnTime { get; set; }
+
+        public List<int>? Categories { get; set; }
+
+        public List<int>? Policies { get; set; }
     }
 }

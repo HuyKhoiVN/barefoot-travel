@@ -53,7 +53,8 @@ namespace barefoot_travel.Controllers.Api
         /// <param name="pageSize">Items per page (default: 10)</param>
         /// <param name="sortBy">Sort field (title, pricePerPerson, createdTime)</param>
         /// <param name="sortOrder">Sort direction (asc, desc)</param>
-        /// <param name="categoryId">Filter by category ID</param>
+        /// <param name="categoryIds">Filter by category IDs (comma-separated)</param>
+        /// <param name="search">Search by title</param>
         /// <param name="active">Filter by active status</param>
         /// <returns>Paginated list of tours</returns>
         [HttpGet("paged")]
@@ -62,11 +63,22 @@ namespace barefoot_travel.Controllers.Api
             [FromQuery] int pageSize = 10,
             [FromQuery] string? sortBy = null,
             [FromQuery] string sortOrder = "asc",
-            [FromQuery] int? categoryId = null,
+            [FromQuery] string? categoryIds = null,
+            [FromQuery] string? search = null,
             [FromQuery] bool? active = null)
         {
             _logger.LogInformation("Getting paged tours - Page: {Page}, PageSize: {PageSize}", page, pageSize);
-            return await _tourService.GetToursPagedAsync(page, pageSize, sortBy, sortOrder, categoryId, active);
+            
+            // Parse categoryIds from comma-separated string
+            List<int>? categoryIdList = null;
+            if (!string.IsNullOrEmpty(categoryIds))
+            {
+                categoryIdList = categoryIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToList();
+            }
+            
+            return await _tourService.GetToursPagedAsync(page, pageSize, sortBy, sortOrder, categoryIdList, search, active);
         }
 
         /// <summary>
