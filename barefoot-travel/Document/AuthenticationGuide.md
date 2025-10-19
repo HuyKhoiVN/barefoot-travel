@@ -122,7 +122,7 @@ Client → POST /api/auth/logout → AuthService → Success
 
 ### User Management Endpoints
 
-#### GET /api/user/profile
+#### GET /api/auth/profile
 **Purpose**: Get current user profile
 
 **Headers**: `Authorization: Bearer <access_token>`

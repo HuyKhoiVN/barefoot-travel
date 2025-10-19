@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>barefoot_travel</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\Client\**" />
+    <Content Remove="Controllers\Client\**" />
+    <EmbeddedResource Remove="Controllers\Client\**" />
+    <None Remove="Controllers\Client\**" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
@@ -28,10 +35,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Controllers\Client\Admin\" />
-	  <Folder Include="Controllers\Client\User\" />
-	  <Folder Include="Document\" />
+	  <Folder Include="Document\Rules\" />
 	  <Folder Include="Services\" />
+	  <Folder Include="wwwroot\images\" />
+	  <Folder Include="wwwroot\ui-admin-template\" />
 	</ItemGroup>
 
 </Project>

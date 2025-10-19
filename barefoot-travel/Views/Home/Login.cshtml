@@ -1,0 +1,297 @@
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <img src="~/assets/images/logos/logo.svg" alt="Barefoot Travel" class="mb-3" style="height: 60px;">
+                    <h4 class="card-title">Welcome Back</h4>
+                    <p class="text-muted">Sign in to your account</p>
+                </div>
+
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" id="loginBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
+                            <span id="loginText">Sign In</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Don't have an account? 
+                        <a href="#" id="registerLink">Register here</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Check if user is already logged in
+    checkAuthStatus();
+
+    // Login form submission
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        performLogin();
+    });
+
+    // Register link click
+    $('#registerLink').on('click', function(e) {
+        e.preventDefault();
+        showRegisterModal();
+    });
+
+    function checkAuthStatus() {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            // Verify token is still valid
+            $.ajax({
+                url: baseUrl + 'api/auth/profile',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // User is already logged in, redirect to admin dashboard
+                        window.location.href = '/tour-manager';
+                    } else {
+                        // Token is invalid, remove it
+                        localStorage.removeItem('jwt_token');
+                    }
+                },
+                error: function() {
+                    // Token is invalid, remove it
+                    localStorage.removeItem('jwt_token');
+                }
+            });
+        }
+    }
+
+    function performLogin() {
+        const username = $('#username').val();
+        const password = $('#password').val();
+
+        if (!username || !password) {
+            showAlert('Please enter both username and password.', 'danger');
+            return;
+        }
+
+        // Show loading state
+        setLoadingState(true);
+
+        const loginData = {
+            username: username,
+            password: password
+        };
+
+        $.ajax({
+            url: baseUrl + 'api/auth/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(loginData),
+            success: function(response) {
+                if (response.success && response.data) {
+                    // Store token in localStorage
+                    localStorage.setItem('jwt_token', response.data.accessToken);
+                    
+                    // Store refresh token if available
+                    if (response.data.refreshToken) {
+                        localStorage.setItem('refresh_token', response.data.refreshToken);
+                    }
+
+                    showAlert('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to tour manager after short delay
+                    setTimeout(function() {
+                        window.location.href = '/tour-manager';
+                    }, 1500);
+                } else {
+                    showAlert('Login failed: ' + (response.message || 'Invalid credentials'), 'danger');
+                }
+            },
+            error: function(xhr) {
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Login failed';
+                showAlert('Login failed: ' + errorMessage, 'danger');
+            },
+            complete: function() {
+                setLoadingState(false);
+            }
+        });
+    }
+
+    function showRegisterModal() {
+        // Create register modal dynamically
+        const modalHtml = `
+            <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="registerModalLabel">Register New Account</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="registerForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Username <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="regUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="regFullName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="regEmail">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="regPhone">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="regPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="regConfirmPassword" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="registerBtn">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        $('#registerModal').remove();
+        
+        // Add modal to body
+        $('body').append(modalHtml);
+        
+        // Show modal
+        $('#registerModal').modal('show');
+
+        // Handle register form submission
+        $('#registerBtn').on('click', function() {
+            performRegister();
+        });
+
+        // Handle form submission on enter
+        $('#registerForm').on('submit', function(e) {
+            e.preventDefault();
+            performRegister();
+        });
+    }
+
+    function performRegister() {
+        const username = $('#regUsername').val();
+        const fullName = $('#regFullName').val();
+        const email = $('#regEmail').val();
+        const phone = $('#regPhone').val();
+        const password = $('#regPassword').val();
+        const confirmPassword = $('#regConfirmPassword').val();
+
+        if (!username || !fullName || !password || !confirmPassword) {
+            showAlert('Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showAlert('Passwords do not match.', 'danger');
+            return;
+        }
+
+        const registerData = {
+            username: username,
+            fullName: fullName,
+            email: email || null,
+            phone: phone || null,
+            password: password,
+            roleId: 2 // Default to User role
+        };
+
+        $.ajax({
+            url: baseUrl + 'api/auth/register',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(registerData),
+            success: function(response) {
+                if (response.success) {
+                    showAlert('Registration successful! You can now login.', 'success');
+                    $('#registerModal').modal('hide');
+                    
+                    // Pre-fill login form with new username
+                    $('#username').val(username);
+                } else {
+                    showAlert('Registration failed: ' + (response.message || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr) {
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Registration failed';
+                showAlert('Registration failed: ' + errorMessage, 'danger');
+            }
+        });
+    }
+
+    function setLoadingState(loading) {
+        if (loading) {
+            $('#loginBtn').prop('disabled', true);
+            $('#loginSpinner').removeClass('d-none');
+            $('#loginText').text('Signing In...');
+        } else {
+            $('#loginBtn').prop('disabled', false);
+            $('#loginSpinner').addClass('d-none');
+            $('#loginText').text('Sign In');
+        }
+    }
+
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="ti ti-${type === 'success' ? 'check-circle' : 'alert-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Remove existing alerts
+        $('.alert').remove();
+        
+        // Add new alert at the top of the page
+        $('.card-body').prepend(alertHtml);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    }
+});
+</script>
+}

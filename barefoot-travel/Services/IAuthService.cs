@@ -9,5 +9,6 @@ namespace barefoot_travel.Services
         Task<TokenDto> RefreshTokenAsync(string refreshToken);
         Task LogoutAsync(string refreshToken);
         Task<ApiResponse> RegisterAsync(RegisterDto dto);
+        Task<UserProfileDto> GetUserProfileAsync(int userId);
     }
 }

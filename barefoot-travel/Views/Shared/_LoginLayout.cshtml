@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@ViewData["Title"] - Barefoot Travel</title>
+  <link rel="shortcut icon" type="image/png" href="~/assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="~/assets/css/_styles.min.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .page-wrapper {
+      background: transparent;
+    }
+    .body-wrapper {
+      background: transparent;
+    }
+    .body-wrapper-inner {
+      background: transparent;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container-fluid {
+      padding: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Login Page Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    
+    <!-- Main wrapper without sidebar -->
+    <div class="body-wrapper">
+      <div class="body-wrapper-inner">
+        <div class="container-fluid">
+          @RenderBody()
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="~/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="~/assets/js/sidebarmenu.js"></script>
+  <script src="~/assets/js/app.min.js"></script>
+  <script src="~/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="~/assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="~/assets/js/dashboard.js"></script>
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  
+  <!-- Global JavaScript Configuration -->
+  <script>
+    // Base URL configuration for API calls
+    var baseUrl = window.location.origin;
+    if (!baseUrl.endsWith("/")) {
+        baseUrl += "/";
+    }
+    
+    // Global AJAX setup
+    $.ajaxSetup({
+      beforeSend: function(xhr) {
+        // Add JWT token to all requests
+        var token = localStorage.getItem('jwt_token');
+        if (token) {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+      },
+      error: function(xhr, status, error) {
+        if (xhr.status === 401) {
+          // Handle unauthorized access
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/Home/Login';
+        }
+      }
+    });
+
+    // Logout function
+    window.logout = function() {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = '/Home/Login';
+    };
+  </script>
+
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

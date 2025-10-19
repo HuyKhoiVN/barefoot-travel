@@ -1,18 +1,26 @@
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using barefoot_travel.Common;
+using barefoot_travel.Common;
+using barefoot_travel.Models;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using barefoot_travel.Models;
-using barefoot_travel.Common;
-using AutoMapper;
-using FluentValidation.AspNetCore;
-using barefoot_travel.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Configure routing
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.AppendTrailingSlash = false;
+});
 
 // Database Configuration
 builder.Services.AddDbContext<SysDbContext>(options =>
@@ -74,7 +82,13 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API for Barefoot Travel Management System"
     });
-    
+
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        var actionDescriptor = apiDesc.ActionDescriptor;
+        return actionDescriptor.EndpointMetadata.Any(em => em is Microsoft.AspNetCore.Mvc.ApiControllerAttribute);
+    });
+
     // JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

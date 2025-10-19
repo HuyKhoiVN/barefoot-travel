@@ -1,0 +1,278 @@
+<aside class="left-sidebar">
+  <!-- Sidebar scroll-->
+  <div>
+    <div class="brand-logo d-flex align-items-center justify-content-between">
+      <a href="@Url.Action("Index", "Admin")" class="text-nowrap logo-img">
+        <img src="~/assets/images/logos/logo.svg" alt="Barefoot Travel" />
+      </a>
+      <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+        <i class="ti ti-x fs-6"></i>
+      </div>
+    </div>
+    <!-- Sidebar navigation-->
+    <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+      <ul id="sidebarnav">
+        <li class="nav-small-cap">
+          <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+          <span class="hide-menu">Dashboard</span>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="@Url.Action("Index", "Admin")" aria-expanded="false">
+            <i class="ti ti-atom"></i>
+            <span class="hide-menu">Dashboard</span>
+          </a>
+        </li>
+
+        <li>
+          <span class="sidebar-divider lg"></span>
+        </li>
+        <li class="nav-small-cap">
+          <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+          <span class="hide-menu">Travel Management</span>
+        </li>
+
+        <!-- Tours Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-map-pin"></i>
+              </span>
+              <span class="hide-menu">Tours</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+           <li class="sidebar-item">
+             <a class="sidebar-link justify-content-between" href="/tour-manager">
+               <div class="d-flex align-items-center gap-3">
+                 <div class="round-16 d-flex align-items-center justify-content-center">
+                   <i class="ti ti-circle"></i>
+                 </div>
+                 <span class="hide-menu">Tour Management</span>
+               </div>
+             </a>
+           </li>
+          </ul>
+        </li>
+
+        <!-- Categories Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-category"></i>
+              </span>
+              <span class="hide-menu">Categories</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Category")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">All Categories</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Create", "Category")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Add Category</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Bookings Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-calendar-check"></i>
+              </span>
+              <span class="hide-menu">Bookings</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Booking")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">All Bookings</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Pending", "Booking")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Pending</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Confirmed", "Booking")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Confirmed</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Users Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-users"></i>
+              </span>
+              <span class="hide-menu">Users</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "User")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">All Users</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Create", "User")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Add User</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Roles Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-shield-check"></i>
+              </span>
+              <span class="hide-menu">Roles & Permissions</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Role")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Roles</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Policy")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Policies</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Price Types Management -->
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-currency-dollar"></i>
+              </span>
+              <span class="hide-menu">Pricing</span>
+            </div>
+          </a>
+          <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "PriceType")">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Price Types</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <span class="sidebar-divider lg"></span>
+        </li>
+        <li class="nav-small-cap">
+          <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+          <span class="hide-menu">Reports</span>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between" href="#" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-chart-bar"></i>
+              </span>
+              <span class="hide-menu">Analytics</span>
+            </div>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between" href="#" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-file-text"></i>
+              </span>
+              <span class="hide-menu">Reports</span>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <span class="sidebar-divider lg"></span>
+        </li>
+        <li class="nav-small-cap">
+          <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+          <span class="hide-menu">Settings</span>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link justify-content-between" href="#" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <span class="d-flex">
+                <i class="ti ti-settings"></i>
+              </span>
+              <span class="hide-menu">System Settings</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- End Sidebar navigation -->
+  </div>
+  <!-- End Sidebar scroll-->
+</aside>

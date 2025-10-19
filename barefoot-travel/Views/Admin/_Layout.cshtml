@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@ViewData["Title"] - Barefoot Travel Admin</title>
+  <link rel="shortcut icon" type="image/png" href="~/assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="~/assets/css/_styles.min.css" />
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+
+    <!-- Sidebar Start -->
+    @await Html.PartialAsync("~/Views/Admin/_Sidebar.cshtml")
+    <!--  Sidebar End -->
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      @await Html.PartialAsync("~/Views/Admin/_Header.cshtml")
+      <!--  Header End -->
+
+      <div class="body-wrapper-inner">
+        <div class="container-fluid">
+          @RenderBody()
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="~/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="~/assets/js/sidebarmenu.js"></script>
+  <script src="~/assets/js/app.min.js"></script>
+  <script src="~/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="~/assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="~/assets/js/dashboard.js"></script>
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  
+  <!-- Global JavaScript Configuration -->
+  <script>
+    // Base URL configuration for API calls
+    var baseUrl = window.location.origin;
+    if (!baseUrl.endsWith("/")) {
+        baseUrl += "/";
+    }
+    
+    // Global AJAX setup
+    $.ajaxSetup({
+      beforeSend: function(xhr) {
+        // Add JWT token to all requests
+        var token = localStorage.getItem('jwt_token');
+        if (token) {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+      },
+      error: function(xhr, status, error) {
+        if (xhr.status === 401) {
+          // Handle unauthorized access
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/Home/Login';
+        }
+      }
+    });
+
+    // Logout function
+    window.logout = function() {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = '/Home/Login';
+    };
+
+    // Check authentication status function
+    window.checkAuthStatus = function() {
+      const token = localStorage.getItem('jwt_token');
+      if (!token) {
+        // No token, redirect to login
+        window.location.href = '/Home/Login';
+        return;
+      }
+
+      // Verify token is still valid
+      $.ajax({
+        url: baseUrl + 'api/auth/profile',
+        type: 'GET',
+        success: function(response) {
+          if (!response.success) {
+            // Token is invalid, redirect to login
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/Home/Login';
+          }
+        },
+        error: function() {
+          // Token is invalid, redirect to login
+          localStorage.removeItem('jwt_token');
+          window.location.href = '/Home/Login';
+        }
+      });
+    };
+
+    // Check authentication on page load
+    $(document).ready(function() {
+      checkAuthStatus();
+    });
+  </script>
+
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

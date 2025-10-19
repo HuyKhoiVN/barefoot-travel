@@ -167,5 +167,45 @@ namespace barefoot_travel.Controllers.Api
                 return StatusCode(500, new ApiResponse(false, "An error occurred during registration"));
             }
         }
+
+        /// <summary>
+        /// Get current user profile
+        /// </summary>
+        /// <returns>User profile information</returns>
+        /// <response code="200">Profile retrieved successfully</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">User not found</response>
+        [HttpGet("profile")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                var userId = GetUserIdFromClaims.GetUserId(User);
+                if (userId <= 0)
+                {
+                    _logger.LogWarning("Invalid user ID in token");
+                    return Unauthorized(new ApiResponse(false, "Invalid user token"));
+                }
+
+                _logger.LogInformation("Getting profile for user: {UserId}", userId);
+
+                var profile = await _authService.GetUserProfileAsync(userId);
+
+                _logger.LogInformation("Profile retrieved successfully for user: {UserId}", userId);
+
+                return Ok(new ApiResponse(true, "Profile retrieved successfully", profile));
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning("User not found: {Message}", ex.Message);
+                return NotFound(new ApiResponse(false, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user profile");
+                return StatusCode(500, new ApiResponse(false, "An error occurred while retrieving profile"));
+            }
+        }
     }
 }

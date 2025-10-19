@@ -234,6 +234,39 @@ namespace barefoot_travel.Services
             return new ApiResponse(true, "Account created successfully", userProfile);
         }
 
+        public async Task<UserProfileDto> GetUserProfileAsync(int userId)
+        {
+            // Validation in Service layer
+            if (userId <= 0)
+            {
+                throw new BadRequestException("Invalid user ID");
+            }
+
+            var user = await _accountRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
+
+            var roleName = GetRoleName(user.RoleId);
+            return MapToUserProfileDto(user, new List<string> { roleName });
+        }
+
+        private UserProfileDto MapToUserProfileDto(Account user, List<string> roles)
+        {
+            if (user == null) return null;
+
+            return new UserProfileDto
+            {
+                UserId = user.Id,
+                Username = user.Username,
+                Name = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                Roles = roles
+            };
+        }
+
         private string GetRoleName(int roleId)
         {
             // Map RoleId to RoleName based on Database-schema.md
