@@ -70,6 +70,8 @@
                                 <th scope="col" class="px-0 text-muted">Name</th>
                                 <th scope="col" class="px-0 text-muted">Type</th>
                                 <th scope="col" class="px-0 text-muted">Parent</th>
+                                <th scope="col" class="px-0 text-muted">Enable</th>
+                                <th scope="col" class="px-0 text-muted">Priority</th>
                                 <th scope="col" class="px-0 text-muted">Created</th>
                                 <th scope="col" class="px-0 text-muted text-end">Actions</th>
                             </tr>
@@ -124,6 +126,27 @@
                                     <option value="">Select Type</option>
                                     <!-- Types will be loaded from API -->
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <input type="number" class="form-control" id="createPriority" min="0" value="0">
+                                <div class="form-text">Higher number = higher priority (0 = default)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="createEnable" checked>
+                                    <label class="form-check-label" for="createEnable">
+                                        Enable Category
+                                    </label>
+                                </div>
+                                <div class="form-text">Disabled categories won't be shown in public listings</div>
                             </div>
                         </div>
                     </div>
@@ -183,6 +206,27 @@
                                     <option value="">Select Type</option>
                                     <!-- Types will be loaded from API -->
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <input type="number" class="form-control" id="editPriority" min="0" value="0">
+                                <div class="form-text">Higher number = higher priority (0 = default)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editEnable">
+                                    <label class="form-check-label" for="editEnable">
+                                        Enable Category
+                                    </label>
+                                </div>
+                                <div class="form-text">Disabled categories won't be shown in public listings</div>
                             </div>
                         </div>
                     </div>
@@ -402,6 +446,34 @@
     .category-item .form-check-label {
         font-size: 0.875rem;
         cursor: pointer;
+    }
+    
+    /* Form switch styles */
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    
+    .form-check-input:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    /* Priority input styles */
+    .form-control:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    /* Badge spacing */
+    .badge {
+        margin-right: 0.25rem;
+    }
+    
+    .badge:last-child {
+        margin-right: 0;
     }
 </style>
 
@@ -666,7 +738,7 @@ $(document).ready(function() {
         if (categories.length === 0) {
             tbody.append(`
                 <tr>
-                    <td colspan="5" class="text-center py-4">
+                    <td colspan="7" class="text-center py-4">
                         <i class="ti ti-inbox fs-1 text-muted"></i>
                         <h4 class="mt-3">No Categories Found</h4>
                         <p class="text-muted">No categories match your current filters.</p>
@@ -678,6 +750,12 @@ $(document).ready(function() {
 
         categories.forEach(category => {
             const parentName = category.parentName || '-';
+            const enableBadge = category.enable ? 
+                '<span class="badge bg-success">Enabled</span>' : 
+                '<span class="badge bg-secondary">Disabled</span>';
+            const priorityBadge = category.priority > 0 ? 
+                `<span class="badge bg-primary">${category.priority}</span>` : 
+                '<span class="badge bg-light text-dark">0</span>';
 
             tbody.append(`
                 <tr>
@@ -686,6 +764,8 @@ $(document).ready(function() {
                     </td>
                     <td class="px-0">${category.type || '-'}</td>
                     <td class="px-0">${parentName}</td>
+                    <td class="px-0">${enableBadge}</td>
+                    <td class="px-0">${priorityBadge}</td>
                     <td class="px-0">${formatDate(category.createdTime)}</td>
                     <td class="px-0 text-end">
                         <div class="btn-group" role="group">
@@ -728,6 +808,12 @@ $(document).ready(function() {
             const totalChildBadge = category.totalChild > 0 ? 
                 `<span class="badge bg-info ms-2">${category.totalChild} child${category.totalChild > 1 ? 'ren' : ''}</span>` : 
                 '';
+            const enableBadge = category.enable ? 
+                '<span class="badge bg-success ms-1">Enabled</span>' : 
+                '<span class="badge bg-secondary ms-1">Disabled</span>';
+            const priorityBadge = category.priority > 0 ? 
+                `<span class="badge bg-primary ms-1">Priority: ${category.priority}</span>` : 
+                '';
 
             html += `
                 <div class="category-item d-flex align-items-center py-2 border-bottom" data-category-id="${category.id}" data-total-child="${category.totalChild}">
@@ -739,6 +825,8 @@ $(document).ready(function() {
                         </span>
                         <small class="text-muted ms-2">(${category.type || 'No Type'})</small>
                         ${totalChildBadge}
+                        ${enableBadge}
+                        ${priorityBadge}
                         <div class="text-muted small">Parent: ${parentName}</div>
                     </div>
                     <div class="btn-group" role="group">
@@ -811,6 +899,12 @@ $(document).ready(function() {
             const totalChildBadge = child.totalChild > 0 ? 
                 `<span class="badge bg-info ms-2">${child.totalChild} child${child.totalChild > 1 ? 'ren' : ''}</span>` : 
                 '';
+            const enableBadge = child.enable ? 
+                '<span class="badge bg-success ms-1">Enabled</span>' : 
+                '<span class="badge bg-secondary ms-1">Disabled</span>';
+            const priorityBadge = child.priority > 0 ? 
+                `<span class="badge bg-primary ms-1">Priority: ${child.priority}</span>` : 
+                '';
 
             const childHtml = `
                 <div class="child-category-row d-flex align-items-center py-2 border-bottom" 
@@ -825,6 +919,8 @@ $(document).ready(function() {
                         </span>
                         <small class="text-muted ms-2">(${child.type || 'No Type'})</small>
                         ${totalChildBadge}
+                        ${enableBadge}
+                        ${priorityBadge}
                         <div class="text-muted small">Parent: ${parentName}</div>
                     </div>
                     <div class="btn-group" role="group">
@@ -1564,7 +1660,8 @@ $(document).ready(function() {
             categoryName: $('#createCategoryName').val(),
             type: $('#createType').val(),
             parentId: $('#createParentCategoryId').val() || null,
-            enable: $('#createEnable').is(':checked')
+            enable: $('#createEnable').is(':checked'),
+            priority: parseInt($('#createPriority').val()) || 0
         };
 
         $.ajax({
@@ -1614,7 +1711,8 @@ $(document).ready(function() {
             categoryName: $('#editCategoryName').val(),
             type: $('#editType').val(),
             parentId: $('#editParentCategoryId').val() || null,
-            enable: $('#editEnable').is(':checked')
+            enable: $('#editEnable').is(':checked'),
+            priority: parseInt($('#editPriority').val()) || 0
         };
 
         $.ajax({
@@ -1745,20 +1843,33 @@ $(document).ready(function() {
     // Helper functions
     function displayCategoryDetails(category) {
         const parentName = category.parentCategory ? category.parentCategory.categoryName : 'None';
-        const statusText = category.enable ? 'Active' : 'Inactive';
+        const statusText = category.enable ? 'Enabled' : 'Disabled';
         const statusClass = category.enable ? 'text-success' : 'text-secondary';
+        const statusBadge = category.enable ? 
+            '<span class="badge bg-success">Enabled</span>' : 
+            '<span class="badge bg-secondary">Disabled</span>';
+        const priorityBadge = category.priority > 0 ? 
+            `<span class="badge bg-primary">Priority: ${category.priority}</span>` : 
+            '<span class="badge bg-light text-dark">Default Priority</span>';
 
         $('#categoryDetailsContent').html(`
             <div class="row">
                 <div class="col-md-8">
                     <h4 class="mb-2">${category.categoryName}</h4>
+                    <div class="mb-3">
+                        ${statusBadge}
+                        ${priorityBadge}
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Type:</strong> ${category.type || 'Not specified'}</p>
                             <p><strong>Parent Category:</strong> ${parentName}</p>
+                            <p><strong>Priority:</strong> ${category.priority || 0}</p>
                         </div>
                         <div class="col-md-6">
+                            <p><strong>Status:</strong> <span class="${statusClass}">${statusText}</span></p>
                             <p><strong>Created:</strong> ${formatDate(category.createdTime)}</p>
+                            ${category.updatedTime ? `<p><strong>Updated:</strong> ${formatDate(category.updatedTime)}</p>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1770,6 +1881,7 @@ $(document).ready(function() {
         $('#editCategoryId').val(category.id);
         $('#editCategoryName').val(category.categoryName);
         $('#editType').val(category.type || '');
+        $('#editPriority').val(category.priority || 0);
         
         // Set parent category radio button
         if (category.parentId) {
