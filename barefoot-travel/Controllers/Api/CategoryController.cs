@@ -56,12 +56,14 @@ namespace barefoot_travel.Controllers.Api
             [FromQuery] int pageSize = 10,
             [FromQuery] string? sortBy = null,
             [FromQuery] string? sortOrder = "asc",
+            [FromQuery] string? categoryName = null,
             [FromQuery] string? type = null,
+            [FromQuery] int? parentCategory = null,
             [FromQuery] bool? active = null)
         {
             try
             {
-                var result = await _categoryService.GetCategoriesPagedAsync(page, pageSize, sortBy, sortOrder, type, active);
+                var result = await _categoryService.GetCategoriesPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, parentCategory, active);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -152,6 +154,41 @@ namespace barefoot_travel.Controllers.Api
         {
             var result = await _categoryService.GetAllType();
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get categories with pagination for tree view
+        /// </summary>
+        [HttpGet("tree-paged")]
+        public async Task<IActionResult> GetTreePaged(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? sortOrder = "asc",
+            [FromQuery] string? categoryName = null,
+            [FromQuery] string? type = null,
+            [FromQuery] List<int>? categoryIds = null,
+            [FromQuery] bool? active = null)
+        {
+            try
+            {
+                var result = await _categoryService.GetTreePagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIds, active);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse(false, ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Get children of a category
+        /// </summary>
+        [HttpGet("child/{id}")]
+        public async Task<IActionResult> GetChildren(int id)
+        {
+            var result = await _categoryService.GetChildrenAsync(id);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace barefoot_travel.Repositories
                 .ToListAsync();
         }
 
-        public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? type = null, bool? active = null)
+        public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null)
         {
             var query = _context.Categories.AsQueryable();
 
@@ -43,10 +43,26 @@ namespace barefoot_travel.Repositories
                 query = query.Where(c => c.Active);
             }
 
+            // Filter by category name (search)
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                query = query.Where(c => c.CategoryName.Contains(categoryName));
+            }
+
             // Filter by type
             if (!string.IsNullOrEmpty(type))
             {
                 query = query.Where(c => c.Type == type);
+            }
+
+            // Filter by parent category (including children)
+            if (parentCategory.HasValue)
+            {
+                // Get all descendant category IDs
+                var descendantIds = await GetDescendantCategoryIds(parentCategory.Value);
+                descendantIds.Add(parentCategory.Value);
+                
+                query = query.Where(c => descendantIds.Contains(c.ParentId ?? 0));
             }
 
             // Apply sorting
@@ -179,6 +195,122 @@ namespace barefoot_travel.Repositories
                 .Where(c => c.Active).OrderBy(c => c.Priority)
                 .Select(c => c.Type)
                 .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<int>> GetDescendantCategoryIds(int parentId)
+        {
+            var descendantIds = new List<int>();
+            var directChildren = await _context.Categories
+                .Where(c => c.ParentId == parentId && c.Active)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            foreach (var childId in directChildren)
+            {
+                descendantIds.Add(childId);
+                var grandChildren = await GetDescendantCategoryIds(childId);
+                descendantIds.AddRange(grandChildren);
+            }
+
+            return descendantIds;
+        }
+
+        public async Task<PagedResult<Category>> GetTreePagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null)
+        {
+            var query = from c in _context.Categories
+                       select new Category
+                       {
+                           Id = c.Id,
+                           ParentId = c.ParentId,
+                           CategoryName = c.CategoryName,
+                           Enable = c.Enable,
+                           Type = c.Type,
+                           Priority = c.Priority,
+                           CreatedTime = c.CreatedTime,
+                           UpdatedTime = c.UpdatedTime,
+                           UpdatedBy = c.UpdatedBy,
+                           Active = c.Active
+                       };
+
+            // Filter by active status
+            if (active.HasValue)
+            {
+                query = query.Where(c => c.Active == active.Value);
+            }
+            else
+            {
+                query = query.Where(c => c.Active);
+            }
+
+            // Filter by category name (search)
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                query = query.Where(c => c.CategoryName.Contains(categoryName));
+            }
+
+            // Filter by type
+            if (!string.IsNullOrEmpty(type))
+            {
+                query = query.Where(c => c.Type == type);
+            }
+
+            // Filter by category IDs (including descendants)
+            if (categoryIds != null && categoryIds.Any())
+            {
+                var allDescendantIds = new List<int>();
+                foreach (var categoryId in categoryIds)
+                {
+                    allDescendantIds.Add(categoryId);
+                    var descendants = await GetDescendantCategoryIds(categoryId);
+                    allDescendantIds.AddRange(descendants);
+                }
+                
+                query = query.Where(c => allDescendantIds.Contains(c.ParentId ?? 0));
+            }
+
+            // Apply sorting
+            var sortedQuery = sortBy?.ToLower() switch
+            {
+                "categoryname" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CategoryName)
+                    : query.OrderBy(c => c.CategoryName),
+                "type" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Type)
+                    : query.OrderBy(c => c.Type),
+                "priority" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Priority)
+                    : query.OrderBy(c => c.Priority),
+                "createdtime" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CreatedTime)
+                    : query.OrderBy(c => c.CreatedTime),
+                _ => query.OrderBy(c => c.CategoryName)
+            };
+
+            var totalItems = await sortedQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            var items = await sortedQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Category>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+        }
+         
+        public async Task<List<Category>> GetChildrenAsync(int parentId)
+        {
+            return await _context.Categories
+                .Where(c => c.ParentId == parentId && c.Active)
+                .OrderBy(c => c.Priority)
+                .ThenBy(c => c.CategoryName)
                 .ToListAsync();
         }
     }

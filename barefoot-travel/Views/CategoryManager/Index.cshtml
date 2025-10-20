@@ -1,0 +1,1833 @@
+@{
+    ViewData["Title"] = "Category Management";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-md-flex align-items-center">
+                    <div>
+                        <h4 class="card-title">Category Management</h4>
+                        <p class="card-subtitle">Manage categories and subcategories</p>
+                    </div>
+                    <div class="ms-auto mt-3 mt-md-0">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" id="viewModeBtn" data-mode="list">
+                                <i class="ti ti-list me-2"></i>List View
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="treeModeBtn" data-mode="tree">
+                                <i class="ti ti-hierarchy me-2"></i>Tree View
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+                            <i class="ti ti-plus me-2"></i>Add New Category
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and Filter Section -->
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Search Categories</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by name...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" id="typeFilter">
+                                <option value="">All Types</option>
+                                <!-- Types will be loaded from API -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Parent Category</label>
+                            <div id="parentCategoryFilter" class="border rounded p-3" style="max-height: 100px; overflow-y: auto;">
+                                <!-- Parent categories will be loaded here -->
+                        </div>
+                    </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-outline-secondary d-block w-100" id="clearFilters">
+                                <i class="ti ti-x me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Table -->
+                <div class="table-responsive mt-4" id="listView">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="categoriesTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">Name</th>
+                                <th scope="col" class="px-0 text-muted">Type</th>
+                                <th scope="col" class="px-0 text-muted">Parent</th>
+                                <th scope="col" class="px-0 text-muted">Created</th>
+                                <th scope="col" class="px-0 text-muted text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tree View -->
+                <div id="treeView" class="mt-4" style="display: none;">
+                    <div class="border rounded p-3" style="max-height: 600px; overflow-y: auto;">
+                        <div id="categoryTree">
+                            <!-- Tree will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Categories pagination" class="mt-4" id="paginationNav">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Category Modal -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCategoryModalLabel">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCategoryForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="createCategoryName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="createType" required>
+                                    <option value="">Select Type</option>
+                                    <!-- Types will be loaded from API -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Category</label>
+                        <div id="createParentCategory" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="createParentCategory" id="createParentNone" value="" checked>
+                                <label class="form-check-label" for="createParentNone">
+                                    No Parent (Root Category)
+                                </label>
+                            </div>
+                            <!-- Parent categories will be loaded here -->
+                    </div>
+                        <input type="hidden" id="createParentCategoryId" name="createParentCategoryId" value="">
+                    </div>
+                    <div class="mb-3" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="createEnable" checked>
+                            <label class="form-check-label" for="createEnable">
+                                Active
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCategoryId">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editCategoryName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editType" required>
+                                    <option value="">Select Type</option>
+                                    <!-- Types will be loaded from API -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Category</label>
+                        <div id="editParentCategory" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="editParentCategory" id="editParentNone" value="">
+                                <label class="form-check-label" for="editParentNone">
+                                    No Parent (Root Category)
+                                </label>
+                            </div>
+                            <!-- Parent categories will be loaded here -->
+                        </div>
+                        <input type="hidden" id="editParentCategoryId" name="editParentCategoryId" value="">
+                    </div>
+                    <div class="mb-3" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editEnable">
+                            <label class="form-check-label" for="editEnable">
+                                Active
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateCategoryBtn">Update Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Details Modal -->
+<div class="modal fade" id="categoryDetailsModal" tabindex="-1" aria-labelledby="categoryDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryDetailsModalLabel">Category Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="categoryDetailsContent">
+                <!-- Category details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<style>
+    /* Category tree styles */
+    .category-item {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .category-item:last-child {
+        border-bottom: none;
+    }
+    
+    .category-item.collapsed {
+        display: none !important;
+    }
+    
+    .category-expand-icon {
+        user-select: none;
+        transition: transform 0.2s ease;
+        display: inline-block;
+        width: 16px;
+        text-align: center;
+    }
+    
+    .category-expand-icon:hover {
+        color: #007bff !important;
+    }
+    
+    .category-expand-icon.expanded {
+        transform: rotate(0deg);
+    }
+    
+    .category-expand-icon.collapsed {
+        transform: rotate(0deg);
+    }
+    
+    /* Category tree container */
+    #categoryTree {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .category-item .d-flex {
+        padding: 8px 0;
+    }
+    
+    .category-item .d-flex:hover {
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    /* View mode buttons */
+    .btn-group .btn.active {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    
+    /* Loading overlay */
+    #loadingOverlay {
+        backdrop-filter: blur(2px);
+    }
+    
+    /* Alert styles */
+    .alert {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Modal styles */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #e9ecef;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    /* Table styles */
+    .varient-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Badge styles */
+    .badge {
+        font-size: 0.75em;
+        padding: 0.375em 0.75em;
+    }
+    
+    /* Button group styles */
+    .btn-group .btn {
+        border-radius: 0;
+    }
+    
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+    }
+    
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+    
+    /* Category tree styles for parent selection */
+    #createParentCategory, #editParentCategory {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .category-item .form-check {
+        margin-bottom: 2px;
+    }
+    
+    /* Child category styling - only for table in tree-view mode */
+    #categoryTree .child-category-row {
+        border-left: 3px solid #dee2e6 !important;
+        margin-left: 30px !important;
+        background-color: #f8f9fa !important;
+        position: relative;
+    }
+    
+    #categoryTree .child-category-row::before {
+        content: "└─";
+        position: absolute;
+        left: -25px;
+        color: #6c757d;
+        font-weight: bold;
+    }
+    
+    #categoryTree .child-category-row:hover {
+        background-color: #e9ecef !important;
+    }
+    
+    .category-item .form-check-input[type="radio"] {
+        margin-top: 0.125em;
+    }
+    
+    .category-item .form-check-label {
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    let currentPage = 1;
+    let pageSize = 10;
+    let currentFilters = {};
+    let currentViewMode = 'list'; // 'list' or 'tree'
+    let isLoading = false;
+    
+    // Base URL for API calls
+    const baseUrl = window.location.origin + '/';
+
+    // Get JWT token and create headers
+    function getAuthHeaders() {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            return {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            };
+        }
+        return {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    // Handle authentication errors
+    function handleAuthError(xhr) {
+        if (xhr.status === 401) {
+            localStorage.removeItem('jwt_token');
+            showAlert('Session expired. Please login again.', 'warning');
+            setTimeout(() => {
+                window.location.href = '/Home/Login';
+            }, 2000);
+            return true;
+        }
+        return false;
+    }
+
+    // Loading animation functions
+    function showLoading() {
+        if (!isLoading) {
+            isLoading = true;
+            $('body').append(`
+                <div id="loadingOverlay" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 9999;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                ">
+                    <div class="text-center text-white">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Loading...</div>
+                    </div>
+                </div>
+            `);
+        }
+    }
+
+    function hideLoading() {
+        if (isLoading) {
+            isLoading = false;
+            $('#loadingOverlay').remove();
+        }
+    }
+
+    // Initialize page
+    loadCategories();
+    loadParentCategories();
+    loadTypes();
+    
+    // Initialize tree interactions for parent category selection
+    initializeParentCategoryTreeInteractions();
+    
+    // Re-initialize tree interactions when modals are shown
+    $('#createCategoryModal').on('shown.bs.modal', function() {
+        initializeParentCategoryTreeInteractions();
+    });
+    
+    $('#editCategoryModal').on('shown.bs.modal', function() {
+        initializeParentCategoryTreeInteractions();
+    });
+
+    // View mode toggle
+    $('#viewModeBtn').on('click', function() {
+        currentViewMode = 'list';
+        
+        // Clear any expanded children in table when switching to list view
+        $('#categoryTree .child-category-row').remove();
+        
+        $('#listView').show();
+        $('#treeView').hide();
+        $('#paginationNav').show();
+        $(this).addClass('active').removeClass('btn-outline-secondary').addClass('btn-primary');
+        $('#treeModeBtn').removeClass('active').removeClass('btn-primary').addClass('btn-outline-secondary');
+        loadCategories();
+    });
+
+    $('#treeModeBtn').on('click', function() {
+        currentViewMode = 'tree';
+        
+        // Clear any existing children in table when switching to tree view
+        $('#categoryTree .child-category-row').remove();
+        
+        $('#listView').hide();
+        $('#treeView').show();
+        $('#paginationNav').show();
+        $(this).addClass('active').removeClass('btn-outline-secondary').addClass('btn-primary');
+        $('#viewModeBtn').removeClass('active').removeClass('btn-primary').addClass('btn-outline-secondary');
+        loadCategoryTree();
+    });
+
+    // Search functionality
+    $('#searchInput').on('input', debounce(function() {
+        const searchValue = $('#searchInput').val() || '';
+        currentFilters.categoryName = searchValue;
+        currentPage = 1;
+        
+        // Clear any expanded children in table when filtering
+        $('#categoryTree .child-category-row').remove();
+        
+        if (currentViewMode === 'list') {
+            loadCategories();
+        } else {
+            loadCategoryTree();
+        }
+    }, 500));
+
+    // Filter functionality
+    $('#typeFilter').on('change', function() {
+        currentFilters.type = $('#typeFilter').val();
+        currentPage = 1;
+        
+        // Clear any expanded children in table when filtering
+        $('#categoryTree .child-category-row').remove();
+        
+        if (currentViewMode === 'list') {
+            loadCategories();
+        } else {
+            loadCategoryTree();
+        }
+    });
+
+    // Parent category filter logic is now handled in initializeFilterTreeInteractions
+
+    // Clear filters
+    $('#clearFilters').on('click', function() {
+        $('#searchInput').val('');
+        $('#typeFilter').val('');
+        $('#parentCategoryFilter input[type="checkbox"]').prop('checked', false);
+        currentFilters = {};
+        currentPage = 1;
+        if (currentViewMode === 'list') {
+            loadCategories();
+        } else {
+            loadCategoryTree();
+        }
+    });
+
+    // Load categories with pagination and filters
+    function loadCategories() {
+        showLoading();
+        const params = {
+            page: currentPage,
+            pageSize: pageSize,
+            sortBy: 'categoryName',
+            sortOrder: 'asc'
+        };
+        
+        // Only add filters that have values
+        if (currentFilters.categoryName) {
+            params.categoryName = currentFilters.categoryName;
+        }
+        if (currentFilters.type) {
+            params.type = currentFilters.type;
+        }
+        if (currentFilters.categoryIds && currentFilters.categoryIds.length > 0) {
+            params.categoryIds = currentFilters.categoryIds;
+        }
+
+        $.ajax({
+            url: baseUrl + 'api/category/paged',
+            type: 'GET',
+            data: params,
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const categories = response.items || response.data?.items || [];
+                const paginationData = response.totalPages ? response : response.items;
+                displayCategories(categories);
+                displayPagination(paginationData);
+                hideLoading();
+            },
+            error: function(xhr) {
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                showAlert('Error loading categories: ' + (xhr.responseJSON?.message || xhr.responseText), 'danger');
+            }
+        });
+    }
+
+    // Load category tree
+    function loadCategoryTree() {
+        showLoading();
+        const params = {};
+        
+        // Only add filters that have values
+        if (currentFilters.categoryName) {
+            params.categoryName = currentFilters.categoryName;
+        }
+        if (currentFilters.type) {
+            params.type = currentFilters.type;
+        }
+        if (currentFilters.categoryIds && currentFilters.categoryIds.length > 0) {
+            params.categoryIds = currentFilters.categoryIds;
+        }
+
+        $.ajax({
+            url: baseUrl + 'api/category/tree-paged',
+            type: 'GET',
+            data: {
+                ...params,
+                page: currentPage,
+                pageSize: pageSize
+            },
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const categories = response.items || response.data?.items || response;
+                const paginationData = response.totalPages ? response : response.items;
+                
+                // Clear any existing expanded children before displaying new tree (only in tree-view mode)
+                if (currentViewMode === 'tree') {
+                    $('#categoryTree .child-category-row').remove();
+                }
+                
+                displayCategoryTree(categories);
+                displayPagination(paginationData);
+                hideLoading();
+            },
+            error: function(xhr) {
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                showAlert('Error loading category tree: ' + (xhr.responseJSON?.message || xhr.responseText), 'danger');
+            }
+        });
+    }
+
+    // Display categories in table
+    function displayCategories(categories) {
+        const tbody = $('#categoriesTableBody');
+        tbody.empty();
+
+        if (categories.length === 0) {
+            tbody.append(`
+                <tr>
+                    <td colspan="5" class="text-center py-4">
+                        <i class="ti ti-inbox fs-1 text-muted"></i>
+                        <h4 class="mt-3">No Categories Found</h4>
+                        <p class="text-muted">No categories match your current filters.</p>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        categories.forEach(category => {
+            const parentName = category.parentName || '-';
+
+            tbody.append(`
+                <tr>
+                    <td class="px-0">
+                        <h6 class="mb-0 fw-bolder">${category.categoryName}</h6>
+                    </td>
+                    <td class="px-0">${category.type || '-'}</td>
+                    <td class="px-0">${parentName}</td>
+                    <td class="px-0">${formatDate(category.createdTime)}</td>
+                    <td class="px-0 text-end">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewCategory(${category.id})" title="View Details">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="editCategory(${category.id})" title="Edit">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})" title="Delete">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    // Display category tree
+    function displayCategoryTree(categories) {
+        const container = $('#categoryTree');
+        container.empty();
+
+        if (!categories || categories.length === 0) {
+            container.html(`
+                <div class="text-center py-4">
+                    <i class="ti ti-inbox fs-1 text-muted"></i>
+                    <h4 class="mt-3">No Categories Found</h4>
+                    <p class="text-muted">No categories match your current filters.</p>
+                </div>
+            `);
+            return;
+        }
+
+        // For paginated tree, we display as a flat list with parent information
+        let html = '';
+        categories.forEach(category => {
+            const parentName = category.parentName || '-';
+            const totalChildBadge = category.totalChild > 0 ? 
+                `<span class="badge bg-info ms-2">${category.totalChild} child${category.totalChild > 1 ? 'ren' : ''}</span>` : 
+                '';
+
+            html += `
+                <div class="category-item d-flex align-items-center py-2 border-bottom" data-category-id="${category.id}" data-total-child="${category.totalChild}">
+                    <div class="flex-grow-1">
+                        <span class="fw-bolder category-name" style="cursor: ${category.totalChild > 0 ? 'pointer' : 'default'};" 
+                              onclick="${category.totalChild > 0 ? `loadTableCategoryChildren(${category.id})` : ''}" 
+                              title="${category.totalChild > 0 ? 'Click to view children' : ''}">
+                              ${category.categoryName}
+                        </span>
+                        <small class="text-muted ms-2">(${category.type || 'No Type'})</small>
+                        ${totalChildBadge}
+                        <div class="text-muted small">Parent: ${parentName}</div>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewCategory(${category.id})" title="View Details">
+                            <i class="ti ti-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="editCategory(${category.id})" title="Edit">
+                            <i class="ti ti-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})" title="Delete">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.html(html);
+    }
+
+    // Load category children for table (tree-view mode only)
+    window.loadTableCategoryChildren = function(categoryId) {
+        // Only work in tree-view mode
+        if (currentViewMode !== 'tree') {
+            return;
+        }
+        
+        showLoading();
+        $.ajax({
+            url: baseUrl + 'api/category/child/' + categoryId,
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                hideLoading();
+                const children = response.success ? response.data : response;
+                if (children && children.length > 0) {
+                    displayTableCategoryChildren(children, categoryId);
+                } else {
+                    showAlert('No children found for this category.', 'info');
+                }
+            },
+            error: function(xhr) {
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                showAlert('Error loading category children: ' + (xhr.responseJSON?.message || xhr.responseText), 'danger');
+            }
+        });
+    };
+
+    // Display category children for table (tree-view mode only)
+    function displayTableCategoryChildren(children, parentId) {
+        // Only work in tree-view mode
+        if (currentViewMode !== 'tree') {
+            return;
+        }
+        
+        const parentItem = $(`#categoryTree [data-category-id="${parentId}"]`);
+        
+        // Check if children are already displayed
+        const existingChildren = parentItem.nextAll('.child-category-row[data-parent-id="' + parentId + '"]');
+        if (existingChildren.length > 0) {
+            // Hide children (toggle off) and all their descendants
+            removeTableDescendants(parentId);
+            return;
+        }
+
+        // Insert children rows right after the parent row
+        children.forEach((child, index) => {
+            const parentName = child.parentName || '-';
+            const totalChildBadge = child.totalChild > 0 ? 
+                `<span class="badge bg-info ms-2">${child.totalChild} child${child.totalChild > 1 ? 'ren' : ''}</span>` : 
+                '';
+
+            const childHtml = `
+                <div class="child-category-row d-flex align-items-center py-2 border-bottom" 
+                     data-category-id="${child.id}" 
+                     data-total-child="${child.totalChild}"
+                     data-parent-id="${parentId}">
+                    <div class="flex-grow-1">
+                        <span class="fw-bolder category-name" style="cursor: ${child.totalChild > 0 ? 'pointer' : 'default'};" 
+                              onclick="${child.totalChild > 0 ? `loadTableCategoryChildren(${child.id})` : ''}" 
+                              title="${child.totalChild > 0 ? 'Click to view children' : ''}">
+                              ${child.categoryName}
+                        </span>
+                        <small class="text-muted ms-2">(${child.type || 'No Type'})</small>
+                        ${totalChildBadge}
+                        <div class="text-muted small">Parent: ${parentName}</div>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewCategory(${child.id})" title="View Details">
+                            <i class="ti ti-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="editCategory(${child.id})" title="Edit">
+                            <i class="ti ti-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${child.id})" title="Delete">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            parentItem.after(childHtml);
+        });
+    }
+
+    // Remove all descendants of a category for table (tree-view mode only)
+    function removeTableDescendants(categoryId) {
+        // Only work in tree-view mode
+        if (currentViewMode !== 'tree') {
+            return;
+        }
+        
+        const parentItem = $(`#categoryTree [data-category-id="${categoryId}"]`);
+        
+        // Find all direct children of this category
+        let directChildren = parentItem.nextAll('.child-category-row[data-parent-id="' + categoryId + '"]');
+        
+        // Remove all direct children and their descendants recursively
+        directChildren.each(function() {
+            const childId = $(this).data('category-id');
+            // First remove all descendants of this child
+            removeTableDescendants(childId);
+            // Then remove this child itself
+            $(this).remove();
+        });
+    }
+
+    // Build category tree HTML
+    function buildCategoryTreeHtml(categories, level = 0) {
+        let html = '';
+        categories.forEach(category => {
+            const hasChildren = category.children && category.children.length > 0;
+            const expandIcon = hasChildren ? 
+                `<span class="category-expand-icon" data-category-id="${category.id}" style="cursor: pointer; margin-right: 5px; font-weight: bold; color: #666;">+</span>` : 
+                `<span style="margin-right: 20px;"></span>`;
+
+            html += `
+                <div class="category-item" data-category-id="${category.id}" data-level="${level}" style="margin-left: ${level * 20}px;">
+                    <div class="d-flex align-items-center py-2">
+                        ${expandIcon}
+                        <div class="flex-grow-1">
+                            <span class="fw-bolder">${category.categoryName}</span>
+                            <small class="text-muted ms-2">(${category.type || 'No Type'})</small>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewCategory(${category.id})" title="View Details">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="editCategory(${category.id})" title="Edit">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})" title="Delete">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (hasChildren) {
+                html += buildCategoryTreeHtml(category.children, level + 1);
+            }
+        });
+        return html;
+    }
+
+    // Initialize tree interactions
+    function initializeTreeInteractions() {
+        $(document).off('click', '.category-expand-icon').on('click', '.category-expand-icon', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const categoryId = $(this).data('category-id');
+            const icon = $(this);
+            
+            toggleCategoryChildren(categoryId, icon);
+        });
+    }
+
+    // Toggle category children visibility
+    function toggleCategoryChildren(categoryId, icon) {
+        const currentItem = icon.closest('.category-item');
+        const currentLevel = parseInt(currentItem.data('level'));
+        
+        // Determine if we should expand or collapse
+        const isExpanded = icon.text() === '-';
+        
+        if (isExpanded) {
+            // Collapse: hide all children
+            icon.text('+');
+            icon.removeClass('expanded').addClass('collapsed');
+            
+            // Hide all descendants of this category
+            hideCategoryDescendants(categoryId, currentLevel);
+        } else {
+            // Expand: show direct children only
+            icon.text('-');
+            icon.removeClass('collapsed').addClass('expanded');
+            
+            // Show direct children only
+            showDirectChildren(categoryId, currentLevel);
+        }
+    }
+
+    // Hide all descendants of a category
+    function hideCategoryDescendants(categoryId, currentLevel) {
+        const allItems = $('#categoryTree').find('.category-item');
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel > currentLevel) {
+                // Check if this item is a descendant of the current category
+                if (isDescendantOf($(this), categoryId, currentLevel)) {
+                    $(this).addClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Show direct children of a category
+    function showDirectChildren(categoryId, currentLevel) {
+        const allItems = $('#categoryTree').find('.category-item');
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel === currentLevel + 1) {
+                // Check if this is a direct child
+                if (isDirectChildOf($(this), categoryId, currentLevel)) {
+                    $(this).removeClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Check if an item is a descendant of a specific category
+    function isDescendantOf(item, parentCategoryId, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel <= parentLevel) return false;
+        
+        // Find the immediate parent of this item
+        const allItems = $('#categoryTree').find('.category-item');
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === itemLevel - 1 && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        if (!immediateParent) return false;
+        
+        const immediateParentId = immediateParent.data('category-id');
+        if (immediateParentId === parentCategoryId) {
+            return true;
+        } else {
+            return isDescendantOf(immediateParent, parentCategoryId, parentLevel);
+        }
+    }
+
+    // Check if an item is a direct child of a specific category
+    function isDirectChildOf(item, parentCategoryId, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel !== parentLevel + 1) return false;
+        
+        // Find the immediate parent of this item
+        const allItems = $('#categoryTree').find('.category-item');
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === parentLevel && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        return immediateParent && immediateParent.data('category-id') === parentCategoryId;
+    }
+
+    // Display pagination
+    function displayPagination(response) {
+        const pagination = $('#pagination');
+        pagination.empty();
+
+        if (response.totalPages <= 1) return;
+
+        // Previous button
+        const prevDisabled = currentPage === 1 ? 'disabled' : '';
+        pagination.append(`
+            <li class="page-item ${prevDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+            </li>
+        `);
+
+        // Page numbers
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(response.totalPages, currentPage + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const activeClass = i === currentPage ? 'active' : '';
+            pagination.append(`
+                <li class="page-item ${activeClass}">
+                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                </li>
+            `);
+        }
+
+        // Next button
+        const nextDisabled = currentPage === response.totalPages ? 'disabled' : '';
+        pagination.append(`
+            <li class="page-item ${nextDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+            </li>
+        `);
+    }
+
+    // Load parent categories for dropdowns and tree
+    function loadParentCategories() {
+        $.ajax({
+            url: baseUrl + 'api/category/tree',
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const categories = response.success ? response.data : response;
+                const createParentCategory = $('#createParentCategory');
+                const editParentCategory = $('#editParentCategory');
+                const parentCategoryFilter = $('#parentCategoryFilter');
+
+                if (Array.isArray(categories)) {
+                    // Build tree structure for create modal
+                    const createHtml = buildCategoryRadioButtons(categories, 'create');
+                            console.log(createHtml);
+                    createParentCategory.append(createHtml);
+                    
+                    // Build tree structure for edit modal
+                    const editHtml = buildCategoryRadioButtons(categories, 'edit');
+                    editParentCategory.append(editHtml);
+                    
+                    // Build tree structure for filter with checkboxes
+                    const filterHtml = buildCategoryCheckboxes(categories, 'filter');
+                    parentCategoryFilter.html(filterHtml);
+                    
+                    // Initialize tree interactions for filter
+                    initializeFilterTreeInteractions();
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                console.error('Error loading parent categories:', xhr.responseText);
+            }
+        });
+    }
+
+    // Build category radio buttons for parent selection
+    function buildCategoryRadioButtons(categories, prefix, level = 0) {
+        let html = '';
+        categories.forEach(category => {
+            const radioId = `${prefix}Parent_${category.id}`;
+            const hasChildren = category.children && category.children.length > 0;
+            const expandIcon = hasChildren ? 
+                `<span class="category-expand-icon" data-category-id="${category.id}" data-prefix="${prefix}" style="cursor: pointer; margin-right: 5px; font-weight: bold; color: #666;">+</span>` : 
+                `<span style="margin-right: 20px;"></span>`;
+            
+            // Only collapse children (level > 0), not root categories
+            const collapsedClass = level > 0 ? 'collapsed' : '';
+            
+            html += `
+                <div class="category-item ${collapsedClass}" data-category-id="${category.id}" data-prefix="${prefix}" data-level="${level}" style="margin-left: ${level * 20}px;">
+                    <div class="form-check">
+                        ${expandIcon}
+                        <input class="form-check-input" type="radio" name="${prefix}ParentCategory" 
+                               id="${radioId}" value="${category.id}">
+                        <label class="form-check-label" for="${radioId}">
+                            ${category.categoryName}
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            if (hasChildren) {
+                html += buildCategoryRadioButtons(category.children, prefix, level + 1);
+            }
+        });
+        return html;
+    }
+
+    // Build category checkboxes for filter
+    function buildCategoryCheckboxes(categories, prefix, level = 0) {
+        let html = '';
+        categories.forEach(category => {
+            const checkboxId = `${prefix}Category_${category.id}`;
+            const hasChildren = category.children && category.children.length > 0;
+            const expandIcon = hasChildren ? 
+                `<span class="category-expand-icon" data-category-id="${category.id}" data-prefix="${prefix}" style="cursor: pointer; margin-right: 5px; font-weight: bold; color: #666;">+</span>` : 
+                `<span style="margin-right: 20px;"></span>`;
+            
+            const collapsedClass = level > 0 ? 'collapsed' : '';
+            
+            html += `
+                <div class="category-item ${collapsedClass}" data-category-id="${category.id}" data-prefix="${prefix}" data-level="${level}" style="margin-left: ${level * 20}px;">
+                    <div class="form-check">
+                        ${expandIcon}
+                        <input class="form-check-input category-checkbox" type="checkbox" 
+                               id="${checkboxId}" value="${category.id}" 
+                               data-parent-id="${category.parentId || ''}"
+                               data-prefix="${prefix}">
+                        <label class="form-check-label" for="${checkboxId}">
+                            ${category.categoryName}
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            if (hasChildren) {
+                html += buildCategoryCheckboxes(category.children, prefix, level + 1);
+            }
+        });
+        return html;
+    }
+
+    // Initialize tree interactions for parent category selection
+    function initializeParentCategoryTreeInteractions() {
+        // Handle expand/collapse for modal parent category selection
+        $(document).off('click', '.category-expand-icon[data-prefix="create"], .category-expand-icon[data-prefix="edit"]').on('click', '.category-expand-icon[data-prefix="create"], .category-expand-icon[data-prefix="edit"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const categoryId = $(this).data('category-id');
+            const prefix = $(this).data('prefix');
+            const icon = $(this);
+            
+            toggleParentCategoryChildren(categoryId, prefix, icon);
+        });
+
+        // Handle radio button selection for modal (single selection)
+        $(document).off('change', 'input[type="radio"][name*="ParentCategory"]').on('change', 'input[type="radio"][name*="ParentCategory"]', function() {
+            const prefix = $(this).attr('name').replace('ParentCategory', '');
+            const selectedValue = $(this).val();
+            
+            // Uncheck all other radio buttons in the same group
+            $(`input[type="radio"][name="${prefix}ParentCategory"]`).not(this).prop('checked', false);
+            
+            // Update the hidden input for form submission
+            if (selectedValue === '') {
+                $(`#${prefix}ParentCategoryId`).val('');
+            } else {
+                $(`#${prefix}ParentCategoryId`).val(selectedValue);
+            }
+        });
+    }
+
+    // Toggle parent category children visibility
+    function toggleParentCategoryChildren(categoryId, prefix, icon) {
+        console.log('toggleParentCategoryChildren called:', { categoryId, prefix, icon: icon.text() });
+        
+        const currentItem = icon.closest('.category-item');
+        const currentLevel = parseInt(currentItem.data('level'));
+        
+        // Determine if we should expand or collapse
+        const isExpanded = icon.text() === '-';
+        
+        if (isExpanded) {
+            // Collapse: hide all children
+            icon.text('+');
+            icon.removeClass('expanded').addClass('collapsed');
+            
+            // Hide all descendants of this category
+            hideParentCategoryDescendants(categoryId, prefix, currentLevel);
+        } else {
+            // Expand: show direct children only
+            icon.text('-');
+            icon.removeClass('collapsed').addClass('expanded');
+            
+            // Show direct children only
+            showParentCategoryDirectChildren(categoryId, prefix, currentLevel);
+        }
+    }
+
+    // Hide all descendants of a parent category
+    function hideParentCategoryDescendants(categoryId, prefix, currentLevel) {
+        const container = $(`#${prefix}ParentCategory`);
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel > currentLevel) {
+                // Check if this item is a descendant of the current category
+                if (isParentCategoryDescendantOf($(this), categoryId, prefix, currentLevel)) {
+                    $(this).addClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Show direct children of a parent category
+    function showParentCategoryDirectChildren(categoryId, prefix, currentLevel) {
+        console.log('showParentCategoryDirectChildren called:', { categoryId, prefix, currentLevel });
+        
+        const container = $(`#${prefix}ParentCategory`);
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        
+        console.log('Found items:', allItems.length);
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel === currentLevel + 1) {
+                // Check if this is a direct child
+                if (isParentCategoryDirectChildOf($(this), categoryId, prefix, currentLevel)) {
+                    console.log('Showing child:', $(this).find('label').text());
+                    $(this).removeClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Check if an item is a descendant of a specific parent category
+    function isParentCategoryDescendantOf(item, parentCategoryId, prefix, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel <= parentLevel) return false;
+        
+        // Find the immediate parent of this item
+        const container = $(`#${prefix}ParentCategory`);
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === itemLevel - 1 && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        if (!immediateParent) return false;
+        
+        const immediateParentId = immediateParent.data('category-id');
+        if (immediateParentId === parentCategoryId) {
+            return true;
+        } else {
+            return isParentCategoryDescendantOf(immediateParent, parentCategoryId, prefix, parentLevel);
+        }
+    }
+
+    // Check if an item is a direct child of a specific parent category
+    function isParentCategoryDirectChildOf(item, parentCategoryId, prefix, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel !== parentLevel + 1) return false;
+        
+        // Find the immediate parent of this item
+        const container = $(`#${prefix}ParentCategory`);
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === parentLevel && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        return immediateParent && immediateParent.data('category-id') === parentCategoryId;
+    }
+
+    // Get selected category IDs for filter
+    function getSelectedCategoryIds() {
+        const selectedIds = [];
+        $('#parentCategoryFilter input[type="checkbox"]:checked').each(function() {
+            selectedIds.push(parseInt($(this).val()));
+        });
+        return selectedIds;
+    }
+
+    // Initialize tree interactions for filter
+    function initializeFilterTreeInteractions() {
+        // Handle expand/collapse for filter only
+        $(document).off('click', '.category-expand-icon[data-prefix="filter"]').on('click', '.category-expand-icon[data-prefix="filter"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const categoryId = $(this).data('category-id');
+            const prefix = $(this).data('prefix');
+            const icon = $(this);
+            
+            toggleFilterCategoryChildren(categoryId, prefix, icon);
+        });
+
+        // Handle checkbox change with parent-child logic
+        $('#parentCategoryFilter').off('change', 'input[type="checkbox"]').on('change', 'input[type="checkbox"]', function() {
+            const checkbox = $(this);
+            const isChecked = checkbox.is(':checked');
+            const categoryId = parseInt(checkbox.val());
+            
+            if (isChecked) {
+                // When checking a child, also check all its parents
+                checkParentCategories(categoryId);
+            } else {
+                // When unchecking a parent, uncheck all its children
+                uncheckChildCategories(categoryId);
+            }
+            
+            // Trigger filter update
+            const selectedIds = getSelectedCategoryIds();
+            currentFilters.categoryIds = selectedIds;
+            currentPage = 1;
+            
+            // Clear any expanded children in table when filtering
+            $('#categoryTree .child-category-row').remove();
+            
+            if (currentViewMode === 'list') {
+                loadCategories();
+            } else {
+                loadCategoryTree();
+            }
+        });
+    }
+
+    // Toggle filter category children visibility
+    function toggleFilterCategoryChildren(categoryId, prefix, icon) {
+        const currentItem = icon.closest('.category-item');
+        const currentLevel = parseInt(currentItem.data('level'));
+        
+        // Determine if we should expand or collapse
+        const isExpanded = icon.text() === '-';
+        
+        if (isExpanded) {
+            // Collapse: hide all children
+            icon.text('+');
+            icon.removeClass('expanded').addClass('collapsed');
+            
+            // Hide all descendants of this category
+            hideFilterCategoryDescendants(categoryId, prefix, currentLevel);
+        } else {
+            // Expand: show direct children only
+            icon.text('-');
+            icon.removeClass('collapsed').addClass('expanded');
+            
+            // Show direct children only
+            showFilterCategoryDirectChildren(categoryId, prefix, currentLevel);
+        }
+    }
+
+    // Hide all descendants of a filter category
+    function hideFilterCategoryDescendants(categoryId, prefix, currentLevel) {
+        const container = $('#parentCategoryFilter');
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel > currentLevel) {
+                // Check if this item is a descendant of the current category
+                if (isFilterCategoryDescendantOf($(this), categoryId, prefix, currentLevel)) {
+                    $(this).addClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Show direct children of a filter category
+    function showFilterCategoryDirectChildren(categoryId, prefix, currentLevel) {
+        const container = $('#parentCategoryFilter');
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel === currentLevel + 1) {
+                // Check if this is a direct child
+                if (isFilterCategoryDirectChildOf($(this), categoryId, prefix, currentLevel)) {
+                    $(this).removeClass('collapsed');
+                }
+            }
+        });
+    }
+
+    // Check if an item is a descendant of a specific filter category
+    function isFilterCategoryDescendantOf(item, parentCategoryId, prefix, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel <= parentLevel) return false;
+        
+        // Find the immediate parent of this item
+        const container = $('#parentCategoryFilter');
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === itemLevel - 1 && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        if (!immediateParent) return false;
+        
+        const immediateParentId = immediateParent.data('category-id');
+        if (immediateParentId === parentCategoryId) {
+            return true;
+        } else {
+            return isFilterCategoryDescendantOf(immediateParent, parentCategoryId, prefix, parentLevel);
+        }
+    }
+
+    // Check if an item is a direct child of a specific filter category
+    function isFilterCategoryDirectChildOf(item, parentCategoryId, prefix, parentLevel) {
+        const itemLevel = parseInt(item.data('level'));
+        if (itemLevel !== parentLevel + 1) return false;
+        
+        // Find the immediate parent of this item
+        const container = $('#parentCategoryFilter');
+        const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
+        let immediateParent = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === parentLevel && $(this).index() < item.index()) {
+                immediateParent = $(this);
+            }
+        });
+        
+        return immediateParent && immediateParent.data('category-id') === parentCategoryId;
+    }
+
+    // Check parent categories when a child is checked
+    function checkParentCategories(categoryId) {
+        const container = $('#parentCategoryFilter');
+        const currentItem = container.find(`[data-category-id="${categoryId}"]`).closest('.category-item');
+        const currentLevel = parseInt(currentItem.data('level'));
+        
+        // Find and check all parent categories
+        for (let level = currentLevel - 1; level >= 0; level--) {
+            const parentItem = findParentAtLevel(currentItem, level);
+            if (parentItem) {
+                const parentCheckbox = parentItem.find('input[type="checkbox"]');
+                if (!parentCheckbox.is(':checked')) {
+                    parentCheckbox.prop('checked', true);
+                }
+            }
+        }
+    }
+
+    // Uncheck child categories when a parent is unchecked
+    function uncheckChildCategories(parentCategoryId) {
+        const container = $('#parentCategoryFilter');
+        const parentItem = container.find(`[data-category-id="${parentCategoryId}"]`).closest('.category-item');
+        const parentLevel = parseInt(parentItem.data('level'));
+        
+        // Find and uncheck all child categories
+        const allItems = container.find('.category-item');
+        allItems.each(function() {
+            const itemLevel = parseInt($(this).data('level'));
+            if (itemLevel > parentLevel) {
+                // Check if this is a descendant of the unchecked parent
+                if (isFilterCategoryDescendantOf($(this), parentCategoryId, 'filter', parentLevel)) {
+                    const childCheckbox = $(this).find('input[type="checkbox"]');
+                    if (childCheckbox.is(':checked')) {
+                        childCheckbox.prop('checked', false);
+                    }
+                }
+            }
+        });
+    }
+
+    // Find parent item at specific level
+    function findParentAtLevel(item, targetLevel) {
+        const container = $('#parentCategoryFilter');
+        const itemLevel = parseInt(item.data('level'));
+        
+        if (itemLevel <= targetLevel) return null;
+        
+        const allItems = container.find('.category-item');
+        let parentItem = null;
+        
+        allItems.each(function() {
+            const level = parseInt($(this).data('level'));
+            if (level === targetLevel && $(this).index() < item.index()) {
+                parentItem = $(this);
+            }
+        });
+        
+        return parentItem;
+    }
+
+    // Load types from API
+    function loadTypes() {
+        $.ajax({
+            url: baseUrl + 'api/category/types',
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const types = response.success ? response.data : response;
+                const typeFilter = $('#typeFilter');
+                const createType = $('#createType');
+                const editType = $('#editType');
+
+                if (Array.isArray(types)) {
+                    types.forEach(type => {
+                        typeFilter.append(`
+                            <option value="${type}">${type}</option>
+                        `);
+                        createType.append(`
+                            <option value="${type}">${type}</option>
+                        `);
+                        editType.append(`
+                            <option value="${type}">${type}</option>
+                        `);
+                    });
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                console.error('Error loading types:', xhr.responseText);
+            }
+        });
+    }
+
+    // Create category
+    $('#saveCategoryBtn').on('click', function() {
+        // Validate required fields
+        if (!$('#createCategoryName').val() || !$('#createType').val()) {
+            showAlert('Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        const categoryData = {
+            categoryName: $('#createCategoryName').val(),
+            type: $('#createType').val(),
+            parentId: $('#createParentCategoryId').val() || null,
+            enable: $('#createEnable').is(':checked')
+        };
+
+        $.ajax({
+            url: baseUrl + 'api/category',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: getAuthHeaders(),
+            data: JSON.stringify(categoryData),
+            beforeSend: function() {
+                showLoading();
+            },
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    showAlert('Category created successfully!', 'success');
+                    $('#createCategoryModal').modal('hide');
+                    $('#createCategoryForm')[0].reset();
+                    if (currentViewMode === 'list') {
+                        loadCategories();
+                    } else {
+                        loadCategoryTree();
+                    }
+                } else {
+                    showAlert('Error creating category: ' + (response.message || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr) {
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error creating category: ' + errorMessage, 'danger');
+            }
+        });
+    });
+
+    // Update category
+    $('#updateCategoryBtn').on('click', function() {
+        const categoryId = $('#editCategoryId').val();
+        
+        // Validate required fields
+        if (!$('#editCategoryName').val() || !$('#editType').val()) {
+            showAlert('Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        const categoryData = {
+            categoryName: $('#editCategoryName').val(),
+            type: $('#editType').val(),
+            parentId: $('#editParentCategoryId').val() || null,
+            enable: $('#editEnable').is(':checked')
+        };
+
+        $.ajax({
+            url: baseUrl + 'api/category/' + categoryId,
+            type: 'PUT',
+            contentType: 'application/json',
+            headers: getAuthHeaders(),
+            data: JSON.stringify(categoryData),
+            beforeSend: function() {
+                showLoading();
+            },
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    showAlert('Category updated successfully!', 'success');
+                    $('#editCategoryModal').modal('hide');
+                    if (currentViewMode === 'list') {
+                        loadCategories();
+                    } else {
+                        loadCategoryTree();
+                    }
+                } else {
+                    showAlert('Error updating category: ' + (response.message || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr) {
+                hideLoading();
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error updating category: ' + errorMessage, 'danger');
+            }
+        });
+    });
+
+    // Global functions for actions
+    window.changePage = function(page) {
+        currentPage = page;
+        
+        // Clear any expanded children in table when changing page
+        $('#categoryTree .child-category-row').remove();
+        
+        if (currentViewMode === 'list') {
+        loadCategories();
+        } else {
+            loadCategoryTree();
+        }
+    };
+
+    window.viewCategory = function(categoryId) {
+        $.ajax({
+            url: baseUrl + 'api/category/' + categoryId,
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const category = response.success ? response.data : response;
+                if (category) {
+                    displayCategoryDetails(category);
+                    $('#categoryDetailsModal').modal('show');
+                } else {
+                    showAlert('Error loading category details: Category not found', 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error loading category details: ' + errorMessage, 'danger');
+            }
+        });
+    };
+
+    window.editCategory = function(categoryId) {
+        $.ajax({
+            url: baseUrl + 'api/category/' + categoryId,
+            type: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                const category = response.success ? response.data : response;
+                if (category) {
+                    populateEditForm(category);
+                    $('#editCategoryModal').modal('show');
+                } else {
+                    showAlert('Error loading category: Category not found', 'danger');
+                }
+            },
+            error: function(xhr) {
+                if (handleAuthError(xhr)) return;
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                showAlert('Error loading category: ' + errorMessage, 'danger');
+            }
+        });
+    };
+
+    window.deleteCategory = function(categoryId) {
+        $('#confirmMessage').text('Are you sure you want to delete this category? This action cannot be undone.');
+        $('#confirmBtn').off('click').on('click', function() {
+            $.ajax({
+                url: baseUrl + 'api/category/' + categoryId,
+                type: 'DELETE',
+                headers: getAuthHeaders(),
+                beforeSend: function() {
+                    showLoading();
+                },
+                success: function(response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('Category deleted successfully!', 'success');
+                        $('#confirmModal').modal('hide');
+                        if (currentViewMode === 'list') {
+                            loadCategories();
+                        } else {
+                            loadCategoryTree();
+                        }
+                    } else {
+                        showAlert('Error deleting category: ' + (response.message || 'Unknown error'), 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    hideLoading();
+                    if (handleAuthError(xhr)) return;
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+                    showAlert('Error deleting category: ' + errorMessage, 'danger');
+                }
+            });
+        });
+        $('#confirmModal').modal('show');
+    };
+
+    // Helper functions
+    function displayCategoryDetails(category) {
+        const parentName = category.parentCategory ? category.parentCategory.categoryName : 'None';
+        const statusText = category.enable ? 'Active' : 'Inactive';
+        const statusClass = category.enable ? 'text-success' : 'text-secondary';
+
+        $('#categoryDetailsContent').html(`
+            <div class="row">
+                <div class="col-md-8">
+                    <h4 class="mb-2">${category.categoryName}</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Type:</strong> ${category.type || 'Not specified'}</p>
+                            <p><strong>Parent Category:</strong> ${parentName}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> ${formatDate(category.createdTime)}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
+    function populateEditForm(category) {
+        $('#editCategoryId').val(category.id);
+        $('#editCategoryName').val(category.categoryName);
+        $('#editType').val(category.type || '');
+        
+        // Set parent category radio button
+        if (category.parentId) {
+            $(`input[name="editParentCategory"][value="${category.parentId}"]`).prop('checked', true);
+            $('#editParentCategoryId').val(category.parentId);
+        } else {
+            $('#editParentNone').prop('checked', true);
+            $('#editParentCategoryId').val('');
+        }
+        
+        $('#editEnable').prop('checked', category.enable);
+    }
+
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'warning' ? 'alert-warning' : 
+                          type === 'info' ? 'alert-info' : 'alert-danger';
+        const iconClass = type === 'success' ? 'check-circle' : 
+                         type === 'warning' ? 'alert-triangle' : 
+                         type === 'info' ? 'info-circle' : 'alert-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="ti ti-${iconClass} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Remove existing alerts
+        $('.alert').remove();
+        
+        // Add new alert at the top of the page
+        $('.card-body').prepend(alertHtml);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN');
+    }
+});
+</script>
+}

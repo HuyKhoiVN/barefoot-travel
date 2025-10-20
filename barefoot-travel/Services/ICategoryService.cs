@@ -9,7 +9,7 @@ namespace barefoot_travel.Services
         // Category CRUD operations
         Task<ApiResponse> GetCategoryByIdAsync(int id);
         Task<ApiResponse> GetAllCategoriesAsync();
-        Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? type = null, bool? active = null);
+        Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null);
         Task<ApiResponse> CreateCategoryAsync(CreateCategoryDto dto, string adminUsername);
         Task<ApiResponse> UpdateCategoryAsync(int id, UpdateCategoryDto dto, string adminUsername);
         Task<ApiResponse> DeleteCategoryAsync(int id, string adminUsername);
@@ -18,5 +18,7 @@ namespace barefoot_travel.Services
         Task<ApiResponse> GetCategoriesByParentIdAsync(int? parentId);
         Task<ApiResponse> GetAllType();
         Task<ApiResponse> GetCategoryTreeAsync();
+        Task<PagedResult<CategoryDto>> GetTreePagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null);
+        Task<ApiResponse> GetChildrenAsync(int parentId);
     }
 }

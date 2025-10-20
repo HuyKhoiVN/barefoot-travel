@@ -25,7 +25,7 @@ namespace barefoot_travel.Services
                     return new ApiResponse(false, "Category not found");
                 }
 
-                var categoryDto = MapToCategoryDto(category);
+                var categoryDto = await MapToCategoryDto(category);
                 return new ApiResponse(true, "Category retrieved successfully", categoryDto);
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace barefoot_travel.Services
             try
             {
                 var categories = await _categoryRepository.GetAllAsync();
-                var categoryDtos = categories.Select(MapToCategoryDto).ToList();
+                var categoryDtos = await MapToCategoryDtos(categories);
                 return new ApiResponse(true, "Categories retrieved successfully", categoryDtos);
             }
             catch (Exception ex)
@@ -48,12 +48,12 @@ namespace barefoot_travel.Services
             }
         }
 
-        public async Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? type = null, bool? active = null)
+        public async Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null)
         {
             try
             {
-                var pagedResult = await _categoryRepository.GetPagedAsync(page, pageSize, sortBy, sortOrder, type, active);
-                var categoryDtos = pagedResult.Items.Select(MapToCategoryDto).ToList();
+                var pagedResult = await _categoryRepository.GetPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, parentCategory, active);
+                var categoryDtos = await MapToCategoryDtos(pagedResult.Items);
 
                 return new PagedResult<CategoryDto>
                 {
@@ -88,7 +88,7 @@ namespace barefoot_travel.Services
 
                 var category = MapToCategory(dto, adminUsername);
                 var createdCategory = await _categoryRepository.CreateAsync(category);
-                var categoryDto = MapToCategoryDto(createdCategory);
+                var categoryDto = await MapToCategoryDto(createdCategory);
 
                 return new ApiResponse(true, "Category created successfully", categoryDto);
             }
@@ -186,7 +186,7 @@ namespace barefoot_travel.Services
             try
             {
                 var categories = await _categoryRepository.GetByTypeAsync(type);
-                var categoryDtos = categories.Select(MapToCategoryDto).ToList();
+                var categoryDtos = await MapToCategoryDtos(categories);
                 return new ApiResponse(true, "Categories retrieved successfully", categoryDtos);
             }
             catch (Exception ex)
@@ -200,7 +200,7 @@ namespace barefoot_travel.Services
             try
             {
                 var categories = await _categoryRepository.GetByParentIdAsync(parentId);
-                var categoryDtos = categories.Select(MapToCategoryDto).ToList();
+                var categoryDtos = await MapToCategoryDtos(categories);
                 return new ApiResponse(true, "Categories retrieved successfully", categoryDtos);
             }
             catch (Exception ex)
@@ -227,7 +227,7 @@ namespace barefoot_travel.Services
             try
             {
                 var categories = await _categoryRepository.GetAllAsync();
-                var categoryDtos = categories.Select(MapToCategoryDto).ToList();
+                var categoryDtos = await MapToCategoryDtos(categories);
                 var categoryTree = BuildCategoryTree(categoryDtos, null);
                 return new ApiResponse(true, "Category tree retrieved successfully", categoryTree);
             }
@@ -265,12 +265,56 @@ namespace barefoot_travel.Services
             category.UpdatedBy = adminUsername;
         }
 
-        private CategoryDto MapToCategoryDto(Category category)
+        public async Task<PagedResult<CategoryDto>> GetTreePagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null)
         {
+            try
+            {
+                var pagedResult = await _categoryRepository.GetTreePagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIds, active);
+                var categoryDtos = await MapToCategoryDtos(pagedResult.Items);
+
+                return new PagedResult<CategoryDto>
+                {
+                    Items = categoryDtos,
+                    TotalItems = pagedResult.TotalItems,
+                    TotalPages = pagedResult.TotalPages,
+                    CurrentPage = pagedResult.CurrentPage,
+                    PageSize = pagedResult.PageSize
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving paged category tree: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> GetChildrenAsync(int parentId)
+        {
+            try
+            {
+                var children = await _categoryRepository.GetChildrenAsync(parentId);
+                var categoryDtos = await MapToCategoryDtos(children);
+                return new ApiResponse(true, "Category children retrieved successfully", categoryDtos);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving category children: {ex.Message}");
+            }
+        }
+
+        private async Task<CategoryDto> MapToCategoryDto(Category category)
+        {
+            string? parentName = null;
+            if (category.ParentId.HasValue)
+            {
+                var parent = await _categoryRepository.GetByIdAsync(category.ParentId.Value);
+                parentName = parent?.CategoryName;
+            }
+
             return new CategoryDto
             {
                 Id = category.Id,
                 ParentId = category.ParentId,
+                ParentName = parentName,
                 CategoryName = category.CategoryName,
                 Enable = category.Enable,
                 Type = category.Type,
@@ -280,6 +324,66 @@ namespace barefoot_travel.Services
                 UpdatedBy = category.UpdatedBy,
                 Active = category.Active
             };
+        }
+
+        private async Task<List<CategoryDto>> MapToCategoryDtos(List<Category> categories)
+        {
+            var categoryDtos = new List<CategoryDto>();
+            
+            // Get all unique parent IDs
+            var parentIds = categories
+                .Where(c => c.ParentId.HasValue)
+                .Select(c => c.ParentId.Value)
+                .Distinct()
+                .ToList();
+
+            // Get all parent categories in one query
+            var parentCategories = new Dictionary<int, string>();
+            foreach (var parentId in parentIds)
+            {
+                var parent = await _categoryRepository.GetByIdAsync(parentId);
+                if (parent != null)
+                {
+                    parentCategories[parentId] = parent.CategoryName;
+                }
+            }
+
+            // Get total children count for each category
+            var categoryIds = categories.Select(c => c.Id).ToList();
+            var childrenCounts = new Dictionary<int, int>();
+            foreach (var categoryId in categoryIds)
+            {
+                var children = await _categoryRepository.GetChildrenAsync(categoryId);
+                childrenCounts[categoryId] = children.Count;
+            }
+
+            // Map categories to DTOs
+            foreach (var category in categories)
+            {
+                string? parentName = null;
+                if (category.ParentId.HasValue && parentCategories.ContainsKey(category.ParentId.Value))
+                {
+                    parentName = parentCategories[category.ParentId.Value];
+                }
+
+                categoryDtos.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    ParentId = category.ParentId,
+                    ParentName = parentName,
+                    CategoryName = category.CategoryName,
+                    Enable = category.Enable,
+                    Type = category.Type,
+                    Priority = category.Priority,
+                    CreatedTime = category.CreatedTime,
+                    UpdatedTime = category.UpdatedTime,
+                    UpdatedBy = category.UpdatedBy,
+                    Active = category.Active,
+                    TotalChild = childrenCounts.ContainsKey(category.Id) ? childrenCounts[category.Id] : 0
+                });
+            }
+
+            return categoryDtos;
         }
 
         private List<CategoryTreeDto> BuildCategoryTree(List<CategoryDto> categories, int? parentId)

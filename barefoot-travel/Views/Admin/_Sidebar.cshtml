@@ -57,36 +57,10 @@
 
         <!-- Categories Management -->
         <li class="sidebar-item">
-          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
-            <div class="d-flex align-items-center gap-3">
-              <span class="d-flex">
-                <i class="ti ti-category"></i>
-              </span>
-              <span class="hide-menu">Categories</span>
-            </div>
+          <a class="sidebar-link" href="@Url.Action("Index", "CategoryManager")" aria-expanded="false">
+            <i class="ti ti-category"></i>
+            <span class="hide-menu">Category Manager</span>
           </a>
-          <ul aria-expanded="false" class="collapse first-level">
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Category")">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle"></i>
-                  </div>
-                  <span class="hide-menu">All Categories</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="@Url.Action("Create", "Category")">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle"></i>
-                  </div>
-                  <span class="hide-menu">Add Category</span>
-                </div>
-              </a>
-            </li>
-          </ul>
         </li>
 
         <!-- Bookings Management -->

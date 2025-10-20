@@ -6,6 +6,7 @@ namespace barefoot_travel.DTOs.Category
     {
         public int Id { get; set; }
         public int? ParentId { get; set; }
+        public string? ParentName { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public bool Enable { get; set; }
         public string Type { get; set; } = string.Empty;
@@ -14,6 +15,7 @@ namespace barefoot_travel.DTOs.Category
         public DateTime? UpdatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public bool Active { get; set; }
+        public int TotalChild { get; set; }
     }
 
     public class CreateCategoryDto
