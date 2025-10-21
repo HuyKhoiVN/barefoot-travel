@@ -1,0 +1,892 @@
+@{
+    ViewData["Title"] = "Booking Management";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-md-flex align-items-center">
+                    <div>
+                        <h4 class="card-title">Booking Management</h4>
+                        <p class="card-subtitle">Manage bookings, status updates, and customer information</p>
+                    </div>
+                    <div class="ms-auto mt-3 mt-md-0">
+                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createBookingModal">
+                            <i class="ti ti-plus me-2"></i>Add New Booking
+                        </button>
+                        <button type="button" class="btn btn-success" id="exportBookingsBtn">
+                            <i class="ti ti-download me-2"></i>Export
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and Filter Section -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Search Bookings</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by customer name, email...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">All Statuses</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Payment Status</label>
+                            <select class="form-select" id="paymentStatusFilter">
+                                <option value="">All Payments</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Date From</label>
+                            <input type="date" class="form-control" id="dateFromFilter">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Date To</label>
+                            <input type="date" class="form-control" id="dateToFilter">
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-outline-secondary d-block w-100" id="clearFilters">
+                                <i class="ti ti-x me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings Table -->
+                <div class="table-responsive mt-4">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="bookingsTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">ID</th>
+                                <th scope="col" class="px-0 text-muted">Customer</th>
+                                <th scope="col" class="px-0 text-muted">Tour</th>
+                                <th scope="col" class="px-0 text-muted">Start Date</th>
+                                <th scope="col" class="px-0 text-muted">People</th>
+                                <th scope="col" class="px-0 text-muted">Total Price</th>
+                                <th scope="col" class="px-0 text-muted">Status</th>
+                                <th scope="col" class="px-0 text-muted">Payment</th>
+                                <th scope="col" class="px-0 text-muted">Created</th>
+                                <th scope="col" class="px-0 text-muted text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Bookings pagination" class="mt-4">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Booking Modal -->
+<div class="modal fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBookingModalLabel">Add New Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createBookingForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tour <span class="text-danger">*</span></label>
+                                <select class="form-select" id="createTourId" required>
+                                    <option value="">Select Tour</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="createStartDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="createCustomerName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="createPhoneNumber" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="createEmail">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Number of People <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="createPeople" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Status</label>
+                                <select class="form-select" id="createPaymentStatus">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Failed">Failed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="createNote" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBookingBtn">Save Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Booking Details Modal -->
+<div class="modal fade" id="viewBookingModal" tabindex="-1" aria-labelledby="viewBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBookingModalLabel">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookingDetails">
+                    <!-- Booking details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusModalLabel">Update Booking Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStatusForm">
+                    <input type="hidden" id="updateStatusBookingId">
+                    <div class="mb-3">
+                        <label class="form-label">New Status</label>
+                        <select class="form-select" id="updateStatusSelect" required>
+                            <!-- Status options will be loaded here -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveStatusBtn">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Note Modal -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Internal Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addNoteForm">
+                    <input type="hidden" id="addNoteBookingId">
+                    <div class="mb-3">
+                        <label class="form-label">Note</label>
+                        <textarea class="form-control" id="addNoteText" rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNoteBtn">Add Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Export Bookings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Export Format</label>
+                                <select class="form-select" id="exportFormat" required>
+                                    <option value="Excel">Excel (.xlsx)</option>
+                                    <option value="PDF">PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status Filter</label>
+                                <select class="form-select" id="exportStatusFilter">
+                                    <option value="">All Statuses</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="exportStartDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="exportEndDate">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmExportBtn">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let currentPage = 1;
+            let pageSize = 10;
+            let currentFilters = {};
+            let bookingStatuses = [];
+            let tours = [];
+            let currentBookingId = null;
+
+            // Initialize the page
+            initializePage();
+
+            function initializePage() {
+                loadBookingStatuses();
+                loadTours();
+                loadBookings();
+                setupEventHandlers();
+            }
+
+            function setupEventHandlers() {
+                // Search functionality
+                $('#searchInput').on('input', debounce(function() {
+                    currentFilters.search = $(this).val();
+                    currentPage = 1;
+                    loadBookings();
+                }, 500));
+
+                // Filter handlers
+                $('#statusFilter, #paymentStatusFilter, #dateFromFilter, #dateToFilter').on('change', function() {
+                    currentFilters.status = $('#statusFilter').val();
+                    currentFilters.paymentStatus = $('#paymentStatusFilter').val();
+                    currentFilters.dateFrom = $('#dateFromFilter').val();
+                    currentFilters.dateTo = $('#dateToFilter').val();
+                    currentPage = 1;
+                    loadBookings();
+                });
+
+                // Clear filters
+                $('#clearFilters').on('click', function() {
+                    $('#searchInput, #statusFilter, #paymentStatusFilter, #dateFromFilter, #dateToFilter').val('');
+                    currentFilters = {};
+                    currentPage = 1;
+                    loadBookings();
+                });
+
+                // Create booking
+                $('#saveBookingBtn').on('click', function() {
+                    createBooking();
+                });
+
+                // Export bookings
+                $('#exportBookingsBtn').on('click', function() {
+                    $('#exportModal').modal('show');
+                });
+
+                $('#confirmExportBtn').on('click', function() {
+                    exportBookings();
+                });
+
+                // Update status
+                $('#saveStatusBtn').on('click', function() {
+                    updateBookingStatus();
+                });
+
+                // Add note
+                $('#saveNoteBtn').on('click', function() {
+                    addBookingNote();
+                });
+
+                // Confirmation modal
+                $('#confirmActionBtn').on('click', function() {
+                    if (window.pendingAction) {
+                        window.pendingAction();
+                        window.pendingAction = null;
+                    }
+                    $('#confirmModal').modal('hide');
+                });
+            }
+
+            function loadBookingStatuses() {
+                $.ajax({
+                    url: '/api/admin/booking/statuses',
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            bookingStatuses = response.data;
+                            populateStatusFilters();
+                        }
+                    },
+                    error: function(xhr) {
+                        showAlert('Error loading booking statuses', 'danger');
+                    }
+                });
+            }
+
+            function loadTours() {
+                $.ajax({
+                    url: '/api/tour',
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            tours = response.data;
+                            populateTourSelect();
+                        }
+                    },
+                    error: function(xhr) {
+                        showAlert('Error loading tours', 'danger');
+                    }
+                });
+            }
+
+            function populateStatusFilters() {
+                const statusSelects = ['#statusFilter', '#updateStatusSelect', '#exportStatusFilter'];
+                
+                statusSelects.forEach(selector => {
+                    const select = $(selector);
+                    select.empty();
+                    
+                    if (selector === '#statusFilter' || selector === '#exportStatusFilter') {
+                        select.append('<option value="">All Statuses</option>');
+                    }
+                    
+                    bookingStatuses.forEach(status => {
+                        select.append(`<option value="${status.id}">${status.statusName}</option>`);
+                    });
+                });
+            }
+
+            function populateTourSelect() {
+                const select = $('#createTourId');
+                select.empty();
+                select.append('<option value="">Select Tour</option>');
+                
+                tours.forEach(tour => {
+                    select.append(`<option value="${tour.id}">${tour.title}</option>`);
+                });
+            }
+
+            function loadBookings() {
+                const params = {
+                    page: currentPage,
+                    pageSize: pageSize,
+                    ...currentFilters
+                };
+
+                $.ajax({
+                    url: '/api/admin/booking',
+                    method: 'GET',
+                    data: params,
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        // GET /api/admin/booking returns PagedResult<BookingDto> directly, not wrapped in ApiResponse
+                        displayBookings(response);
+                        updatePagination(response);
+                    },
+                    error: function(xhr) {
+                        showAlert('Error loading bookings', 'danger');
+                    }
+                });
+            }
+
+            function displayBookings(data) {
+                const tbody = $('#bookingsTableBody');
+                tbody.empty();
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(booking => {
+                        const row = createBookingRow(booking);
+                        tbody.append(row);
+                    });
+                } else {
+                    tbody.append(`
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <i class="ti ti-inbox fs-1 text-muted"></i>
+                                <h4 class="mt-3">No Bookings Found</h4>
+                                <p class="text-muted">There are no bookings to display.</p>
+                            </td>
+                        </tr>
+                    `);
+                }
+            }
+
+            function createBookingRow(booking) {
+                const statusBadge = getStatusBadge(booking.statusName);
+                const paymentBadge = getPaymentBadge(booking.paymentStatus);
+                const formattedDate = formatDate(booking.startDate);
+                const formattedCreatedDate = formatDate(booking.createdTime);
+
+                return `
+                    <tr>
+                        <td class="px-0">#${booking.id}</td>
+                        <td class="px-0">
+                            <div>
+                                <h6 class="mb-0">${booking.nameCustomer}</h6>
+                                <small class="text-muted">${booking.email || 'No email'}</small>
+                            </div>
+                        </td>
+                        <td class="px-0">
+                            <div>
+                                <h6 class="mb-0">${booking.tourTitle}</h6>
+                                <small class="text-muted">${booking.phoneNumber}</small>
+                            </div>
+                        </td>
+                        <td class="px-0">${formattedDate}</td>
+                        <td class="px-0">${booking.people}</td>
+                        <td class="px-0">$${booking.totalPrice.toFixed(2)}</td>
+                        <td class="px-0">${statusBadge}</td>
+                        <td class="px-0">${paymentBadge}</td>
+                        <td class="px-0">${formattedCreatedDate}</td>
+                        <td class="px-0 text-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewBooking(${booking.id})" title="View Details">
+                                    <i class="ti ti-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-warning" onclick="updateStatus(${booking.id})" title="Update Status">
+                                    <i class="ti ti-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="addNote(${booking.id})" title="Add Note">
+                                    <i class="ti ti-note"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            function getStatusBadge(statusName) {
+                const statusClasses = {
+                    'Pending': 'badge bg-warning',
+                    'Confirmed': 'badge bg-success',
+                    'Cancelled': 'badge bg-danger',
+                    'Completed': 'badge bg-info'
+                };
+                const className = statusClasses[statusName] || 'badge bg-secondary';
+                return `<span class="${className}">${statusName}</span>`;
+            }
+
+            function getPaymentBadge(paymentStatus) {
+                const paymentClasses = {
+                    'Paid': 'badge bg-success',
+                    'Pending': 'badge bg-warning',
+                    'Failed': 'badge bg-danger'
+                };
+                const className = paymentClasses[paymentStatus] || 'badge bg-secondary';
+                return `<span class="${className}">${paymentStatus}</span>`;
+            }
+
+            function updatePagination(data) {
+                const pagination = $('#pagination');
+                pagination.empty();
+
+                if (data.totalPages <= 1) return;
+
+                // Previous button
+                const prevDisabled = currentPage === 1 ? 'disabled' : '';
+                pagination.append(`
+                    <li class="page-item ${prevDisabled}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+                    </li>
+                `);
+
+                // Page numbers
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(data.totalPages, currentPage + 2);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const activeClass = i === currentPage ? 'active' : '';
+                    pagination.append(`
+                        <li class="page-item ${activeClass}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `);
+                }
+
+                // Next button
+                const nextDisabled = currentPage === data.totalPages ? 'disabled' : '';
+                pagination.append(`
+                    <li class="page-item ${nextDisabled}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+                    </li>
+                `);
+            }
+
+            function createBooking() {
+                const formData = {
+                    tourId: parseInt($('#createTourId').val()),
+                    startDate: $('#createStartDate').val(),
+                    nameCustomer: $('#createCustomerName').val(),
+                    phoneNumber: $('#createPhoneNumber').val(),
+                    email: $('#createEmail').val(),
+                    people: parseInt($('#createPeople').val()),
+                    paymentStatus: $('#createPaymentStatus').val(),
+                    note: $('#createNote').val()
+                };
+
+                // Validation
+                if (!formData.tourId || !formData.startDate || !formData.nameCustomer || !formData.phoneNumber || !formData.people) {
+                    showAlert('Please fill in all required fields', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/admin/booking',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        // POST /api/admin/booking returns ApiResponse
+                        if (response.success) {
+                            showAlert('Booking created successfully', 'success');
+                            $('#createBookingModal').modal('hide');
+                            $('#createBookingForm')[0].reset();
+                            loadBookings();
+                        } else {
+                            showAlert(response.message || 'Error creating booking', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error creating booking';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            function updateBookingStatus() {
+                const bookingId = $('#updateStatusBookingId').val();
+                const statusTypeId = parseInt($('#updateStatusSelect').val());
+
+                if (!statusTypeId) {
+                    showAlert('Please select a status', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: `/api/admin/booking/${bookingId}/status`,
+                    method: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ statusTypeId: statusTypeId }),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Booking status updated successfully', 'success');
+                            $('#updateStatusModal').modal('hide');
+                            loadBookings();
+                        } else {
+                            showAlert(response.message || 'Error updating status', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error updating status';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            function addBookingNote() {
+                const bookingId = $('#addNoteBookingId').val();
+                const note = $('#addNoteText').val();
+
+                if (!note.trim()) {
+                    showAlert('Please enter a note', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: `/api/admin/booking/${bookingId}/note`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ note: note }),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Note added successfully', 'success');
+                            $('#addNoteModal').modal('hide');
+                            $('#addNoteForm')[0].reset();
+                        } else {
+                            showAlert(response.message || 'Error adding note', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error adding note';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            function exportBookings() {
+                const exportData = {
+                    exportFormat: $('#exportFormat').val(),
+                    startDateFrom: $('#exportStartDate').val() || null,
+                    startDateTo: $('#exportEndDate').val() || null,
+                    statusTypeId: $('#exportStatusFilter').val() || null,
+                    tourId: null
+                };
+
+                $.ajax({
+                    url: '/api/admin/booking/export',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(exportData),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Export completed successfully', 'success');
+                            $('#exportModal').modal('hide');
+                            // Handle file download if needed
+                        } else {
+                            showAlert(response.message || 'Error exporting bookings', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error exporting bookings';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            // Global functions for onclick handlers
+            window.viewBooking = function(bookingId) {
+                $.ajax({
+                    url: `/api/admin/booking/${bookingId}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            displayBookingDetails(response.data);
+                            $('#viewBookingModal').modal('show');
+                        }
+                    },
+                    error: function(xhr) {
+                        showAlert('Error loading booking details', 'danger');
+                    }
+                });
+            };
+
+            window.updateStatus = function(bookingId) {
+                currentBookingId = bookingId;
+                $('#updateStatusBookingId').val(bookingId);
+                $('#updateStatusModal').modal('show');
+            };
+
+            window.addNote = function(bookingId) {
+                currentBookingId = bookingId;
+                $('#addNoteBookingId').val(bookingId);
+                $('#addNoteModal').modal('show');
+            };
+
+            window.changePage = function(page) {
+                currentPage = page;
+                loadBookings();
+            };
+
+            function displayBookingDetails(booking) {
+                const detailsHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Booking Information</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Booking ID:</strong></td><td>#${booking.id}</td></tr>
+                                <tr><td><strong>Tour:</strong></td><td>${booking.tourTitle}</td></tr>
+                                <tr><td><strong>Start Date:</strong></td><td>${formatDate(booking.startDate)}</td></tr>
+                                <tr><td><strong>People:</strong></td><td>${booking.people}</td></tr>
+                                <tr><td><strong>Total Price:</strong></td><td>$${booking.totalPrice.toFixed(2)}</td></tr>
+                                <tr><td><strong>Status:</strong></td><td>${getStatusBadge(booking.statusName)}</td></tr>
+                                <tr><td><strong>Payment:</strong></td><td>${getPaymentBadge(booking.paymentStatus)}</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Name:</strong></td><td>${booking.nameCustomer}</td></tr>
+                                <tr><td><strong>Phone:</strong></td><td>${booking.phoneNumber}</td></tr>
+                                <tr><td><strong>Email:</strong></td><td>${booking.email || 'Not provided'}</td></tr>
+                                <tr><td><strong>Created:</strong></td><td>${formatDate(booking.createdTime)}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    ${booking.note ? `
+                        <div class="mt-3">
+                            <h6>Notes</h6>
+                            <div class="alert alert-info">${booking.note}</div>
+                        </div>
+                    ` : ''}
+                `;
+                $('#bookingDetails').html(detailsHtml);
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            }
+
+            function showAlert(message, type) {
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        <i class="ti ti-${type === 'success' ? 'check-circle' : type === 'danger' ? 'alert-circle' : 'info-circle'} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                // Remove existing alerts
+                $('.alert').remove();
+                
+                // Add new alert at the top of the page
+                $('.card-body').prepend(alertHtml);
+                
+                // Auto-hide after 5 seconds
+                setTimeout(function() {
+                    $('.alert').fadeOut();
+                }, 5000);
+            }
+
+            function getAuthToken() {
+                // Get token from localStorage or cookie
+                return localStorage.getItem('authToken') || getCookie('authToken');
+            }
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        });
+    </script>
+}

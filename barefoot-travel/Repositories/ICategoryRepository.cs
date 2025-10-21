@@ -9,7 +9,7 @@ namespace barefoot_travel.Repositories
         // Category CRUD operations
         Task<Category?> GetByIdAsync(int id);
         Task<List<Category>> GetAllAsync();
-        Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null);
+        Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null);
         Task<Category> CreateAsync(Category category);
         Task<Category> UpdateAsync(Category category);
         Task<bool> DeleteAsync(int id);

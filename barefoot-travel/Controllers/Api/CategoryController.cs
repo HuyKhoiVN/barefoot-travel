@@ -58,12 +58,21 @@ namespace barefoot_travel.Controllers.Api
             [FromQuery] string? sortOrder = "asc",
             [FromQuery] string? categoryName = null,
             [FromQuery] string? type = null,
-            [FromQuery] int? parentCategory = null,
+            [FromQuery] string? categoryIds = null,
             [FromQuery] bool? active = null)
         {
             try
             {
-                var result = await _categoryService.GetCategoriesPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, parentCategory, active);
+                List<int>? categoryIdsList = null;
+                if (!string.IsNullOrEmpty(categoryIds))
+                {
+                    categoryIdsList = categoryIds.Split(',')
+                        .Where(x => int.TryParse(x.Trim(), out _))
+                        .Select(x => int.Parse(x.Trim()))
+                        .ToList();
+                }
+
+                var result = await _categoryService.GetCategoriesPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIdsList, active);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -167,12 +176,21 @@ namespace barefoot_travel.Controllers.Api
             [FromQuery] string? sortOrder = "asc",
             [FromQuery] string? categoryName = null,
             [FromQuery] string? type = null,
-            [FromQuery] List<int>? categoryIds = null,
+            [FromQuery] string? categoryIds = null,
             [FromQuery] bool? active = null)
         {
             try
             {
-                var result = await _categoryService.GetTreePagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIds, active);
+                List<int>? categoryIdsList = null;
+                if (!string.IsNullOrEmpty(categoryIds))
+                {
+                    categoryIdsList = categoryIds.Split(',')
+                        .Where(x => int.TryParse(x.Trim(), out _))
+                        .Select(x => int.Parse(x.Trim()))
+                        .ToList();
+                }
+
+                var result = await _categoryService.GetTreePagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIdsList, active);
                 return Ok(result);
             }
             catch (Exception ex)

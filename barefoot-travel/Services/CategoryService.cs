@@ -48,11 +48,11 @@ namespace barefoot_travel.Services
             }
         }
 
-        public async Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null)
+        public async Task<PagedResult<CategoryDto>> GetCategoriesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null)
         {
             try
             {
-                var pagedResult = await _categoryRepository.GetPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, parentCategory, active);
+                var pagedResult = await _categoryRepository.GetPagedAsync(page, pageSize, sortBy, sortOrder, categoryName, type, categoryIds, active);
                 var categoryDtos = await MapToCategoryDtos(pagedResult.Items);
 
                 return new PagedResult<CategoryDto>

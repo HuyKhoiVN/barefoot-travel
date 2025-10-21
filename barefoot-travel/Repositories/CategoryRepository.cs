@@ -29,7 +29,7 @@ namespace barefoot_travel.Repositories
                 .ToListAsync();
         }
 
-        public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, int? parentCategory = null, bool? active = null)
+        public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null)
         {
             var query = _context.Categories.AsQueryable();
 
@@ -55,14 +55,18 @@ namespace barefoot_travel.Repositories
                 query = query.Where(c => c.Type == type);
             }
 
-            // Filter by parent category (including children)
-            if (parentCategory.HasValue)
+            // Filter by category IDs (including descendants)
+            if (categoryIds != null && categoryIds.Any())
             {
-                // Get all descendant category IDs
-                var descendantIds = await GetDescendantCategoryIds(parentCategory.Value);
-                descendantIds.Add(parentCategory.Value);
+                var allDescendantIds = new List<int>();
+                foreach (var categoryId in categoryIds)
+                {
+                    allDescendantIds.Add(categoryId);
+                    var descendants = await GetDescendantCategoryIds(categoryId);
+                    allDescendantIds.AddRange(descendants);
+                }
                 
-                query = query.Where(c => descendantIds.Contains(c.ParentId ?? 0));
+                query = query.Where(c => allDescendantIds.Contains(c.ParentId ?? 0));
             }
 
             // Apply sorting
@@ -255,18 +259,15 @@ namespace barefoot_travel.Repositories
                 query = query.Where(c => c.Type == type);
             }
 
-            // Filter by category IDs (including descendants)
+            // Filter by category IDs - only show categories that are direct children of selected categories
             if (categoryIds != null && categoryIds.Any())
             {
-                var allDescendantIds = new List<int>();
-                foreach (var categoryId in categoryIds)
-                {
-                    allDescendantIds.Add(categoryId);
-                    var descendants = await GetDescendantCategoryIds(categoryId);
-                    allDescendantIds.AddRange(descendants);
-                }
-                
-                query = query.Where(c => allDescendantIds.Contains(c.ParentId ?? 0));
+                query = query.Where(c => categoryIds.Contains(c.ParentId ?? 0));
+            }
+            else
+            {
+                // If no categoryIds filter, only show root level categories (ParentId is null)
+                query = query.Where(c => c.ParentId == null);
             }
 
             // Apply sorting
