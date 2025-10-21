@@ -1,3 +1,4 @@
+using barefoot_travel.Common;
 using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Booking;
 using barefoot_travel.Models;
@@ -95,7 +96,11 @@ namespace barefoot_travel.Repositories
                 query = from b in query where b.PhoneNumber.Contains(filter.PhoneNumber) select b;
 
             if (!string.IsNullOrEmpty(filter.NameCustomer))
-                query = from b in query where b.NameCustomer.Contains(filter.NameCustomer) select b;
+            {
+                string name = filter.NameCustomer.Trim().ToLower();
+                query = query.Where(b => EF.Functions.Collate(b.NameCustomer.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(name, SQLParams.Latin_General)));
+            }
+
 
             if (!string.IsNullOrEmpty(filter.Email))
                 query = from b in query where b.Email != null && b.Email.Contains(filter.Email) select b;

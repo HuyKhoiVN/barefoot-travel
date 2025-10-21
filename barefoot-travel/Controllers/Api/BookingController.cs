@@ -22,30 +22,59 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
-        /// Get all bookings with pagination and sorting
+        /// Get all bookings with pagination and filtering
         /// </summary>
         /// <param name="page">Page number (default: 1)</param>
         /// <param name="pageSize">Page size (default: 10)</param>
         /// <param name="sortBy">Sort field (default: CreatedTime)</param>
         /// <param name="sortDirection">Sort direction: asc or desc (default: desc)</param>
+        /// <param name="statusTypeId">Filter by status ID</param>
+        /// <param name="paymentStatus">Filter by payment status</param>
+        /// <param name="startDateFrom">Filter by start date from</param>
+        /// <param name="startDateTo">Filter by start date to</param>
+        /// <param name="nameCustomer">Filter by customer name</param>
+        /// <param name="email">Filter by email</param>
+        /// <param name="phoneNumber">Filter by phone number</param>
         /// <returns>Paged list of bookings</returns>
-        [HttpGet]
-        public async Task<PagedResult<BookingDto>> GetBookings(
+        [HttpGet("paged")]
+        public async Task<PagedResult<BookingDto>> GetBookingsPaged(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "CreatedTime",
-            [FromQuery] string sortDirection = "desc")
+            [FromQuery] string sortDirection = "desc",
+            [FromQuery] int? statusTypeId = null,
+            [FromQuery] string? paymentStatus = null,
+            [FromQuery] DateTime? startDateFrom = null,
+            [FromQuery] DateTime? startDateTo = null,
+            [FromQuery] string? nameCustomer = null,
+            [FromQuery] string? email = null,
+            [FromQuery] string? phoneNumber = null)
         {
-            _logger.LogInformation("Getting bookings - Page: {Page}, PageSize: {PageSize}, SortBy: {SortBy}, SortDirection: {SortDirection}", 
+            _logger.LogInformation("Getting bookings with filters - Page: {Page}, PageSize: {PageSize}, SortBy: {SortBy}, SortDirection: {SortDirection}", 
                 page, pageSize, sortBy, sortDirection);
 
             try
             {
-                return await _bookingService.GetBookingsPagedAsync(page, pageSize, sortBy, sortDirection);
+                var filter = new BookingFilterDto
+                {
+                    Page = page,
+                    PageSize = pageSize,
+                    SortBy = sortBy,
+                    SortDirection = sortDirection,
+                    StatusTypeId = statusTypeId,
+                    PaymentStatus = paymentStatus,
+                    StartDateFrom = startDateFrom,
+                    StartDateTo = startDateTo,
+                    NameCustomer = nameCustomer,
+                    Email = email,
+                    PhoneNumber = phoneNumber
+                };
+
+                return await _bookingService.GetBookingsFilteredAsync(filter);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting bookings");
+                _logger.LogError(ex, "Error getting bookings with filters");
                 throw;
             }
         }

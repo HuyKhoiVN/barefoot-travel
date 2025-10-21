@@ -76,7 +76,7 @@
                     <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="bookingsTable">
                         <thead>
                             <tr>
-                                <th scope="col" class="px-0 text-muted">ID</th>
+                                <th scope="col" class="px-0 text-muted">No.</th>
                                 <th scope="col" class="px-0 text-muted">Customer</th>
                                 <th scope="col" class="px-0 text-muted">Tour</th>
                                 <th scope="col" class="px-0 text-muted">Start Date</th>
@@ -352,17 +352,21 @@
             function setupEventHandlers() {
                 // Search functionality
                 $('#searchInput').on('input', debounce(function() {
-                    currentFilters.search = $(this).val();
+                    const searchValue = $('#searchInput').val() || '';
+                    // Search by customer name, email, or phone number
+                    currentFilters.nameCustomer = searchValue;
+                    currentFilters.email = searchValue;
+                    currentFilters.phoneNumber = searchValue;
                     currentPage = 1;
                     loadBookings();
                 }, 500));
 
                 // Filter handlers
                 $('#statusFilter, #paymentStatusFilter, #dateFromFilter, #dateToFilter').on('change', function() {
-                    currentFilters.status = $('#statusFilter').val();
-                    currentFilters.paymentStatus = $('#paymentStatusFilter').val();
-                    currentFilters.dateFrom = $('#dateFromFilter').val();
-                    currentFilters.dateTo = $('#dateToFilter').val();
+                    currentFilters.statusTypeId = $('#statusFilter').val() || null;
+                    currentFilters.paymentStatus = $('#paymentStatusFilter').val() || null;
+                    currentFilters.startDateFrom = $('#dateFromFilter').val() || null;
+                    currentFilters.startDateTo = $('#dateToFilter').val() || null;
                     currentPage = 1;
                     loadBookings();
                 });
@@ -411,7 +415,7 @@
 
             function loadBookingStatuses() {
                 $.ajax({
-                    url: '/api/admin/booking/statuses',
+                    url: '/api/bookingstatus',
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + getAuthToken()
@@ -482,14 +486,14 @@
                 };
 
                 $.ajax({
-                    url: '/api/admin/booking',
+                    url: '/api/admin/booking/paged',
                     method: 'GET',
                     data: params,
                     headers: {
                         'Authorization': 'Bearer ' + getAuthToken()
                     },
                     success: function(response) {
-                        // GET /api/admin/booking returns PagedResult<BookingDto> directly, not wrapped in ApiResponse
+                        // GET /api/admin/booking/paged returns PagedResult<BookingDto> directly, not wrapped in ApiResponse
                         displayBookings(response);
                         updatePagination(response);
                     },
@@ -504,8 +508,8 @@
                 tbody.empty();
 
                 if (data.items && data.items.length > 0) {
-                    data.items.forEach(booking => {
-                        const row = createBookingRow(booking);
+                    data.items.forEach((booking, index) => {
+                        const row = createBookingRow(booking, index);
                         tbody.append(row);
                     });
                 } else {
@@ -521,15 +525,16 @@
                 }
             }
 
-            function createBookingRow(booking) {
+            function createBookingRow(booking, index) {
                 const statusBadge = getStatusBadge(booking.statusName);
                 const paymentBadge = getPaymentBadge(booking.paymentStatus);
-                const formattedDate = formatDate(booking.startDate);
-                const formattedCreatedDate = formatDate(booking.createdTime);
+                const formattedDate = formatDateOnly(booking.startDate);
+                const formattedCreatedDate = formatDateOnly(booking.createdTime);
+                const sequentialNumber = (currentPage - 1) * pageSize + index + 1;
 
                 return `
                     <tr>
-                        <td class="px-0">#${booking.id}</td>
+                        <td class="px-0">${sequentialNumber}</td>
                         <td class="px-0">
                             <div>
                                 <h6 class="mb-0">${booking.nameCustomer}</h6>
@@ -808,7 +813,6 @@
                         <div class="col-md-6">
                             <h6>Booking Information</h6>
                             <table class="table table-sm">
-                                <tr><td><strong>Booking ID:</strong></td><td>#${booking.id}</td></tr>
                                 <tr><td><strong>Tour:</strong></td><td>${booking.tourTitle}</td></tr>
                                 <tr><td><strong>Start Date:</strong></td><td>${formatDate(booking.startDate)}</td></tr>
                                 <tr><td><strong>People:</strong></td><td>${booking.people}</td></tr>
@@ -841,6 +845,12 @@
                 if (!dateString) return 'N/A';
                 const date = new Date(dateString);
                 return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            }
+
+            function formatDateOnly(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
             }
 
             function showAlert(message, type) {

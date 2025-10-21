@@ -136,6 +136,7 @@ builder.Services.AddScoped<barefoot_travel.Repositories.ITourPolicyRepository, b
 builder.Services.AddScoped<barefoot_travel.Repositories.ICategoryRepository, barefoot_travel.Repositories.CategoryRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IPolicyRepository, barefoot_travel.Repositories.PolicyRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IBookingRepository, barefoot_travel.Repositories.BookingRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IBookingStatusRepository, barefoot_travel.Repositories.BookingStatusRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IPriceTypeRepository, barefoot_travel.Repositories.PriceTypeRepository>();
 
 // Service Registration
@@ -146,6 +147,7 @@ builder.Services.AddScoped<barefoot_travel.Services.ITourService, barefoot_trave
 builder.Services.AddScoped<barefoot_travel.Services.ICategoryService, barefoot_travel.Services.CategoryService>();
 builder.Services.AddScoped<barefoot_travel.Services.IPolicyService, barefoot_travel.Services.PolicyService>();
 builder.Services.AddScoped<barefoot_travel.Services.IBookingService, barefoot_travel.Services.BookingService>();
+builder.Services.AddScoped<barefoot_travel.Services.IBookingStatusService, barefoot_travel.Services.BookingStatusService>();
 builder.Services.AddScoped<barefoot_travel.Services.IPriceTypeService, barefoot_travel.Services.PriceTypeService>();
 builder.Services.AddScoped<barefoot_travel.Services.IFileUploadService, barefoot_travel.Services.FileUploadService>();
 

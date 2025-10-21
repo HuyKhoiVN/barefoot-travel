@@ -251,7 +251,7 @@ namespace barefoot_travel.Repositories
             // Apply search filter by title
             if (!string.IsNullOrEmpty(search))
             {
-                baseQuery = baseQuery.Where(t => t.Title.Contains(search));
+                baseQuery = baseQuery.Where(t => t.Title.ToLower().Contains(search.ToLower()));
             }
 
             // Apply category filter with optimized join
