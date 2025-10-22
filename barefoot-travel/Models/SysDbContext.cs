@@ -1,6 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using barefoot_travel.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace barefoot_travel.Models;
 
@@ -43,15 +47,32 @@ public partial class SysDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDbFunction(typeof(CustomQuery).GetMethod(nameof(CustomQuery.ToCustomString))).HasTranslation(
+                e =>
+                {
+                    return new SqlFunctionExpression(functionName: "format", arguments: new[]{
+                                 e.First(),
+                                 new SqlFragmentExpression("'dd/MM/yyyy HH:mm:ss'")
+                            }, nullable: true, new List<bool>(), type: typeof(string), typeMapping: new StringTypeMapping("", DbType.String));
+                });
+
+        modelBuilder.HasDbFunction(typeof(CustomQuery).GetMethod(nameof(CustomQuery.ToDateString))).HasTranslation(
+            e =>
+            {
+                return new SqlFunctionExpression(functionName: "format", arguments: new[]{
+                                 e.First(),
+                                 new SqlFragmentExpression("'dd/MM/yyyy'")
+                        }, nullable: true, new List<bool>(), type: typeof(string), typeMapping: new StringTypeMapping("", DbType.String));
+            });
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Account__3214EC0782569B4A");
+            entity.HasKey(e => e.Id).HasName("PK__Account__3214EC0780E3BA5A");
 
             entity.ToTable("Account");
 
-            entity.HasIndex(e => e.Active, "IX_Account_Active");
-
-            entity.HasIndex(e => e.Username, "UQ__Account__536C85E403771DB2").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Account__536C85E46452D927").IsUnique();
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -75,19 +96,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Booking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Booking__3214EC073D33053B");
+            entity.HasKey(e => e.Id).HasName("PK__Booking__3214EC07C0F9F35D");
 
             entity.ToTable("Booking");
-
-            entity.HasIndex(e => e.Active, "IX_Booking_Active");
-
-            entity.HasIndex(e => e.StartDate, "IX_Booking_StartDate");
-
-            entity.HasIndex(e => e.StatusTypeId, "IX_Booking_StatusTypeId");
-
-            entity.HasIndex(e => e.TourId, "IX_Booking_TourId");
-
-            entity.HasIndex(e => e.UserId, "IX_Booking_UserId");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -107,11 +118,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<BookingStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__BookingS__3214EC07C52222F3");
+            entity.HasKey(e => e.Id).HasName("PK__BookingS__3214EC077F0934BD");
 
             entity.ToTable("BookingStatus");
-
-            entity.HasIndex(e => e.Active, "IX_BookingStatus_Active");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -124,15 +133,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07F66634D3");
+            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC0748447EA8");
 
             entity.ToTable("Category");
-
-            entity.HasIndex(e => e.Active, "IX_Category_Active");
-
-            entity.HasIndex(e => e.CategoryName, "IX_Category_CategoryName");
-
-            entity.HasIndex(e => e.ParentId, "IX_Category_ParentId");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CategoryName).HasMaxLength(255);
@@ -147,7 +150,7 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<CompanyInfo>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__CompanyI__3214EC071EA18966");
+            entity.HasKey(e => e.Id).HasName("PK__CompanyI__3214EC07144A07C7");
 
             entity.ToTable("CompanyInfo");
 
@@ -165,13 +168,11 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Permission>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Permissi__3214EC077BB771A7");
+            entity.HasKey(e => e.Id).HasName("PK__Permissi__3214EC0733DD13B7");
 
             entity.ToTable("Permission");
 
-            entity.HasIndex(e => e.Active, "IX_Permission_Active");
-
-            entity.HasIndex(e => e.PermissionKey, "UQ__Permissi__8884ABD4001192CF").IsUnique();
+            entity.HasIndex(e => e.PermissionKey, "UQ__Permissi__8884ABD4246C797F").IsUnique();
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -185,11 +186,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Policy>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Policy__3214EC07640B9913");
+            entity.HasKey(e => e.Id).HasName("PK__Policy__3214EC074808FE2F");
 
             entity.ToTable("Policy");
-
-            entity.HasIndex(e => e.Active, "IX_Policy_Active");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -202,11 +201,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<PriceType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__PriceTyp__3214EC07DBF31274");
+            entity.HasKey(e => e.Id).HasName("PK__PriceTyp__3214EC079D1B1B1C");
 
             entity.ToTable("PriceType");
-
-            entity.HasIndex(e => e.Active, "IX_PriceType_Active");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -219,11 +216,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Roles__3214EC0787F5D6AC");
+            entity.HasKey(e => e.Id).HasName("PK__Roles__3214EC073FE87E0C");
 
-            entity.HasIndex(e => e.Active, "IX_Roles_Active");
-
-            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B61609274EEF7").IsUnique();
+            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B61609FEFF9F9").IsUnique();
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -237,7 +232,7 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<RolePermission>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__RolePerm__3214EC07B87B79F5");
+            entity.HasKey(e => e.Id).HasName("PK__RolePerm__3214EC070BC434D3");
 
             entity.ToTable("RolePermission");
 
@@ -251,11 +246,7 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<Tour>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tours__3214EC07DB98891E");
-
-            entity.HasIndex(e => e.Active, "IX_Tours_Active");
-
-            entity.HasIndex(e => new { e.PricePerPerson, e.Duration }, "IX_Tours_PricePerPerson_Duration");
+            entity.HasKey(e => e.Id).HasName("PK__Tours__3214EC075316BC9A");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -273,11 +264,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<TourCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TourCate__3214EC07246FE5F3");
+            entity.HasKey(e => e.Id).HasName("PK__TourCate__3214EC0718B989E3");
 
             entity.ToTable("TourCategory");
-
-            entity.HasIndex(e => new { e.TourId, e.CategoryId }, "IX_TourCategory_TourId_CategoryId");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -289,13 +278,7 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<TourImage>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TourImag__3214EC07D8D7D6A2");
-
-            entity.HasIndex(e => e.Active, "IX_TourImages_Active");
-
-            entity.HasIndex(e => e.IsBanner, "IX_TourImages_IsBanner");
-
-            entity.HasIndex(e => e.TourId, "IX_TourImages_TourId");
+            entity.HasKey(e => e.Id).HasName("PK__TourImag__3214EC072F983203");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -310,11 +293,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<TourPolicy>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TourPoli__3214EC0765B4A214");
+            entity.HasKey(e => e.Id).HasName("PK__TourPoli__3214EC07BBF7F7E3");
 
             entity.ToTable("TourPolicy");
-
-            entity.HasIndex(e => new { e.TourId, e.PolicyId }, "IX_TourPolicy_TourId_PolicyId");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
@@ -326,11 +307,9 @@ public partial class SysDbContext : DbContext
 
         modelBuilder.Entity<TourPrice>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TourPric__3214EC07790C9F54");
+            entity.HasKey(e => e.Id).HasName("PK__TourPric__3214EC07E2F0A77E");
 
             entity.ToTable("TourPrice");
-
-            entity.HasIndex(e => new { e.TourId, e.PriceTypeId }, "IX_TourPrice_TourId_PriceTypeId");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)

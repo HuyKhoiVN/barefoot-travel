@@ -1,15 +1,18 @@
 using barefoot_travel.DTOs.Booking;
 using System.Text;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 
 namespace barefoot_travel.Services
 {
     public class ExportService
     {
-        public byte[] GenerateBookingReport(List<BookingDto> bookings, string format)
+        public byte[] GenerateBookingReport(List<BookingDto> bookings, string format, DateTime? startDateFrom = null, DateTime? startDateTo = null)
         {
             if (format.ToLower() == "excel")
             {
-                return GenerateExcelReport(bookings);
+                return GenerateExcelReport(bookings, startDateFrom, startDateTo);
             }
             else if (format.ToLower() == "pdf")
             {
@@ -21,31 +24,107 @@ namespace barefoot_travel.Services
             }
         }
 
-        private byte[] GenerateExcelReport(List<BookingDto> bookings)
+        private byte[] GenerateExcelReport(List<BookingDto> bookings, DateTime? startDateFrom = null, DateTime? startDateTo = null)
         {
-            var csv = new StringBuilder();
-            
-            // Add headers
-            csv.AppendLine("ID,Tour Title,Customer Name,Phone,Email,Start Date,People,Total Price,Status,Payment Status,Created Time,Note");
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            // Add data rows
-            foreach (var booking in bookings)
+            // Get template file path
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "template", "barefootReportTemplate.xlsx");
+            
+            if (!File.Exists(templatePath))
             {
-                csv.AppendLine($"{booking.Id}," +
-                              $"\"{booking.TourTitle}\"," +
-                              $"\"{booking.NameCustomer}\"," +
-                              $"\"{booking.PhoneNumber}\"," +
-                              $"\"{booking.Email ?? ""}\"," +
-                              $"{booking.StartDate:yyyy-MM-dd}," +
-                              $"{booking.People}," +
-                              $"{booking.TotalPrice}," +
-                              $"\"{booking.StatusName}\"," +
-                              $"\"{booking.PaymentStatus}\"," +
-                              $"{booking.CreatedTime:yyyy-MM-dd HH:mm:ss}," +
-                              $"\"{booking.Note?.Replace("\"", "\"\"") ?? ""}\"");
+                throw new FileNotFoundException($"Template file not found: {templatePath}");
             }
 
-            return Encoding.UTF8.GetBytes(csv.ToString());
+            using var package = new ExcelPackage(new FileInfo(templatePath));
+            var worksheet = package.Workbook.Worksheets[0];
+
+            // Fill date range in template
+            if (startDateFrom.HasValue)
+            {
+                worksheet.Cells["D6"].Value = startDateFrom.Value.ToLocalTime().ToString("dd/MM/yyyy");
+            }
+            if (startDateTo.HasValue)
+            {
+                worksheet.Cells["I6"].Value = startDateTo.Value.ToLocalTime().ToString("dd/MM/yyyy");
+            }
+
+            // Fill data starting from row 9
+            int currentRow = 9;
+            int rowNumber = 1;
+
+            foreach (var booking in bookings)
+            {
+                // No.
+                worksheet.Cells[currentRow, 1].Value = rowNumber;
+
+                // Tour Title
+                worksheet.Cells[currentRow, 2].Value = booking.TourTitle ?? "";
+
+                // Customer Name
+                worksheet.Cells[currentRow, 3].Value = booking.NameCustomer ?? "";
+
+                // Phone - add ' prefix if starts with 0
+                var phoneNumber = booking.PhoneNumber ?? "";
+                if (phoneNumber.StartsWith("0"))
+                {
+                    phoneNumber = "'" + phoneNumber;
+                }
+                worksheet.Cells[currentRow, 4].Value = phoneNumber;
+
+                // Email
+                worksheet.Cells[currentRow, 5].Value = booking.Email ?? "";
+
+                // Start Date - convert UTC to local time and show only date
+                worksheet.Cells[currentRow, 6].Value = booking.StartDate?.ToLocalTime().ToString("dd/MM/yyyy");
+
+                // People
+                worksheet.Cells[currentRow, 7].Value = booking.People;
+
+                // Total Price - format as currency without symbol
+                worksheet.Cells[currentRow, 8].Value = booking.TotalPrice;
+                worksheet.Cells[currentRow, 8].Style.Numberformat.Format = "#,##0";
+
+                // Status
+                worksheet.Cells[currentRow, 9].Value = booking.StatusName ?? "";
+
+                // Payment Status with color coding
+                var paymentStatusCell = worksheet.Cells[currentRow, 10];
+                paymentStatusCell.Value = booking.PaymentStatus ?? "";
+                
+                // Apply color based on payment status
+                switch (booking.PaymentStatus?.ToUpper())
+                {
+                    case "PENDING":
+                        paymentStatusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        paymentStatusCell.Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                        break;
+                    case "PAID":
+                        paymentStatusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        paymentStatusCell.Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                        break;
+                    case "CANCELLED":
+                    case "REFUNDED":
+                        paymentStatusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        paymentStatusCell.Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
+                        break;
+                }
+
+                // Created Time - convert UTC to local time and show date + time
+                worksheet.Cells[currentRow, 11].Value = booking.CreatedTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+
+                // Note
+                worksheet.Cells[currentRow, 12].Value = booking.Note ?? "";
+
+                currentRow++;
+                rowNumber++;
+            }
+
+            // Auto-fit columns for better readability
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            return package.GetAsByteArray();
         }
 
         private byte[] GeneratePdfReport(List<BookingDto> bookings)
@@ -58,15 +137,17 @@ namespace barefoot_travel.Services
             html.AppendLine("<meta charset='utf-8'>");
             html.AppendLine("<title>Booking Report</title>");
             html.AppendLine("<style>");
-            html.AppendLine("table { border-collapse: collapse; width: 100%; }");
+            html.AppendLine("table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }");
             html.AppendLine("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
-            html.AppendLine("th { background-color: #f2f2f2; }");
+            html.AppendLine("th { background-color: #f2f2f2; font-weight: bold; }");
+            html.AppendLine("tr:nth-child(even) { background-color: #f9f9f9; }");
+            html.AppendLine("h1 { color: #333; }");
             html.AppendLine("</style>");
             html.AppendLine("</head>");
             html.AppendLine("<body>");
             html.AppendLine("<h1>Booking Report</h1>");
-            html.AppendLine($"<p>Generated on: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}</p>");
-            html.AppendLine($"<p>Total Records: {bookings.Count}</p>");
+            html.AppendLine($"<p><strong>Generated on:</strong> {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}</p>");
+            html.AppendLine($"<p><strong>Total Records:</strong> {bookings.Count}</p>");
             
             html.AppendLine("<table>");
             html.AppendLine("<tr>");
@@ -88,17 +169,17 @@ namespace barefoot_travel.Services
             {
                 html.AppendLine("<tr>");
                 html.AppendLine($"<td>{booking.Id}</td>");
-                html.AppendLine($"<td>{booking.TourTitle}</td>");
-                html.AppendLine($"<td>{booking.NameCustomer}</td>");
-                html.AppendLine($"<td>{booking.PhoneNumber}</td>");
-                html.AppendLine($"<td>{booking.Email ?? ""}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.TourTitle ?? "")}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.NameCustomer ?? "")}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.PhoneNumber ?? "")}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.Email ?? "")}</td>");
                 html.AppendLine($"<td>{booking.StartDate:yyyy-MM-dd}</td>");
                 html.AppendLine($"<td>{booking.People}</td>");
-                html.AppendLine($"<td>{booking.TotalPrice:C}</td>");
-                html.AppendLine($"<td>{booking.StatusName}</td>");
-                html.AppendLine($"<td>{booking.PaymentStatus}</td>");
+                html.AppendLine($"<td>${booking.TotalPrice:F2}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.StatusName ?? "")}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.PaymentStatus ?? "")}</td>");
                 html.AppendLine($"<td>{booking.CreatedTime:yyyy-MM-dd HH:mm:ss}</td>");
-                html.AppendLine($"<td>{booking.Note ?? ""}</td>");
+                html.AppendLine($"<td>{EscapeHtml(booking.Note ?? "")}</td>");
                 html.AppendLine("</tr>");
             }
 
@@ -106,9 +187,23 @@ namespace barefoot_travel.Services
             html.AppendLine("</body>");
             html.AppendLine("</html>");
 
-            // For simplicity, return HTML as bytes
-            // In a real implementation, you would use a PDF library like iTextSharp or PdfSharp
-            return Encoding.UTF8.GetBytes(html.ToString());
+            // Use UTF-8 with BOM for better compatibility
+            var utf8WithBom = new UTF8Encoding(true);
+            return utf8WithBom.GetBytes(html.ToString());
+        }
+
+        private string EscapeHtml(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return "";
+
+            return text.Replace("&", "&amp;")
+                      .Replace("<", "&lt;")
+                      .Replace(">", "&gt;")
+                      .Replace("\"", "&quot;")
+                      .Replace("'", "&#39;")
+                      .Replace("\n", "<br>")
+                      .Replace("\r", "");
         }
     }
 }

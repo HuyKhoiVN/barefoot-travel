@@ -72,26 +72,90 @@
                 </div>
 
                 <!-- Bookings Table -->
-                <div class="table-responsive mt-4">
-                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="bookingsTable">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="px-0 text-muted">No.</th>
-                                <th scope="col" class="px-0 text-muted">Customer</th>
-                                <th scope="col" class="px-0 text-muted">Tour</th>
-                                <th scope="col" class="px-0 text-muted">Start Date</th>
-                                <th scope="col" class="px-0 text-muted">People</th>
-                                <th scope="col" class="px-0 text-muted">Total Price</th>
-                                <th scope="col" class="px-0 text-muted">Status</th>
-                                <th scope="col" class="px-0 text-muted">Payment</th>
-                                <th scope="col" class="px-0 text-muted">Created</th>
-                                <th scope="col" class="px-0 text-muted text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookingsTableBody">
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="table-responsive mt-4">
+                            <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="bookingsTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-0 text-muted">No.</th>
+                                        <th scope="col" class="px-0 text-muted ">Customer</th>
+                                        <th scope="col" class="px-0 text-muted">Tour</th>
+                                        <th scope="col" class="px-0 text-muted">Start Date</th>
+                                        <th scope="col" class="px-0 text-muted">People</th>
+                                        <th scope="col" class="px-0 text-muted">Status</th>
+                                        <th scope="col" class="px-0 text-muted">Payment</th>
+                                        <th scope="col" class="px-0 text-muted">Created</th>
+                                        <th scope="col" class="px-0 text-muted text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Booking Status Flow</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="status-flow">
+                                    <div class="status-item">
+                                        <div class="status-badge status-pending">1</div>
+                                        <div class="status-info">
+                                            <strong>Pending</strong>
+                                            <small class="text-muted d-block">Initial booking status</small>
+                                        </div>
+                                        <div class="status-arrow">→</div>
+                                    </div>
+                                    
+                                    <div class="status-item">
+                                        <div class="status-badge status-confirmed">2</div>
+                                        <div class="status-info">
+                                            <strong>Confirmed</strong>
+                                            <small class="text-muted d-block">Booking confirmed by admin</small>
+                                        </div>
+                                        <div class="status-arrow">→</div>
+
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-badge status-inprogress">3</div>
+                                        <div class="status-info">
+                                            <strong>In Progress</strong>
+                                            <small class="text-muted d-block">Tour is ongoing</small>
+                                        </div>
+                                        <div class="status-arrow">→</div>
+
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-badge status-complete">5</div>
+                                        <div class="status-info">
+                                            <strong>Complete</strong>
+                                            <small class="text-muted d-block">Tour finished successfully</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="status-item">
+                                    <div class="status-badge status-cancel">4</div>
+                                    <div class="status-info">
+                                        <strong>Cancel</strong>
+                                        <small class="text-muted d-block">Booking cancelled (can be from any status)</small>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <strong>Rules:</strong><br>
+                                        • Cannot update <b>Cancel/Complete</b> status<br>
+                                        • In <b>Progress</b> → <b>Complete</b> only<br>
+                                        • Cannot directly go to <b>Cancel/Complete</b> from <b>Pending/Confirmed</b>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Pagination -->
@@ -216,17 +280,82 @@
             <div class="modal-body">
                 <form id="updateStatusForm">
                     <input type="hidden" id="updateStatusBookingId">
+                    <input type="hidden" id="updateStatusCurrentStatus">
                     <div class="mb-3">
                         <label class="form-label">New Status</label>
                         <select class="form-select" id="updateStatusSelect" required>
                             <!-- Status options will be loaded here -->
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Note (Optional)</label>
+                        <textarea class="form-control" id="updateStatusNote" rows="3" placeholder="Add a note about this status change..."></textarea>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="saveStatusBtn">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Booking Confirmation Modal -->
+<div class="modal fade" id="completeBookingModal" tabindex="-1" aria-labelledby="completeBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="completeBookingModalLabel">Complete Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="ti ti-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                <p class="text-center">Are you sure you want to mark this booking as <strong>Complete</strong>?</p>
+                <p class="text-muted text-center small">This action cannot be undone.</p>
+                <input type="hidden" id="completeBookingId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmCompleteBtn">Yes, Complete Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Payment Status Modal -->
+<div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updatePaymentModalLabel">Update Payment Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updatePaymentForm">
+                    <input type="hidden" id="updatePaymentBookingId">
+                    <input type="hidden" id="updatePaymentCurrentStatus">
+                    <div class="mb-3">
+                        <label class="form-label">Current Payment Status</label>
+                        <input type="text" class="form-control" id="currentPaymentStatusDisplay" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Payment Status</label>
+                        <select class="form-select" id="updatePaymentSelect" required>
+                            <!-- Payment status options will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Note (Optional)</label>
+                        <textarea class="form-control" id="updatePaymentNote" rows="3" placeholder="Add a note about this payment status change..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="savePaymentBtn">Update Payment Status</button>
             </div>
         </div>
     </div>
@@ -291,14 +420,25 @@
                             <div class="mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" class="form-control" id="exportStartDate">
+                                <small class="text-muted">Optional - Leave empty to export all dates</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">End Date</label>
                                 <input type="date" class="form-control" id="exportEndDate">
+                                <small class="text-muted">Maximum 3 months from start date</small>
                             </div>
                         </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="ti ti-info-circle me-2"></i>
+                        <strong>Export Guidelines:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Maximum date range: 3 months (90 days)</li>
+                            <li>Large exports may take longer to process</li>
+                            <li>Files will be automatically downloaded after generation</li>
+                        </ul>
                     </div>
                 </form>
             </div>
@@ -332,12 +472,29 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Constants for frontend
+            const PAYMENT_STATUS = {
+                PENDING: 'Pending',
+                PAID: 'Paid',
+                CANCELLED: 'Cancelled',
+                REFUNDED: 'Refunded'
+            };
+
+            const BOOKING_STATUS = {
+                PENDING: 1,
+                CONFIRMED: 2,
+                IN_PROGRESS: 3,
+                CANCEL: 4,
+                COMPLETE: 5
+            };
+
             let currentPage = 1;
             let pageSize = 10;
             let currentFilters = {};
             let bookingStatuses = [];
             let tours = [];
             let currentBookingId = null;
+            let bookings = [];
 
             // Initialize the page
             initializePage();
@@ -353,10 +510,8 @@
                 // Search functionality
                 $('#searchInput').on('input', debounce(function() {
                     const searchValue = $('#searchInput').val() || '';
-                    // Search by customer name, email, or phone number
-                    currentFilters.nameCustomer = searchValue;
-                    currentFilters.email = searchValue;
-                    currentFilters.phoneNumber = searchValue;
+                    // Search across all booking properties
+                    currentFilters.searchAll = searchValue;
                     currentPage = 1;
                     loadBookings();
                 }, 500));
@@ -393,9 +548,25 @@
                     exportBookings();
                 });
 
+                // Real-time validation for export date range
+                $('#exportStartDate, #exportEndDate').on('change', function() {
+                    validateExportDateRange();
+                });
+
                 // Update status
                 $('#saveStatusBtn').on('click', function() {
                     updateBookingStatus();
+                });
+
+                // Confirm complete booking
+                $('#confirmCompleteBtn').on('click', function() {
+                    const bookingId = $('#completeBookingId').val();
+                    completeBooking(bookingId);
+                });
+
+                // Update payment status
+                $('#savePaymentBtn').on('click', function() {
+                    updatePaymentStatus();
                 });
 
                 // Add note
@@ -507,6 +678,9 @@
                 const tbody = $('#bookingsTableBody');
                 tbody.empty();
 
+                // Store bookings data for later use
+                bookings = data.items || [];
+
                 if (data.items && data.items.length > 0) {
                     data.items.forEach((booking, index) => {
                         const row = createBookingRow(booking, index);
@@ -548,8 +722,7 @@
                             </div>
                         </td>
                         <td class="px-0">${formattedDate}</td>
-                        <td class="px-0">${booking.people}</td>
-                        <td class="px-0">$${booking.totalPrice.toFixed(2)}</td>
+                        <td class="px-0 text-center">${booking.people}</td>
                         <td class="px-0">${statusBadge}</td>
                         <td class="px-0">${paymentBadge}</td>
                         <td class="px-0">${formattedCreatedDate}</td>
@@ -558,15 +731,72 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewBooking(${booking.id})" title="View Details">
                                     <i class="ti ti-eye"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-warning" onclick="updateStatus(${booking.id})" title="Update Status">
-                                    <i class="ti ti-edit"></i>
-                                </button>
+                                ${getUpdateStatusButton(booking.statusTypeId, booking.id)}
+                                ${getUpdatePaymentButton(booking.paymentStatus, booking.id, booking.statusTypeId)}
                                 <button type="button" class="btn btn-sm btn-outline-info" onclick="addNote(${booking.id})" title="Add Note">
                                     <i class="ti ti-note"></i>
                                 </button>
                             </div>
                         </td>
                     </tr>
+                `;
+            }
+
+            function getUpdateStatusButton(statusTypeId, bookingId) {
+                // Hide button completely for Complete (5) and Cancel (4) status
+                if (statusTypeId === BOOKING_STATUS.CANCEL || statusTypeId === BOOKING_STATUS.COMPLETE) {
+                    return '';
+                }
+                
+                // For InProgress (3), show complete button with different icon
+                if (statusTypeId === BOOKING_STATUS.IN_PROGRESS) {
+                    return `
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="confirmCompleteBooking(${bookingId})" title="Mark as Complete">
+                            <i class="ti ti-check"></i>
+                        </button>
+                    `;
+                }
+                
+                // For other statuses (Pending, Confirmed), show normal update button
+                return `
+                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="updateStatus(${bookingId})" title="Update Status">
+                        <i class="ti ti-edit"></i>
+                    </button>
+                `;
+            }
+
+            function getUpdatePaymentButton(paymentStatus, bookingId, bookingStatusId) {
+                // Hide payment button if booking status is Complete or Cancel
+                if (bookingStatusId === BOOKING_STATUS.CANCEL || bookingStatusId === BOOKING_STATUS.COMPLETE) {
+                    return '';
+                }
+                
+                // Show payment button based on current payment status
+                if (paymentStatus === PAYMENT_STATUS.PENDING) {
+                    return `
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="updatePaymentStatus(${bookingId})" title="Update Payment Status">
+                            <i class="ti ti-credit-card"></i>
+                        </button>
+                    `;
+                } else if (paymentStatus === PAYMENT_STATUS.PAID) {
+                    return `
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="updatePaymentStatus(${bookingId})" title="Update Payment Status">
+                            <i class="ti ti-credit-card"></i>
+                        </button>
+                    `;
+                } else if (paymentStatus === PAYMENT_STATUS.CANCELLED || paymentStatus === PAYMENT_STATUS.REFUNDED) {
+                    return `
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updatePaymentStatus(${bookingId})" title="View Payment Status">
+                            <i class="ti ti-eye"></i>
+                        </button>
+                    `;
+                }
+                
+                // Default button for any other payment status
+                return `
+                    <button type="button" class="btn btn-sm btn-outline-info" onclick="updatePaymentStatus(${bookingId})" title="Update Payment Status">
+                        <i class="ti ti-credit-card"></i>
+                    </button>
                 `;
             }
 
@@ -674,9 +904,18 @@
             function updateBookingStatus() {
                 const bookingId = $('#updateStatusBookingId').val();
                 const statusTypeId = parseInt($('#updateStatusSelect').val());
+                const currentStatusId = parseInt($('#updateStatusCurrentStatus').val());
+                const note = $('#updateStatusNote').val();
 
                 if (!statusTypeId) {
                     showAlert('Please select a status', 'warning');
+                    return;
+                }
+
+                // Frontend validation
+                const validationResult = validateStatusTransition(currentStatusId, statusTypeId);
+                if (!validationResult.isValid) {
+                    showAlert(validationResult.errorMessage, 'warning');
                     return;
                 }
 
@@ -684,7 +923,10 @@
                     url: `/api/admin/booking/${bookingId}/status`,
                     method: 'PATCH',
                     contentType: 'application/json',
-                    data: JSON.stringify({ statusTypeId: statusTypeId }),
+                    data: JSON.stringify({ 
+                        statusTypeId: statusTypeId,
+                        note: note || null
+                    }),
                     headers: {
                         'Authorization': 'Bearer ' + getAuthToken()
                     },
@@ -692,6 +934,7 @@
                         if (response.success) {
                             showAlert('Booking status updated successfully', 'success');
                             $('#updateStatusModal').modal('hide');
+                            $('#updateStatusForm')[0].reset();
                             loadBookings();
                         } else {
                             showAlert(response.message || 'Error updating status', 'danger');
@@ -702,6 +945,180 @@
                         showAlert(errorMessage, 'danger');
                     }
                 });
+            }
+
+            function validateStatusTransition(currentStatusId, newStatusId) {
+                // Cannot update if current status is Cancel or Complete
+                if (currentStatusId === BOOKING_STATUS.CANCEL || currentStatusId === BOOKING_STATUS.COMPLETE) {
+                    return {
+                        isValid: false,
+                        errorMessage: 'Cannot update status for cancelled or completed bookings'
+                    };
+                }
+
+                // If current status is InProgress, can only change to Complete
+                if (currentStatusId === BOOKING_STATUS.IN_PROGRESS) {
+                    if (newStatusId !== BOOKING_STATUS.COMPLETE) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'In-progress bookings can only be marked as Complete'
+                        };
+                    }
+                }
+
+                // Cannot change to Cancel or Complete from Pending or Confirmed (business rule)
+                if (newStatusId === BOOKING_STATUS.CANCEL || newStatusId === BOOKING_STATUS.COMPLETE) {
+                    if (currentStatusId === BOOKING_STATUS.PENDING || currentStatusId === BOOKING_STATUS.CONFIRMED) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'Cannot directly change to Cancel or Complete from Pending or Confirmed status'
+                        };
+                    }
+                }
+
+                return { isValid: true, errorMessage: '' };
+            }
+
+            function completeBooking(bookingId) {
+                $.ajax({
+                    url: `/api/admin/booking/${bookingId}/status`,
+                    method: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 
+                        statusTypeId: BOOKING_STATUS.COMPLETE, // Complete status
+                        note: "Booking marked as complete"
+                    }),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Booking marked as Complete successfully', 'success');
+                            $('#completeBookingModal').modal('hide');
+                            loadBookings();
+                        } else {
+                            showAlert(response.message || 'Error completing booking', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error completing booking';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            function populatePaymentStatusOptions(currentPaymentStatus) {
+                const select = $('#updatePaymentSelect');
+                select.empty();
+                
+                if (currentPaymentStatus === PAYMENT_STATUS.PENDING) {
+                    select.append('<option value="">Select new payment status...</option>');
+                    select.append(`<option value="${PAYMENT_STATUS.PAID}">Paid</option>`);
+                    select.append(`<option value="${PAYMENT_STATUS.CANCELLED}">Cancelled</option>`);
+                } else if (currentPaymentStatus === PAYMENT_STATUS.PAID) {
+                    select.append('<option value="">Select new payment status...</option>');
+                    select.append(`<option value="${PAYMENT_STATUS.REFUNDED}">Refunded</option>`);
+                } else if (currentPaymentStatus === PAYMENT_STATUS.CANCELLED) {
+                    select.append('<option value="">Select new payment status...</option>');
+                    select.append(`<option value="${PAYMENT_STATUS.PENDING}">Reactivate to Pending</option>`);
+                } else if (currentPaymentStatus === PAYMENT_STATUS.REFUNDED) {
+                    select.append('<option value="">No further actions available</option>');
+                    select.prop('disabled', true);
+                } else {
+                    // Default case for unknown payment status
+                    select.append('<option value="">Select new payment status...</option>');
+                    select.append(`<option value="${PAYMENT_STATUS.PENDING}">Pending</option>`);
+                    select.append(`<option value="${PAYMENT_STATUS.PAID}">Paid</option>`);
+                    select.append(`<option value="${PAYMENT_STATUS.CANCELLED}">Cancelled</option>`);
+                }
+            }
+
+            function updatePaymentStatus() {
+                const bookingId = $('#updatePaymentBookingId').val();
+                const paymentStatus = $('#updatePaymentSelect').val();
+                const note = $('#updatePaymentNote').val();
+                const currentPaymentStatus = $('#updatePaymentCurrentStatus').val();
+
+                if (!paymentStatus) {
+                    showAlert('Please select a payment status', 'warning');
+                    return;
+                }
+
+                // Frontend validation
+                const validationResult = validatePaymentStatusTransition(currentPaymentStatus, paymentStatus);
+                if (!validationResult.isValid) {
+                    showAlert(validationResult.errorMessage, 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: `/api/admin/booking/${bookingId}/payment`,
+                    method: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 
+                        paymentStatus: paymentStatus,
+                        note: note || null
+                    }),
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Payment status updated successfully', 'success');
+                            $('#updatePaymentModal').modal('hide');
+                            loadBookings();
+                        } else {
+                            showAlert(response.message || 'Error updating payment status', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error updating payment status';
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            }
+
+            function validatePaymentStatusTransition(currentPaymentStatus, newPaymentStatus) {
+                // Only allow specific transitions
+                if (currentPaymentStatus === PAYMENT_STATUS.PENDING) {
+                    if (newPaymentStatus !== PAYMENT_STATUS.PAID && newPaymentStatus !== PAYMENT_STATUS.CANCELLED) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'Pending payments can only be changed to Paid or Cancelled'
+                        };
+                    }
+                } else if (currentPaymentStatus === PAYMENT_STATUS.PAID) {
+                    if (newPaymentStatus !== PAYMENT_STATUS.REFUNDED) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'Paid payments can only be changed to Refunded'
+                        };
+                    }
+                } else if (currentPaymentStatus === PAYMENT_STATUS.CANCELLED) {
+                    if (newPaymentStatus !== PAYMENT_STATUS.PENDING) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'Cancelled payments can only be reactivated to Pending'
+                        };
+                    }
+                } else if (currentPaymentStatus === PAYMENT_STATUS.REFUNDED) {
+                    return {
+                        isValid: false,
+                        errorMessage: 'Refunded payments cannot be changed'
+                    };
+                } else {
+                    // For unknown statuses, allow common transitions
+                    if (newPaymentStatus !== PAYMENT_STATUS.PENDING && 
+                        newPaymentStatus !== PAYMENT_STATUS.PAID && 
+                        newPaymentStatus !== PAYMENT_STATUS.CANCELLED) {
+                        return {
+                            isValid: false,
+                            errorMessage: 'Invalid payment status transition'
+                        };
+                    }
+                }
+
+                return { isValid: true, errorMessage: '' };
             }
 
             function addBookingNote() {
@@ -746,6 +1163,29 @@
                     tourId: null
                 };
 
+                // Frontend validation
+                if (exportData.startDateFrom && exportData.startDateTo) {
+                    const startDate = new Date(exportData.startDateFrom);
+                    const endDate = new Date(exportData.startDateTo);
+                    
+                    if (startDate > endDate) {
+                        showAlert('Start date cannot be later than end date', 'warning');
+                        return;
+                    }
+                    
+                    // Calculate 3 months from start date
+                    const threeMonthsLater = new Date(startDate);
+                    threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+                    
+                    if (endDate > threeMonthsLater) {
+                        showAlert('Export date range cannot exceed 3 months', 'warning');
+                        return;
+                    }
+                }
+
+                // Show loading state
+                $('#confirmExportBtn').prop('disabled', true).html('<i class="ti ti-loader me-2"></i>Exporting...');
+
                 $.ajax({
                     url: '/api/admin/booking/export',
                     method: 'POST',
@@ -756,9 +1196,22 @@
                     },
                     success: function(response) {
                         if (response.success) {
+                            // Debug logging
+                            console.log('Export response:', response);
+                            console.log('Response data:', response.data);
+                            console.log('File name:', response.data?.fileName || response.data?.FileName);
+                            console.log('Content type:', response.data?.contentType || response.data?.ContentType);
+                            console.log('File size:', response.data?.fileSize || response.data?.FileSize);
+                            console.log('Base64 length:', (response.data?.fileBytes || response.data?.FileBytes) ? (response.data.fileBytes || response.data.FileBytes).length : 'null');
+                            
+                            // Download file automatically - try both camelCase and PascalCase
+                            const fileBytes = response.data?.fileBytes || response.data?.FileBytes;
+                            const fileName = response.data?.fileName || response.data?.FileName;
+                            const contentType = response.data?.contentType || response.data?.ContentType;
+                            
+                            downloadFile(fileBytes, fileName, contentType);
                             showAlert('Export completed successfully', 'success');
                             $('#exportModal').modal('hide');
-                            // Handle file download if needed
                         } else {
                             showAlert(response.message || 'Error exporting bookings', 'danger');
                         }
@@ -766,8 +1219,109 @@
                     error: function(xhr) {
                         const errorMessage = xhr.responseJSON?.message || 'Error exporting bookings';
                         showAlert(errorMessage, 'danger');
+                    },
+                    complete: function() {
+                        // Reset button state
+                        $('#confirmExportBtn').prop('disabled', false).html('Export');
                     }
                 });
+            }
+
+            function validateExportDateRange() {
+                const startDate = $('#exportStartDate').val();
+                const endDate = $('#exportEndDate').val();
+                const exportBtn = $('#confirmExportBtn');
+                
+                if (startDate && endDate) {
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    
+                    if (start > end) {
+                        exportBtn.prop('disabled', true);
+                        showExportWarning('Start date cannot be later than end date');
+                    } else {
+                        // Calculate 3 months from start date
+                        const threeMonthsLater = new Date(start);
+                        threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+                        
+                        if (end > threeMonthsLater) {
+                            exportBtn.prop('disabled', true);
+                            showExportWarning('Date range cannot exceed 3 months');
+                        } else {
+                            exportBtn.prop('disabled', false);
+                            hideExportWarning();
+                        }
+                    }
+                } else {
+                    exportBtn.prop('disabled', false);
+                    hideExportWarning();
+                }
+            }
+
+            function showExportWarning(message) {
+                // Remove existing warning
+                $('.export-warning').remove();
+                
+                // Add warning message
+                const warningHtml = `
+                    <div class="export-warning alert alert-warning alert-sm mt-2">
+                        <i class="ti ti-alert-triangle me-1"></i>
+                        ${message}
+                    </div>
+                `;
+                $('#exportEndDate').closest('.mb-3').append(warningHtml);
+            }
+
+            function hideExportWarning() {
+                $('.export-warning').remove();
+            }
+
+            function downloadFile(base64Data, fileName, contentType) {
+                try {
+                    // Validate base64 data
+                    if (!base64Data || typeof base64Data !== 'string') {
+                        throw new Error('Invalid base64 data received');
+                    }
+
+                    // Clean base64 string (remove any whitespace, newlines, etc.)
+                    const cleanBase64 = base64Data.replace(/[\s\n\r]/g, '');
+                    
+                    // Validate base64 format
+                    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(cleanBase64)) {
+                        throw new Error('Invalid base64 format');
+                    }
+
+                    // Convert base64 to blob
+                    const byteCharacters = atob(cleanBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: contentType });
+
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    link.style.display = 'none';
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Clean up
+                    window.URL.revokeObjectURL(url);
+                    
+                    console.log('File downloaded successfully:', fileName);
+                } catch (error) {
+                    console.error('Error downloading file:', error);
+                    console.error('Base64 data length:', base64Data ? base64Data.length : 'null');
+                    console.error('Base64 data preview:', base64Data ? base64Data.substring(0, 100) + '...' : 'null');
+                    showAlert('Error downloading file. Please try again or contact support.', 'danger');
+                }
             }
 
             // Global functions for onclick handlers
@@ -793,7 +1347,42 @@
             window.updateStatus = function(bookingId) {
                 currentBookingId = bookingId;
                 $('#updateStatusBookingId').val(bookingId);
+                
+                // Find the booking and set current status
+                const booking = bookings.find(b => b.id === bookingId);
+                if (booking) {
+                    $('#updateStatusCurrentStatus').val(booking.statusTypeId);
+                }
+                
                 $('#updateStatusModal').modal('show');
+            };
+
+            window.confirmCompleteBooking = function(bookingId) {
+                $('#completeBookingId').val(bookingId);
+                $('#completeBookingModal').modal('show');
+            };
+
+            window.updatePaymentStatus = function(bookingId) {
+                $('#updatePaymentBookingId').val(bookingId);
+                
+                // Find the booking and set current payment status
+                const booking = bookings.find(b => b.id === bookingId);
+                if (booking) {
+                    // Check if booking status is Complete or Cancel - if so, prevent payment status update
+                    if (booking.statusTypeId === BOOKING_STATUS.CANCEL || booking.statusTypeId === BOOKING_STATUS.COMPLETE) {
+                        showAlert('Cannot update payment status for cancelled or completed bookings', 'warning');
+                        return;
+                    }
+                    
+                    $('#updatePaymentCurrentStatus').val(booking.paymentStatus);
+                    $('#currentPaymentStatusDisplay').val(booking.paymentStatus);
+                    
+                    // Reset and enable the select box
+                    $('#updatePaymentSelect').prop('disabled', false);
+                    populatePaymentStatusOptions(booking.paymentStatus);
+                }
+                
+                $('#updatePaymentModal').modal('show');
             };
 
             window.addNote = function(bookingId) {
@@ -834,7 +1423,7 @@
                     ${booking.note ? `
                         <div class="mt-3">
                             <h6>Notes</h6>
-                            <div class="alert alert-info">${booking.note}</div>
+                            <div class="alert alert-info" style="white-space: pre-line;">${booking.note}</div>
                         </div>
                     ` : ''}
                 `;
@@ -899,4 +1488,75 @@
             }
         });
     </script>
+
+    <style>
+        .status-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+        }
+
+        .status-confirmed {
+            background-color: #17a2b8;
+        }
+
+        .status-inprogress {
+            background-color: #007bff;
+        }
+
+        .status-complete {
+            background-color: #28a745;
+        }
+
+        .status-cancel {
+            background-color: #dc3545;
+        }
+
+        .status-arrow {
+            text-align: center;
+            font-size: 18px;
+            color: #6c757d;
+            margin: 5px 0;
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-info strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .status-info small {
+            font-size: 11px;
+        }
+
+        .alert-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    </style>
 }

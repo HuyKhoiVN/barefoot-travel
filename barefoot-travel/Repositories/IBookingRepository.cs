@@ -1,6 +1,7 @@
 using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Booking;
 using barefoot_travel.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace barefoot_travel.Repositories
 {
@@ -20,5 +21,6 @@ namespace barefoot_travel.Repositories
         Task<Account?> GetAccountByIdAsync(int id);
         Task<List<BookingWithDetailsDto>> GetBookingsWithDetailsAsync(List<int> bookingIds);
         Task<List<BookingWithDetailsDto>> GetBookingsWithDetailsForExportAsync(ExportBookingDto exportFilter);
+        Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

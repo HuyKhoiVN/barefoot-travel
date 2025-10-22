@@ -32,9 +32,7 @@ namespace barefoot_travel.Controllers.Api
         /// <param name="paymentStatus">Filter by payment status</param>
         /// <param name="startDateFrom">Filter by start date from</param>
         /// <param name="startDateTo">Filter by start date to</param>
-        /// <param name="nameCustomer">Filter by customer name</param>
-        /// <param name="email">Filter by email</param>
-        /// <param name="phoneNumber">Filter by phone number</param>
+        /// <param name="searchAll">Search across all booking properties</param>
         /// <returns>Paged list of bookings</returns>
         [HttpGet("paged")]
         public async Task<PagedResult<BookingDto>> GetBookingsPaged(
@@ -46,12 +44,10 @@ namespace barefoot_travel.Controllers.Api
             [FromQuery] string? paymentStatus = null,
             [FromQuery] DateTime? startDateFrom = null,
             [FromQuery] DateTime? startDateTo = null,
-            [FromQuery] string? nameCustomer = null,
-            [FromQuery] string? email = null,
-            [FromQuery] string? phoneNumber = null)
+            [FromQuery] string? searchAll = null)
         {
-            _logger.LogInformation("Getting bookings with filters - Page: {Page}, PageSize: {PageSize}, SortBy: {SortBy}, SortDirection: {SortDirection}", 
-                page, pageSize, sortBy, sortDirection);
+            _logger.LogInformation("Getting bookings with filters - Page: {Page}, PageSize: {PageSize}, SortBy: {SortBy}, SortDirection: {SortDirection}, SearchAll: {SearchAll}", 
+                page, pageSize, sortBy, sortDirection, searchAll);
 
             try
             {
@@ -65,9 +61,7 @@ namespace barefoot_travel.Controllers.Api
                     PaymentStatus = paymentStatus,
                     StartDateFrom = startDateFrom,
                     StartDateTo = startDateTo,
-                    NameCustomer = nameCustomer,
-                    Email = email,
-                    PhoneNumber = phoneNumber
+                    SearchAll = searchAll
                 };
 
                 return await _bookingService.GetBookingsFilteredAsync(filter);
@@ -135,13 +129,38 @@ namespace barefoot_travel.Controllers.Api
             try
             {
                 // Get current user from claims
-                var updatedBy = User.Identity?.Name ?? "System";
+                var updatedBy = GetUserIdFromClaims.GetUsername(User) ?? "Guest";
                 
                 return await _bookingService.UpdateBookingStatusAsync(id, dto, updatedBy);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating booking status for ID: {BookingId}", id);
+                return new ApiResponse(false, $"Error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update payment status
+        /// </summary>
+        /// <param name="id">Booking ID</param>
+        /// <param name="dto">Payment status update data</param>
+        /// <returns>Update result</returns>
+        [HttpPatch("{id}/payment")]
+        public async Task<ApiResponse> UpdatePaymentStatus(int id, [FromBody] UpdatePaymentStatusDto dto)
+        {
+            _logger.LogInformation("Updating payment status for ID: {BookingId}, PaymentStatus: {PaymentStatus}", id, dto.PaymentStatus);
+
+            try
+            {
+                // Get current user from claims
+                var updatedBy = GetUserIdFromClaims.GetUsername(User) ?? "Guest";
+                
+                return await _bookingService.UpdatePaymentStatusAsync(id, dto, updatedBy);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating payment status for ID: {BookingId}", id);
                 return new ApiResponse(false, $"Error: {ex.Message}");
             }
         }
@@ -159,8 +178,7 @@ namespace barefoot_travel.Controllers.Api
 
             try
             {
-                // Get current user from claims
-                var updatedBy = User.Identity?.Name ?? "System";
+                var updatedBy = GetUserIdFromClaims.GetUsername(User) ?? "Guest";
                 
                 return await _bookingService.AddBookingNoteAsync(id, dto, updatedBy);
             }
@@ -221,6 +239,7 @@ namespace barefoot_travel.Controllers.Api
         /// <param name="exportFilter">Export filter parameters</param>
         /// <returns>Export file data</returns>
         [HttpPost("export")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResponse> ExportBookings([FromBody] ExportBookingDto exportFilter)
         {
             _logger.LogInformation("Exporting bookings with filter: {@ExportFilter}", exportFilter);
@@ -228,11 +247,11 @@ namespace barefoot_travel.Controllers.Api
             try
             {
                 // Check if user has export permission (Admin only)
-                var userRole = User.FindFirst("role")?.Value;
-                if (userRole != "Admin")
-                {
-                    return new ApiResponse(false, "Access denied. Export permission required.");
-                }
+                //var userRole = User.FindFirst("role")?.Value;
+                //if (userRole != "Admin")
+                //{
+                //    return new ApiResponse(false, "Access denied. Export permission required.");
+                //}
 
                 return await _bookingService.ExportBookingsAsync(exportFilter);
             }

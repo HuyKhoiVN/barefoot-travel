@@ -17,7 +17,7 @@ public partial class Booking
 
     public string PhoneNumber { get; set; } = null!;
 
-    public string NameCustomer { get; set; } = null!;
+    public string? NameCustomer { get; set; }
 
     public string? Email { get; set; }
 

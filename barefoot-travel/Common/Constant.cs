@@ -8,9 +8,10 @@
 
     public static class PaymentStatusConstant
     {
-        public const string PENDING = "pending";
-        public const string PAID = "paid";
+        public const string PENDING = "Pending";
+        public const string PAID = "Paid";
         public const string CANCELLED = "Cancelled";
+        public const string REFUNDED = "Refunded";
     }
 
     public static class BookingStatusConstant

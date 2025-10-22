@@ -11,9 +11,7 @@ namespace barefoot_travel.DTOs.Booking
         public DateTime? StartDateTo { get; set; }
         public DateTime? CreatedTimeFrom { get; set; }
         public DateTime? CreatedTimeTo { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? NameCustomer { get; set; }
-        public string? Email { get; set; }
+        public string? SearchAll { get; set; }
         public string? PaymentStatus { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;

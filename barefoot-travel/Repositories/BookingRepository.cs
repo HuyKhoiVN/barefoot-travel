@@ -3,6 +3,7 @@ using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Booking;
 using barefoot_travel.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace barefoot_travel.Repositories
 {
@@ -92,18 +93,25 @@ namespace barefoot_travel.Repositories
             if (filter.CreatedTimeTo.HasValue)
                 query = from b in query where b.CreatedTime <= filter.CreatedTimeTo.Value select b;
 
-            if (!string.IsNullOrEmpty(filter.PhoneNumber))
-                query = from b in query where b.PhoneNumber.Contains(filter.PhoneNumber) select b;
-
-            if (!string.IsNullOrEmpty(filter.NameCustomer))
+            if (!string.IsNullOrEmpty(filter.SearchAll))
             {
-                string name = filter.NameCustomer.Trim().ToLower();
-                query = query.Where(b => EF.Functions.Collate(b.NameCustomer.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(name, SQLParams.Latin_General)));
+                string searchAll = filter.SearchAll.Trim().ToLower();
+                query = query.Where(b =>
+                    EF.Functions.Collate(b.Id.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.TourId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.UserId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.People.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.PhoneNumber.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.NameCustomer.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Email.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Note.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.TotalPrice.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.StatusTypeId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.PaymentStatus.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Active.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.UpdatedBy.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General))
+                );
             }
-
-
-            if (!string.IsNullOrEmpty(filter.Email))
-                query = from b in query where b.Email != null && b.Email.Contains(filter.Email) select b;
 
             if (!string.IsNullOrEmpty(filter.PaymentStatus))
                 query = from b in query where b.PaymentStatus.Contains(filter.PaymentStatus) select b;
@@ -331,6 +339,11 @@ namespace barefoot_travel.Repositories
                          };
 
             return await result.ToListAsync();
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
         }
     }
 }
