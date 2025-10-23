@@ -51,10 +51,18 @@
                         <thead>
                             <tr>
                                 <th scope="col" class="px-0 text-muted">Image</th>
-                                <th scope="col" class="px-0 text-muted">Title</th>
-                                <th scope="col" class="px-0 text-muted">Price</th>
-                                <th scope="col" class="px-0 text-muted">Duration</th>
-                                <th scope="col" class="px-0 text-muted">Max People</th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="title">
+                                    <span class="sortable-content">Title <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="price">
+                                    <span class="sortable-content">Price <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="duration">
+                                    <span class="sortable-content">Duration <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="maxPeople">
+                                    <span class="sortable-content">Max People <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
                                 <th scope="col" class="px-0 text-muted text-end">Actions</th>
                             </tr>
                         </thead>
@@ -531,6 +539,28 @@
 </div>
 
 @section Scripts {
+    <style>
+        .sortable {
+            cursor: pointer !important;
+        }
+        
+        .sortable:hover .sortable-content {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .sort-icon {
+            transition: all 0.2s ease;
+        }
+        
+        .sortable:hover .sort-icon {
+            opacity: 0.8 !important;
+        }
+    </style>
+    
 <!-- Include Quill.js for rich text editor -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -540,6 +570,7 @@ $(document).ready(function() {
     let currentPage = 1;
     let pageSize = 10;
     let currentFilters = {};
+    let currentSort = { field: 'title', direction: 'asc' };
     let currentEditorMode = ''; // 'create' or 'edit'
     let quillEditor = null;
     let uploadedImages = [];
@@ -622,6 +653,7 @@ $(document).ready(function() {
     loadTours();
     loadCategories();
     loadPolicies();
+    setupSortableHeaders();
     
     // Initialize category tree expand/collapse functionality
     initializeCategoryTree();
@@ -1450,14 +1482,53 @@ $(document).ready(function() {
         loadTours();
     });
 
+    // Setup sortable headers
+    function setupSortableHeaders() {
+        $('.sortable').on('click', function() {
+            const field = $(this).data('sort');
+            const icon = $(this).find('.sort-icon');
+            
+            // Reset all icons to default state
+            $('.sort-icon').removeClass('ti-chevron-up ti-chevron-down').addClass('ti-chevron-up').css({
+                'opacity': '0.6',
+                'color': '#6c757d'
+            });
+            
+            // Update current sort
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update active icon with darker color
+            icon.removeClass('ti-chevron-up ti-chevron-down')
+                .addClass(currentSort.direction === 'asc' ? 'ti-chevron-up' : 'ti-chevron-down')
+                .css({
+                    'opacity': '1',
+                    'color': '#495057'
+                });
+            
+            // Apply sort
+            currentFilters.sortBy = currentSort.field;
+            currentFilters.sortOrder = currentSort.direction;
+            currentPage = 1;
+            loadTours();
+        });
+        
+        // Add cursor pointer to sortable headers
+        $('.sortable').css('cursor', 'pointer');
+    }
+
     // Load tours with pagination and filters
     function loadTours() {
         showLoading();
         const params = {
             page: currentPage,
             pageSize: pageSize,
-            sortBy: 'createdTime',
-            sortOrder: 'desc',
+            sortBy: currentSort.field,
+            sortOrder: currentSort.direction,
             ...currentFilters
         };
 

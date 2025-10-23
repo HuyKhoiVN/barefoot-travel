@@ -44,6 +44,18 @@ namespace barefoot_travel.Repositories
                 "namecustomer" => sortDirection.ToLower() == "asc" 
                     ? query.OrderBy(b => b.NameCustomer) 
                     : query.OrderByDescending(b => b.NameCustomer),
+                "numberofpeople" => sortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.People) 
+                    : query.OrderByDescending(b => b.People),
+                "paymentstatus" => sortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.PaymentStatus) 
+                    : query.OrderByDescending(b => b.PaymentStatus),
+                "statustypename" => sortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.StatusTypeId) 
+                    : query.OrderByDescending(b => b.StatusTypeId),
+                "tourtitle" => sortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.TourId) 
+                    : query.OrderByDescending(b => b.TourId),
                 _ => query.OrderByDescending(b => b.CreatedTime)
             };
 
@@ -131,6 +143,18 @@ namespace barefoot_travel.Repositories
                 "namecustomer" => filter.SortDirection.ToLower() == "asc" 
                     ? query.OrderBy(b => b.NameCustomer) 
                     : query.OrderByDescending(b => b.NameCustomer),
+                "numberofpeople" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.People) 
+                    : query.OrderByDescending(b => b.People),
+                "paymentstatus" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.PaymentStatus) 
+                    : query.OrderByDescending(b => b.PaymentStatus),
+                "statustypename" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.StatusTypeId) 
+                    : query.OrderByDescending(b => b.StatusTypeId),
+                "tourtitle" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.TourId) 
+                    : query.OrderByDescending(b => b.TourId),
                 _ => query.OrderByDescending(b => b.CreatedTime)
             };
 

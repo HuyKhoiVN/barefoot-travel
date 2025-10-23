@@ -59,7 +59,10 @@ namespace barefoot_travel.Repositories
             query = sortBy?.ToLower() switch
             {
                 "title" => sortOrder == "desc" ? query.OrderByDescending(t => t.Title) : query.OrderBy(t => t.Title),
+                "price" => sortOrder == "desc" ? query.OrderByDescending(t => t.PricePerPerson) : query.OrderBy(t => t.PricePerPerson),
                 "priceperperson" => sortOrder == "desc" ? query.OrderByDescending(t => t.PricePerPerson) : query.OrderBy(t => t.PricePerPerson),
+                "duration" => sortOrder == "desc" ? query.OrderByDescending(t => t.Duration) : query.OrderBy(t => t.Duration),
+                "maxpeople" => sortOrder == "desc" ? query.OrderByDescending(t => t.MaxPeople) : query.OrderBy(t => t.MaxPeople),
                 "createdtime" => sortOrder == "desc" ? query.OrderByDescending(t => t.CreatedTime) : query.OrderBy(t => t.CreatedTime),
                 _ => query.OrderBy(t => t.Title)
             };

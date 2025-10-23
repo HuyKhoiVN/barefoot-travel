@@ -72,12 +72,21 @@ namespace barefoot_travel.Repositories
             // Apply sorting
             var sortedQuery = sortBy?.ToLower() switch
             {
+                "name" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CategoryName)
+                    : query.OrderBy(c => c.CategoryName),
                 "categoryname" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.CategoryName)
                     : query.OrderBy(c => c.CategoryName),
                 "type" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.Type)
                     : query.OrderBy(c => c.Type),
+                "parentname" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.ParentId)
+                    : query.OrderBy(c => c.ParentId),
+                "enable" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Enable)
+                    : query.OrderBy(c => c.Enable),
                 "priority" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.Priority)
                     : query.OrderBy(c => c.Priority),
@@ -273,12 +282,21 @@ namespace barefoot_travel.Repositories
             // Apply sorting
             var sortedQuery = sortBy?.ToLower() switch
             {
+                "name" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.CategoryName)
+                    : query.OrderBy(c => c.CategoryName),
                 "categoryname" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.CategoryName)
                     : query.OrderBy(c => c.CategoryName),
                 "type" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.Type)
                     : query.OrderBy(c => c.Type),
+                "parentname" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.ParentId)
+                    : query.OrderBy(c => c.ParentId),
+                "enable" => sortOrder == "desc"
+                    ? query.OrderByDescending(c => c.Enable)
+                    : query.OrderBy(c => c.Enable),
                 "priority" => sortOrder == "desc"
                     ? query.OrderByDescending(c => c.Priority)
                     : query.OrderBy(c => c.Priority),

@@ -79,13 +79,27 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" class="px-0 text-muted">No.</th>
-                                        <th scope="col" class="px-0 text-muted ">Customer</th>
-                                        <th scope="col" class="px-0 text-muted">Tour</th>
-                                        <th scope="col" class="px-0 text-muted">Start Date</th>
-                                        <th scope="col" class="px-0 text-muted">People</th>
-                                        <th scope="col" class="px-0 text-muted">Status</th>
-                                        <th scope="col" class="px-0 text-muted">Payment</th>
-                                        <th scope="col" class="px-0 text-muted">Created</th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="nameCustomer">
+                                            <span class="sortable-content">Customer <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="tourTitle">
+                                            <span class="sortable-content">Tour <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="startDate">
+                                            <span class="sortable-content">Start Date <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="numberOfPeople">
+                                            <span class="sortable-content">People <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="statusTypeName">
+                                            <span class="sortable-content">Status <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="paymentStatus">
+                                            <span class="sortable-content">Payment <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
+                                        <th scope="col" class="px-0 text-muted sortable" data-sort="createdTime">
+                                            <span class="sortable-content">Created <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                        </th>
                                         <th scope="col" class="px-0 text-muted text-end">Actions</th>
                                     </tr>
                                 </thead>
@@ -470,6 +484,28 @@
 </div>
 
 @section Scripts {
+    <style>
+        .sortable {
+            cursor: pointer !important;
+        }
+        
+        .sortable:hover .sortable-content {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .sort-icon {
+            transition: all 0.2s ease;
+        }
+        
+        .sortable:hover .sort-icon {
+            opacity: 0.8 !important;
+        }
+    </style>
+    
     <script>
         $(document).ready(function() {
             // Constants for frontend
@@ -491,10 +527,12 @@
             let currentPage = 1;
             let pageSize = 10;
             let currentFilters = {};
+            let currentSort = { field: 'createdTime', direction: 'desc' };
             let bookingStatuses = [];
             let tours = [];
             let currentBookingId = null;
             let bookings = [];
+            let isLoading = false;
 
             // Initialize the page
             initializePage();
@@ -504,6 +542,7 @@
                 loadTours();
                 loadBookings();
                 setupEventHandlers();
+                setupSortableHeaders();
             }
 
             function setupEventHandlers() {
@@ -649,10 +688,87 @@
                 });
             }
 
+            // Loading animation functions
+            function showLoading() {
+                if (!isLoading) {
+                    isLoading = true;
+                    $('body').append(`
+                        <div id="loadingOverlay" style="
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0,0,0,0.5);
+                            z-index: 9999;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        ">
+                            <div class="text-center text-white">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div class="mt-2">Loading...</div>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+
+            function hideLoading() {
+                if (isLoading) {
+                    isLoading = false;
+                    $('#loadingOverlay').remove();
+                }
+            }
+
+            // Setup sortable headers
+            function setupSortableHeaders() {
+                $('.sortable').on('click', function() {
+                    const field = $(this).data('sort');
+                    const icon = $(this).find('.sort-icon');
+                    
+                    // Reset all icons to default state
+                    $('.sort-icon').removeClass('ti-chevron-up ti-chevron-down').addClass('ti-chevron-up').css({
+                        'opacity': '0.6',
+                        'color': '#6c757d'
+                    });
+                    
+                    // Update current sort
+                    if (currentSort.field === field) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.field = field;
+                        currentSort.direction = 'asc';
+                    }
+                    
+                    // Update active icon with darker color
+                    icon.removeClass('ti-chevron-up ti-chevron-down')
+                        .addClass(currentSort.direction === 'asc' ? 'ti-chevron-up' : 'ti-chevron-down')
+                        .css({
+                            'opacity': '1',
+                            'color': '#495057'
+                        });
+                    
+                    // Apply sort
+                    currentFilters.sortBy = currentSort.field;
+                    currentFilters.sortDirection = currentSort.direction;
+                    currentPage = 1;
+                    loadBookings();
+                });
+                
+                // Add cursor pointer to sortable headers
+                $('.sortable').css('cursor', 'pointer');
+            }
+
             function loadBookings() {
+                showLoading();
                 const params = {
                     page: currentPage,
                     pageSize: pageSize,
+                    sortBy: currentSort.field,
+                    sortDirection: currentSort.direction,
                     ...currentFilters
                 };
 
@@ -667,8 +783,10 @@
                         // GET /api/admin/booking/paged returns PagedResult<BookingDto> directly, not wrapped in ApiResponse
                         displayBookings(response);
                         updatePagination(response);
+                        hideLoading();
                     },
                     error: function(xhr) {
+                        hideLoading();
                         showAlert('Error loading bookings', 'danger');
                     }
                 });
@@ -875,6 +993,7 @@
                     return;
                 }
 
+                showLoading();
                 $.ajax({
                     url: '/api/admin/booking',
                     method: 'POST',
@@ -884,6 +1003,7 @@
                         'Authorization': 'Bearer ' + getAuthToken()
                     },
                     success: function(response) {
+                        hideLoading();
                         // POST /api/admin/booking returns ApiResponse
                         if (response.success) {
                             showAlert('Booking created successfully', 'success');
@@ -895,6 +1015,7 @@
                         }
                     },
                     error: function(xhr) {
+                        hideLoading();
                         const errorMessage = xhr.responseJSON?.message || 'Error creating booking';
                         showAlert(errorMessage, 'danger');
                     }
@@ -919,6 +1040,7 @@
                     return;
                 }
 
+                showLoading();
                 $.ajax({
                     url: `/api/admin/booking/${bookingId}/status`,
                     method: 'PATCH',
@@ -931,6 +1053,7 @@
                         'Authorization': 'Bearer ' + getAuthToken()
                     },
                     success: function(response) {
+                        hideLoading();
                         if (response.success) {
                             showAlert('Booking status updated successfully', 'success');
                             $('#updateStatusModal').modal('hide');
@@ -941,6 +1064,7 @@
                         }
                     },
                     error: function(xhr) {
+                        hideLoading();
                         const errorMessage = xhr.responseJSON?.message || 'Error updating status';
                         showAlert(errorMessage, 'danger');
                     }

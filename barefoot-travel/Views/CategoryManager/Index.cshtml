@@ -67,12 +67,24 @@
                     <table class="table mb-0 text-nowrap varient-table align-middle fs-3" id="categoriesTable">
                         <thead>
                             <tr>
-                                <th scope="col" class="px-0 text-muted">Name</th>
-                                <th scope="col" class="px-0 text-muted">Type</th>
-                                <th scope="col" class="px-0 text-muted">Parent</th>
-                                <th scope="col" class="px-0 text-muted">Enable</th>
-                                <th scope="col" class="px-0 text-muted">Priority</th>
-                                <th scope="col" class="px-0 text-muted">Created</th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="name">
+                                    <span class="sortable-content">Name <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="type">
+                                    <span class="sortable-content">Type <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="parentName">
+                                    <span class="sortable-content">Parent <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="enable">
+                                    <span class="sortable-content">Enable <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="priority">
+                                    <span class="sortable-content">Priority <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
+                                <th scope="col" class="px-0 text-muted sortable" data-sort="createdTime">
+                                    <span class="sortable-content">Created <i class="ti ti-chevron-up sort-icon" style="opacity: 0.6; color: #6c757d;"></i></span>
+                                </th>
                                 <th scope="col" class="px-0 text-muted text-end">Actions</th>
                             </tr>
                         </thead>
@@ -300,6 +312,27 @@
 
 @section Scripts {
 <style>
+    /* Sorting styles */
+    .sortable {
+        cursor: pointer !important;
+    }
+    
+    .sortable:hover .sortable-content {
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+        padding: 2px 4px;
+        margin: -2px -4px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .sort-icon {
+        transition: all 0.2s ease;
+    }
+    
+    .sortable:hover .sort-icon {
+        opacity: 0.8 !important;
+    }
+
     /* Category tree styles */
     .category-item {
         transition: all 0.3s ease;
@@ -482,6 +515,7 @@ $(document).ready(function() {
     let currentPage = 1;
     let pageSize = 10;
     let currentFilters = {};
+    let currentSort = { field: 'name', direction: 'asc' };
     let currentViewMode = 'list'; // 'list' or 'tree'
     let isLoading = false;
     
@@ -554,6 +588,7 @@ $(document).ready(function() {
     loadCategories();
     loadParentCategories();
     loadTypes();
+    setupSortableHeaders();
     
     // Initialize tree interactions for parent category selection
     initializeParentCategoryTreeInteractions();
@@ -643,14 +678,53 @@ $(document).ready(function() {
         }
     });
 
+    // Setup sortable headers
+    function setupSortableHeaders() {
+        $('.sortable').on('click', function() {
+            const field = $(this).data('sort');
+            const icon = $(this).find('.sort-icon');
+            
+            // Reset all icons to default state
+            $('.sort-icon').removeClass('ti-chevron-up ti-chevron-down').addClass('ti-chevron-up').css({
+                'opacity': '0.6',
+                'color': '#6c757d'
+            });
+            
+            // Update current sort
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update active icon with darker color
+            icon.removeClass('ti-chevron-up ti-chevron-down')
+                .addClass(currentSort.direction === 'asc' ? 'ti-chevron-up' : 'ti-chevron-down')
+                .css({
+                    'opacity': '1',
+                    'color': '#495057'
+                });
+            
+            // Apply sort
+            currentFilters.sortBy = currentSort.field;
+            currentFilters.sortOrder = currentSort.direction;
+            currentPage = 1;
+            loadCategories();
+        });
+        
+        // Add cursor pointer to sortable headers
+        $('.sortable').css('cursor', 'pointer');
+    }
+
     // Load categories with pagination and filters
     function loadCategories() {
         showLoading();
         const params = {
             page: currentPage,
             pageSize: pageSize,
-            sortBy: 'categoryName',
-            sortOrder: 'asc'
+            sortBy: currentSort.field,
+            sortOrder: currentSort.direction
         };
         
         // Only add filters that have values

@@ -1,3 +1,4 @@
+using barefoot_travel.DTOs;
 using barefoot_travel.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,6 +66,73 @@ namespace barefoot_travel.Repositories
         {
             return await _context.Accounts
                 .AnyAsync(a => a.Id == id && a.Active);
+        }
+
+        // Additional methods for UserService
+        public async Task<Account?> GetByUsernameAsync(string username)
+        {
+            return await _context.Accounts
+                .Where(a => a.Username == username)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<PagedResult<Account>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string sortOrder = "asc", string? search = null, int? roleId = null, DateTime? dateFrom = null, DateTime? dateTo = null)
+        {
+            var query = _context.Accounts.Where(a => a.Active).AsQueryable();
+
+            // Apply role filter
+            if (roleId.HasValue)
+            {
+                query = query.Where(a => a.RoleId == roleId.Value);
+            }
+
+            // Apply date range filter
+            if (dateFrom.HasValue)
+            {
+                query = query.Where(a => a.CreatedTime >= dateFrom.Value);
+            }
+            if (dateTo.HasValue)
+            {
+                query = query.Where(a => a.CreatedTime <= dateTo.Value);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(a => 
+                    a.Username.Contains(search) ||
+                    a.FullName.Contains(search) ||
+                    (a.Email != null && a.Email.Contains(search)) ||
+                    (a.Phone != null && a.Phone.Contains(search)));
+            }
+
+            // Apply sorting
+            query = sortBy?.ToLower() switch
+            {
+                "username" => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.Username) : query.OrderBy(a => a.Username),
+                "email" => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.Email) : query.OrderBy(a => a.Email),
+                "phone" => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.Phone) : query.OrderBy(a => a.Phone),
+                "createdtime" => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.CreatedTime) : query.OrderBy(a => a.CreatedTime),
+                "roleid" => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.RoleId) : query.OrderBy(a => a.RoleId),
+                _ => sortOrder.ToLower() == "desc" ? query.OrderByDescending(a => a.CreatedTime) : query.OrderBy(a => a.CreatedTime)
+            };
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Account>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
         }
     }
 }
