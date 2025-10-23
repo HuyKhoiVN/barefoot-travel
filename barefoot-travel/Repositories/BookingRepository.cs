@@ -266,6 +266,134 @@ namespace barefoot_travel.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<PagedResult<BookingWithDetailsDto>> GetFilteredWithDetailsAsync(BookingFilterDto filter)
+        {
+            var query = from b in _context.Bookings
+                        join t in _context.Tours on b.TourId equals t.Id into tourGroup
+                        from t in tourGroup.DefaultIfEmpty()
+                        join a in _context.Accounts on b.UserId equals a.Id into accountGroup
+                        from a in accountGroup.DefaultIfEmpty()
+                        join bs in _context.BookingStatuses on b.StatusTypeId equals bs.Id into statusGroup
+                        from bs in statusGroup.DefaultIfEmpty()
+                        where b.Active && (t == null || t.Active) && (a == null || a.Active) && (bs == null || bs.Active)
+                        select new BookingWithDetailsDto
+                        {
+                            Id = b.Id,
+                            TourId = b.TourId,
+                            TourTitle = t != null ? t.Title : "N/A",
+                            UserId = b.UserId,
+                            UserFullName = a != null ? a.FullName : "Guest",
+                            StartDate = b.StartDate,
+                            People = b.People,
+                            PhoneNumber = b.PhoneNumber,
+                            NameCustomer = b.NameCustomer ?? "N/A",
+                            Email = b.Email,
+                            Note = b.Note,
+                            TotalPrice = b.TotalPrice,
+                            StatusTypeId = b.StatusTypeId,
+                            StatusName = bs != null ? bs.StatusName : "Unknown",
+                            PaymentStatus = b.PaymentStatus,
+                            CreatedTime = b.CreatedTime,
+                            UpdatedTime = b.UpdatedTime,
+                            UpdatedBy = b.UpdatedBy,
+                            Active = b.Active
+                        };
+
+            // Apply filters
+            if (filter.StatusTypeId.HasValue)
+                query = query.Where(b => b.StatusTypeId == filter.StatusTypeId.Value);
+
+            if (filter.TourId.HasValue)
+                query = query.Where(b => b.TourId == filter.TourId.Value);
+
+            if (filter.UserId.HasValue)
+                query = query.Where(b => b.UserId == filter.UserId.Value);
+
+            if (filter.StartDateFrom.HasValue)
+                query = query.Where(b => b.StartDate >= filter.StartDateFrom.Value);
+
+            if (filter.StartDateTo.HasValue)
+                query = query.Where(b => b.StartDate <= filter.StartDateTo.Value);
+
+            if (filter.CreatedTimeFrom.HasValue)
+                query = query.Where(b => b.CreatedTime >= filter.CreatedTimeFrom.Value);
+
+            if (filter.CreatedTimeTo.HasValue)
+                query = query.Where(b => b.CreatedTime <= filter.CreatedTimeTo.Value);
+
+            if (!string.IsNullOrEmpty(filter.SearchAll))
+            {
+                string searchAll = filter.SearchAll.Trim().ToLower();
+                query = query.Where(b =>
+                    EF.Functions.Collate(b.Id.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.TourId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.UserId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.People.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.PhoneNumber.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.NameCustomer.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Email.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Note.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.TotalPrice.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.StatusTypeId.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.PaymentStatus.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.Active.ToString().ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.UpdatedBy.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.TourTitle.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General)) ||
+                    EF.Functions.Collate(b.StatusName.ToLower(), SQLParams.Latin_General).Contains(EF.Functions.Collate(searchAll, SQLParams.Latin_General))
+                );
+            }
+
+            if (!string.IsNullOrEmpty(filter.PaymentStatus))
+                query = query.Where(b => b.PaymentStatus.Contains(filter.PaymentStatus));
+
+            // Apply sorting - this is the key fix!
+            query = filter.SortBy.ToLower() switch
+            {
+                "startdate" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.StartDate) 
+                    : query.OrderByDescending(b => b.StartDate),
+                "createdtime" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.CreatedTime) 
+                    : query.OrderByDescending(b => b.CreatedTime),
+                "totalprice" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.TotalPrice) 
+                    : query.OrderByDescending(b => b.TotalPrice),
+                "namecustomer" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.NameCustomer) 
+                    : query.OrderByDescending(b => b.NameCustomer),
+                "numberofpeople" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.People) 
+                    : query.OrderByDescending(b => b.People),
+                "paymentstatus" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.PaymentStatus) 
+                    : query.OrderByDescending(b => b.PaymentStatus),
+                "statustypename" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.StatusName) 
+                    : query.OrderByDescending(b => b.StatusName),
+                "tourtitle" => filter.SortDirection.ToLower() == "asc" 
+                    ? query.OrderBy(b => b.TourTitle) 
+                    : query.OrderByDescending(b => b.TourTitle),
+                _ => query.OrderByDescending(b => b.CreatedTime)
+            };
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalItems / filter.PageSize);
+
+            var items = await query
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<BookingWithDetailsDto>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = filter.Page,
+                PageSize = filter.PageSize
+            };
+        }
+
         public async Task<List<BookingWithDetailsDto>> GetBookingsWithDetailsAsync(List<int> bookingIds)
         {
             if (!bookingIds.Any())

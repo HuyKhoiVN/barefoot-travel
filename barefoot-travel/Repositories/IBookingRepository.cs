@@ -10,6 +10,7 @@ namespace barefoot_travel.Repositories
         Task<Booking?> GetByIdAsync(int id);
         Task<PagedResult<Booking>> GetPagedAsync(int page, int pageSize, string sortBy, string sortDirection);
         Task<PagedResult<Booking>> GetFilteredAsync(BookingFilterDto filter);
+        Task<PagedResult<BookingWithDetailsDto>> GetFilteredWithDetailsAsync(BookingFilterDto filter);
         Task<List<Booking>> GetForExportAsync(ExportBookingDto exportFilter);
         Task<Booking> CreateAsync(Booking booking);
         Task<Booking> UpdateAsync(Booking booking);

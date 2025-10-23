@@ -73,13 +73,10 @@ namespace barefoot_travel.Services
         {
             try
             {
-                var pagedResult = await _bookingRepository.GetFilteredAsync(filter);
+                // Use the new optimized method that combines filtering, sorting, and joining in one query
+                var pagedResult = await _bookingRepository.GetFilteredWithDetailsAsync(filter);
                 
-                // Get related data using JOIN
-                var bookingIds = pagedResult.Items.Select(b => b.Id).ToList();
-                var bookingsWithDetails = await _bookingRepository.GetBookingsWithDetailsAsync(bookingIds);
-
-                var bookingDtos = bookingsWithDetails.Select(MapToBookingDto).ToList();
+                var bookingDtos = pagedResult.Items.Select(MapToBookingDto).ToList();
 
                 return new PagedResult<BookingDto>
                 {
