@@ -9,7 +9,7 @@ namespace barefoot_travel.Services
         // Policy CRUD operations
         Task<ApiResponse> GetPolicyByIdAsync(int id);
         Task<ApiResponse> GetAllPoliciesAsync();
-        Task<PagedResult<PolicyDto>> GetPoliciesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", bool? active = null);
+        Task<PagedResult<PolicyDto>> GetPoliciesPagedAsync(int page, int pageSize, string? policyType = null, string? sortBy = null, string? sortOrder = "asc", bool? active = null);
         Task<ApiResponse> CreatePolicyAsync(CreatePolicyDto dto, string adminUsername);
         Task<ApiResponse> UpdatePolicyAsync(int id, UpdatePolicyDto dto, string adminUsername);
         Task<ApiResponse> DeletePolicyAsync(int id, string adminUsername);

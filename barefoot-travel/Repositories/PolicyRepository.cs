@@ -29,7 +29,7 @@ namespace barefoot_travel.Repositories
                 .ToListAsync();
         }
 
-        public async Task<PagedResult<Policy>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", bool? active = null)
+        public async Task<PagedResult<Policy>> GetPagedAsync(int page, int pageSize, string? policyType = null, string? sortBy = null, string? sortOrder = "asc", bool? active = null)
         {
             var query = _context.Policies.AsQueryable();
 
@@ -41,6 +41,12 @@ namespace barefoot_travel.Repositories
             else
             {
                 query = query.Where(p => p.Active);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(policyType))
+            {
+                query = query.Where(p => p.PolicyType.ToLower().Contains(policyType.ToLower()));
             }
 
             // Apply sorting

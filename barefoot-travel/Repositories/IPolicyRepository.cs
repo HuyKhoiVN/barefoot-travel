@@ -9,7 +9,7 @@ namespace barefoot_travel.Repositories
         // Policy CRUD operations
         Task<Policy?> GetByIdAsync(int id);
         Task<List<Policy>> GetAllAsync();
-        Task<PagedResult<Policy>> GetPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", bool? active = null);
+        Task<PagedResult<Policy>> GetPagedAsync(int page, int pageSize, string? policyType = null, string? sortBy = null, string? sortOrder = "asc", bool? active = null);
         Task<Policy> CreateAsync(Policy policy);
         Task<Policy> UpdateAsync(Policy policy);
         Task<bool> DeleteAsync(int id);

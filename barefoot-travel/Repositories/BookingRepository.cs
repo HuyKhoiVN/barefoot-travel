@@ -493,6 +493,48 @@ namespace barefoot_travel.Repositories
             return await result.ToListAsync();
         }
 
+        public async Task<List<BookingWithDetailsDto>> GetBookingsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var query = from b in _context.Bookings
+                        join t in _context.Tours on b.TourId equals t.Id into tourGroup
+                        from t in tourGroup.DefaultIfEmpty()
+                        join a in _context.Accounts on b.UserId equals a.Id into accountGroup
+                        from a in accountGroup.DefaultIfEmpty()
+                        join bs in _context.BookingStatuses on b.StatusTypeId equals bs.Id into statusGroup
+                        from bs in statusGroup.DefaultIfEmpty()
+                        where b.Active && 
+                              (b.StartDate ?? DateTime.MinValue).Date >= startDate.Date && 
+                              (b.StartDate ?? DateTime.MinValue).Date <= endDate.Date &&
+                              (t == null || t.Active) && 
+                              (a == null || a.Active) && 
+                              (bs == null || bs.Active)
+                        orderby b.StartDate, b.CreatedTime
+                        select new BookingWithDetailsDto
+                        {
+                            Id = b.Id,
+                            TourId = b.TourId,
+                            TourTitle = t != null ? t.Title : "N/A",
+                            UserId = b.UserId,
+                            UserFullName = a != null ? a.FullName : "Guest",
+                            StartDate = b.StartDate,
+                            People = b.People,
+                            PhoneNumber = b.PhoneNumber,
+                            NameCustomer = b.NameCustomer,
+                            Email = b.Email,
+                            Note = b.Note,
+                            TotalPrice = b.TotalPrice,
+                            StatusTypeId = b.StatusTypeId,
+                            StatusName = bs != null ? bs.StatusName : "Unknown",
+                            PaymentStatus = b.PaymentStatus,
+                            CreatedTime = b.CreatedTime,
+                            UpdatedTime = b.UpdatedTime,
+                            UpdatedBy = b.UpdatedBy,
+                            Active = b.Active
+                        };
+
+            return await query.ToListAsync();
+        }
+
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _context.Database.BeginTransactionAsync();

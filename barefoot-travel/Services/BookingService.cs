@@ -456,6 +456,140 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<ApiResponse> GetBookingsForCalendarAsync(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                // Debug logging for date parameters
+                Console.WriteLine($"GetBookingsForCalendarAsync called with startDate: {startDate:yyyy-MM-dd HH:mm:ss}, endDate: {endDate:yyyy-MM-dd HH:mm:ss}");
+                Console.WriteLine($"startDate.Date: {startDate.Date:yyyy-MM-dd}, endDate.Date: {endDate.Date:yyyy-MM-dd}");
+                
+                // Validate date range (max 3 months)
+                var maxEndDate = startDate.AddMonths(3);
+                if (endDate > maxEndDate)
+                {
+                    return new ApiResponse(false, "Date range cannot exceed 3 months");
+                }
+
+                // Get bookings in date range
+                var bookings = await _bookingRepository.GetBookingsByDateRangeAsync(startDate, endDate);
+                
+                // Debug logging
+                Console.WriteLine($"Found {bookings.Count} bookings in date range {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}");
+                foreach (var booking in bookings.Take(5)) // Log first 5 bookings
+                {
+                    Console.WriteLine($"Booking {booking.Id}: {booking.TourTitle} on {booking.StartDate:yyyy-MM-dd}");
+                }
+                
+                // Group bookings by date and month
+                var calendarView = CreateCalendarView(startDate, endDate, bookings);
+                
+                return new ApiResponse(true, "Calendar data retrieved successfully", calendarView);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error getting calendar data: {ex.Message}");
+            }
+        }
+
+        private CalendarViewDto CreateCalendarView(DateTime startDate, DateTime endDate, List<BookingWithDetailsDto> bookings)
+        {
+            var calendarView = new CalendarViewDto
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                Months = new List<CalendarMonthDto>()
+            };
+
+            // Group bookings by date
+            var bookingsByDate = bookings.GroupBy(b => b.StartDate?.Date ?? DateTime.MinValue)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            Console.WriteLine($"Grouped bookings by date. Keys: {string.Join(", ", bookingsByDate.Keys.Select(d => d.ToString("yyyy-MM-dd")))}");
+
+            // Create months - ensure we start from the beginning of the start month
+            var currentDate = new DateTime(startDate.Year, startDate.Month, 1);
+            var endMonth = new DateTime(endDate.Year, endDate.Month, 1);
+
+            Console.WriteLine($"Creating months from {currentDate:yyyy-MM-dd} to {endMonth:yyyy-MM-dd}");
+
+            while (currentDate <= endMonth)
+            {
+                var monthDto = new CalendarMonthDto
+                {
+                    Year = currentDate.Year,
+                    Month = currentDate.Month,
+                    MonthName = currentDate.ToString("MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                    Days = new List<CalendarDayDto>()
+                };
+
+                Console.WriteLine($"Creating month: {monthDto.MonthName} (Year: {monthDto.Year}, Month: {monthDto.Month})");
+
+                // Get days in month
+                var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+                for (int day = 1; day <= daysInMonth; day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
+                    
+                    // Skip if date is outside range
+                    if (date < startDate.Date || date > endDate.Date)
+                        continue;
+
+                    // Only create day if there are bookings for this date
+                    if (bookingsByDate.ContainsKey(date.Date))
+                    {
+                        var dayBookings = bookingsByDate[date.Date];
+                        var dayDto = new CalendarDayDto
+                        {
+                            Date = date,
+                            Bookings = dayBookings.Select(MapToCalendarBookingDto).ToList(),
+                            TotalBookings = dayBookings.Count,
+                            TotalPeople = dayBookings.Sum(b => b.People),
+                            TotalRevenue = dayBookings.Sum(b => b.TotalPrice)
+                        };
+                        
+                        Console.WriteLine($"Added {dayBookings.Count} bookings for {date:yyyy-MM-dd}");
+                        monthDto.Days.Add(dayDto);
+                    }
+                }
+
+                // Calculate month totals
+                monthDto.TotalBookings = monthDto.Days.Sum(d => d.TotalBookings);
+                monthDto.TotalPeople = monthDto.Days.Sum(d => d.TotalPeople);
+                monthDto.TotalRevenue = monthDto.Days.Sum(d => d.TotalRevenue);
+
+                Console.WriteLine($"Month {monthDto.MonthName}: {monthDto.TotalBookings} bookings, {monthDto.TotalPeople} people, ${monthDto.TotalRevenue:F2} revenue");
+                calendarView.Months.Add(monthDto);
+                currentDate = currentDate.AddMonths(1);
+            }
+
+            // Calculate overall totals
+            calendarView.TotalBookings = calendarView.Months.Sum(m => m.TotalBookings);
+            calendarView.TotalPeople = calendarView.Months.Sum(m => m.TotalPeople);
+            calendarView.TotalRevenue = calendarView.Months.Sum(m => m.TotalRevenue);
+
+            Console.WriteLine($"Calendar view created with {calendarView.Months.Count} months");
+            return calendarView;
+        }
+
+        private CalendarBookingDto MapToCalendarBookingDto(BookingWithDetailsDto booking)
+        {
+            return new CalendarBookingDto
+            {
+                Id = booking.Id,
+                TourTitle = booking.TourTitle,
+                StartDate = booking.StartDate ?? DateTime.MinValue,
+                People = booking.People,
+                StatusName = booking.StatusName,
+                PaymentStatus = booking.PaymentStatus,
+                NameCustomer = booking.NameCustomer,
+                PhoneNumber = booking.PhoneNumber,
+                Email = booking.Email,
+                TotalPrice = booking.TotalPrice,
+                Note = booking.Note
+            };
+        }
+
         // Manual mapping methods
         private BookingDto MapToBookingDto(BookingWithDetailsDto booking)
         {

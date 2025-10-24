@@ -15,5 +15,6 @@ namespace barefoot_travel.Services
         Task<ApiResponse> GetBookingStatusesAsync();
         Task<ApiResponse> ExportBookingsAsync(ExportBookingDto exportFilter);
         Task<ApiResponse> CreateBookingAsync(CreateBookingDto dto, string createdBy);
+        Task<ApiResponse> GetBookingsForCalendarAsync(DateTime startDate, DateTime endDate);
     }
 }

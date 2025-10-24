@@ -28,11 +28,28 @@ public class PriceTypeRepository : IPriceTypeRepository
             .ToListAsync();
     }
 
-    public async Task<PagedResult<PriceType>> GetPagedAsync(int page, int pageSize)
+    public async Task<PagedResult<PriceType>> GetPagedAsync(int page, int pageSize, string? priceTypeName = null, string? sortBy = "priceTypeName", string? sortOrder = "asc")
     {
         var query = _context.PriceTypes
-            .Where(pt => pt.Active)
-            .OrderBy(pt => pt.PriceTypeName);
+            .Where(pt => pt.Active);
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(priceTypeName))
+        {
+            query = query.Where(pt => pt.PriceTypeName.Contains(priceTypeName));
+        }
+
+        // Apply sorting
+        query = sortBy?.ToLower() switch
+        {
+            "pricetypename" => sortOrder?.ToLower() == "desc" 
+                ? query.OrderByDescending(pt => pt.PriceTypeName)
+                : query.OrderBy(pt => pt.PriceTypeName),
+            "createdtime" => sortOrder?.ToLower() == "desc"
+                ? query.OrderByDescending(pt => pt.CreatedTime)
+                : query.OrderBy(pt => pt.CreatedTime),
+            _ => query.OrderBy(pt => pt.PriceTypeName)
+        };
 
         var totalItems = await query.CountAsync();
         var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);

@@ -68,7 +68,7 @@
           <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
             <div class="d-flex align-items-center gap-3">
               <span class="d-flex">
-                <i class="ti ti-calendar-check"></i>
+                                <i class="fa-solid fa-calendar-days"></i>
               </span>
               <span class="hide-menu">Bookings</span>
             </div>
@@ -81,6 +81,16 @@
                     <i class="ti ti-circle"></i>
                   </div>
                   <span class="hide-menu">Booking Management</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="/booking-calendar">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle"></i>
+                  </div>
+                  <span class="hide-menu">Booking Calendar</span>
                 </div>
               </a>
             </li>
@@ -112,39 +122,7 @@
         </li>
 
         <!-- Roles Management -->
-        <li class="sidebar-item">
-          <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
-            <div class="d-flex align-items-center gap-3">
-              <span class="d-flex">
-                <i class="ti ti-shield-check"></i>
-              </span>
-              <span class="hide-menu">Roles & Permissions</span>
-            </div>
-          </a>
-          <ul aria-expanded="false" class="collapse first-level">
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Role")">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle"></i>
-                  </div>
-                  <span class="hide-menu">Roles</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "Policy")">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle"></i>
-                  </div>
-                  <span class="hide-menu">Policies</span>
-                </div>
-              </a>
-            </li>
-          </ul>
-        </li>
-
+        
         <!-- Price Types Management -->
         <li class="sidebar-item">
           <a class="sidebar-link justify-content-between has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -157,19 +135,19 @@
           </a>
           <ul aria-expanded="false" class="collapse first-level">
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="@Url.Action("Index", "PriceType")">
+              <a class="sidebar-link justify-content-between" href="/price-policy-management">
                 <div class="d-flex align-items-center gap-3">
                   <div class="round-16 d-flex align-items-center justify-content-center">
                     <i class="ti ti-circle"></i>
                   </div>
-                  <span class="hide-menu">Price Types</span>
+                  <span class="hide-menu">Price & Policy</span>
                 </div>
               </a>
             </li>
           </ul>
         </li>
 
-        <li>
+      @*   <li>
           <span class="sidebar-divider lg"></span>
         </li>
         <li class="nav-small-cap">
@@ -214,7 +192,7 @@
             </div>
           </a>
         </li>
-      </ul>
+      </ul> *@
     </nav>
     <!-- End Sidebar navigation -->
   </div>

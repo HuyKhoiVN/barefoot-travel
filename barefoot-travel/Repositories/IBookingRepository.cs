@@ -22,6 +22,7 @@ namespace barefoot_travel.Repositories
         Task<Account?> GetAccountByIdAsync(int id);
         Task<List<BookingWithDetailsDto>> GetBookingsWithDetailsAsync(List<int> bookingIds);
         Task<List<BookingWithDetailsDto>> GetBookingsWithDetailsForExportAsync(ExportBookingDto exportFilter);
+        Task<List<BookingWithDetailsDto>> GetBookingsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

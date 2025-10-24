@@ -261,5 +261,29 @@ namespace barefoot_travel.Controllers.Api
                 return new ApiResponse(false, $"Error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Get bookings for calendar view by date range
+        /// </summary>
+        /// <param name="startDate">Start date for the range</param>
+        /// <param name="endDate">End date for the range</param>
+        /// <returns>List of bookings grouped by date</returns>
+        [HttpGet("calendar")]
+        public async Task<ApiResponse> GetBookingsForCalendar(
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
+        {
+            _logger.LogInformation("Getting bookings for calendar from {StartDate} to {EndDate}", startDate, endDate);
+
+            try
+            {
+                return await _bookingService.GetBookingsForCalendarAsync(startDate, endDate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting bookings for calendar");
+                return new ApiResponse(false, $"Error: {ex.Message}");
+            }
+        }
     }
 }

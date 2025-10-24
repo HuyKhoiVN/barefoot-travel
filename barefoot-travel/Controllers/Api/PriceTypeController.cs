@@ -48,15 +48,21 @@ public class PriceTypeController : ControllerBase
     /// </summary>
     /// <param name="page">Page number (default: 1)</param>
     /// <param name="pageSize">Page size (default: 10)</param>
+    /// <param name="priceTypeName">Search by price type name</param>
+    /// <param name="sortBy">Sort field (default: priceTypeName)</param>
+    /// <param name="sortOrder">Sort direction: asc or desc (default: asc)</param>
     /// <returns>Paginated list of price types</returns>
     /// <response code="200">Success</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("paged")]
     public async Task<PagedResult<PriceTypeDto>> GetPriceTypesPaged(
         [FromQuery] int page = 1, 
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? priceTypeName = null,
+        [FromQuery] string? sortBy = "priceTypeName",
+        [FromQuery] string? sortOrder = "asc")
     {
-        return await _priceTypeService.GetPriceTypesPagedAsync(page, pageSize);
+        return await _priceTypeService.GetPriceTypesPagedAsync(page, pageSize, priceTypeName, sortBy, sortOrder);
     }
 
     /// <summary>

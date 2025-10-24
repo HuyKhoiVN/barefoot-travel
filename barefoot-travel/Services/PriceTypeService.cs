@@ -48,11 +48,11 @@ public class PriceTypeService : IPriceTypeService
         }
     }
 
-    public async Task<PagedResult<PriceTypeDto>> GetPriceTypesPagedAsync(int page, int pageSize)
+    public async Task<PagedResult<PriceTypeDto>> GetPriceTypesPagedAsync(int page, int pageSize, string? priceTypeName = null, string? sortBy = "priceTypeName", string? sortOrder = "asc")
     {
         try
         {
-            var pagedResult = await _priceTypeRepository.GetPagedAsync(page, pageSize);
+            var pagedResult = await _priceTypeRepository.GetPagedAsync(page, pageSize, priceTypeName, sortBy, sortOrder);
             var priceTypeDtos = MapToPriceTypeDtoList(pagedResult.Items);
 
             return new PagedResult<PriceTypeDto>

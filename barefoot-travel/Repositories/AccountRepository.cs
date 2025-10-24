@@ -46,6 +46,7 @@ namespace barefoot_travel.Repositories
         public async Task<Account> UpdateAsync(Account account)
         {
             account.UpdatedTime = DateTime.UtcNow;
+            account.Active = true;
             _context.Accounts.Update(account);
             await _context.SaveChangesAsync();
             return account;

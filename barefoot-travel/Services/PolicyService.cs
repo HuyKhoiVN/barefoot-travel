@@ -54,11 +54,11 @@ namespace barefoot_travel.Services
             }
         }
 
-        public async Task<PagedResult<PolicyDto>> GetPoliciesPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", bool? active = null)
+        public async Task<PagedResult<PolicyDto>> GetPoliciesPagedAsync(int page, int pageSize, string? policyType = null, string? sortBy = null, string? sortOrder = "asc", bool? active = null)
         {
             try
             {
-                var pagedResult = await _policyRepository.GetPagedAsync(page, pageSize, sortBy, sortOrder, active);
+                var pagedResult = await _policyRepository.GetPagedAsync(page, pageSize, policyType, sortBy, sortOrder, active);
                 var policyDtos = pagedResult.Items.Select(MapToPolicyDto).ToList();
 
                 return new PagedResult<PolicyDto>

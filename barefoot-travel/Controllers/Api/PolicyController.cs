@@ -44,13 +44,14 @@ namespace barefoot_travel.Controllers.Api
         public async Task<IActionResult> GetPoliciesPaged(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
+            [FromQuery] string? policyType = null,
             [FromQuery] string? sortBy = null,
             [FromQuery] string? sortOrder = "asc",
             [FromQuery] bool? active = null)
         {
             try
             {
-                var result = await _policyService.GetPoliciesPagedAsync(page, pageSize, sortBy, sortOrder, active);
+                var result = await _policyService.GetPoliciesPagedAsync(page, pageSize, policyType, sortBy, sortOrder, active);
                 return Ok(result);
             }
             catch (Exception ex)
