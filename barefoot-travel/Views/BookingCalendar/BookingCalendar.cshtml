@@ -31,49 +31,40 @@
                     </div>
                 </div>
                 
-                <!-- Date Range Selector -->
-                <div class="row mt-4">
-                    <div class="col-md-3">
-                        <div class="mb-3">
-                            <label class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDatePicker">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="mb-3">
-                            <label class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="endDatePicker">
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-success d-block w-100" id="loadCalendarBtn">
-                                <i class="ti ti-refresh me-2"></i>Load Calendar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-outline-secondary d-block w-100" id="clearDateBtn">
-                                <i class="ti ti-x me-2"></i>Clear
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="showWeekendsSwitch" checked>
-                                <label class="form-check-label" for="showWeekendsSwitch">
-                                    Show Weekends
-                                </label>
+               
+                <!-- View Mode Selector -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card mb-0">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">View Mode:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="btn-group" role="group" id="viewModeGroup">
+                                            <input type="radio" class="btn-check" name="viewMode" id="singleMonth" value="1" checked>
+                                            <label class="btn btn-outline-primary" for="singleMonth">
+                                                <i class="ti ti-calendar me-1"></i>Single Month
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="viewMode" id="threeMonths" value="3">
+                                            <label class="btn btn-outline-primary" for="threeMonths">
+                                                <i class="ti ti-calendar-grid me-1"></i>3 Months
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="viewMode" id="sixMonths" value="6">
+                                            <label class="btn btn-outline-primary" for="sixMonths">
+                                                <i class="ti ti-calendar-grid me-1"></i>6 Months
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Calendar Container -->
                 <div class="calendar-slider-container mt-4">
                     <div class="calendar-slider-wrapper">
@@ -150,6 +141,44 @@
             transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             width: 100%;
             padding: 8px;
+        }
+        
+        /* Grid View Styles */
+        .calendar-grid-view {
+            display: grid;
+            gap: 20px;
+            width: 100%;
+            padding: 8px;
+        }
+        
+        .calendar-grid-view.mode-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .calendar-grid-view.mode-6 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+        
+        .calendar-grid-view .calendar-month {
+            width: 100%;
+            margin: 0;
+        }
+        
+        /* Responsive Grid */
+        @@media (max-width: 1200px) {
+            .calendar-grid-view.mode-6 {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+        }
+        
+        @@media (max-width: 768px) {
+            .calendar-grid-view.mode-3,
+            .calendar-grid-view.mode-6 {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
         }
 
         .calendar-month {
@@ -502,6 +531,7 @@
         $(document).ready(function() {
             let currentDate = new Date();
             let calendarData = null;
+            let currentViewMode = 1; // 1 = single month, 3 = 3 months, 6 = 6 months
             
             // Initialize date pickers
             initializeDatePickers();
@@ -511,6 +541,9 @@
             
             // Event handlers
             setupEventHandlers();
+            
+            // Setup view mode handlers
+            setupViewModeHandlers();
             
             function initializeDatePickers() {
                 const today = new Date();
@@ -591,12 +624,24 @@
             }
             
             function navigateToPreviousMonth() {
-                currentDate.setMonth(currentDate.getMonth() - 1);
+                if (currentViewMode === 1) {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                } else if (currentViewMode === 3) {
+                    currentDate.setMonth(currentDate.getMonth() - 3);
+                } else if (currentViewMode === 6) {
+                    currentDate.setMonth(currentDate.getMonth() - 6);
+                }
                 loadMonthData(currentDate);
             }
             
             function navigateToNextMonth() {
-                currentDate.setMonth(currentDate.getMonth() + 1);
+                if (currentViewMode === 1) {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                } else if (currentViewMode === 3) {
+                    currentDate.setMonth(currentDate.getMonth() + 3);
+                } else if (currentViewMode === 6) {
+                    currentDate.setMonth(currentDate.getMonth() + 6);
+                }
                 loadMonthData(currentDate);
             }
             
@@ -606,10 +651,23 @@
             }
             
             function loadMonthData(targetDate) {
-                const startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
-                const endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+                let startOfMonth, endOfMonth;
                 
-                console.log(`Loading month data for ${targetDate.getFullYear()}-${targetDate.getMonth() + 1}`);
+                if (currentViewMode === 1) {
+                    // Single month
+                    startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                    endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+                } else if (currentViewMode === 3) {
+                    // 3 months
+                    startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                    endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 3, 0);
+                } else if (currentViewMode === 6) {
+                    // 6 months
+                    startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                    endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 6, 0);
+                }
+                
+                console.log(`Loading ${currentViewMode} month(s) data for ${targetDate.getFullYear()}-${targetDate.getMonth() + 1}`);
                 console.log(`Start: ${startOfMonth.toISOString()}, End: ${endOfMonth.toISOString()}`);
                 
                 loadCalendarForMonth(startOfMonth, endOfMonth);
@@ -665,6 +723,21 @@
                     return;
                 }
                 
+                if (currentViewMode === 1) {
+                    // Single month view
+                    displaySingleMonth(data);
+                } else {
+                    // Grid view (3 or 6 months)
+                    displayGridMonths(data);
+                }
+                
+                updateMonthDisplay();
+            }
+            
+            function displaySingleMonth(data) {
+                const container = $('#calendarSlider');
+                container.removeClass('calendar-grid-view').addClass('calendar-slider');
+                
                 // Find the current month instead of just taking the first one
                 const today = new Date();
                 const currentYear = today.getFullYear();
@@ -690,38 +763,74 @@
                     console.log('No month data found');
                     container.html('<div class="alert alert-info">No month data available</div>');
                 }
+            }
+            
+            function displayGridMonths(data) {
+                const container = $('#calendarSlider');
+                container.removeClass('calendar-slider').addClass('calendar-grid-view');
                 
-                updateMonthDisplay();
+                // Add mode class
+                container.removeClass('mode-3 mode-6').addClass(`mode-${currentViewMode}`);
+                
+                console.log(`Displaying ${data.months.length} months in grid mode`);
+                
+                data.months.forEach((month, index) => {
+                    const monthHtml = createMonthHtml(month, 'grid');
+                    container.append(monthHtml);
+                    console.log(`Month ${index + 1} HTML created: ${month.monthName}`);
+                });
             }
             
             function updateMonthDisplay() {
                 if (!calendarData || !calendarData.months) return;
                 
-                // Find the current month instead of just taking the first one
-                const today = new Date();
-                const currentYear = today.getFullYear();
-                const currentMonth = today.getMonth() + 1; // JavaScript months are 0-based
-                
-                const month = calendarData.months.find(m => m.year === currentYear && m.month === currentMonth);
-                
-                if (month) {
-                    // Format month name in English (e.g., "Oct - 2025")
-                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    const monthName = monthNames[month.month - 1] + ' - ' + month.year;
-                    $('#currentMonthDisplay').text(monthName);
+                if (currentViewMode === 1) {
+                    // Single month display
+                    const today = new Date();
+                    const currentYear = today.getFullYear();
+                    const currentMonth = today.getMonth() + 1; // JavaScript months are 0-based
+                    
+                    const month = calendarData.months.find(m => m.year === currentYear && m.month === currentMonth);
+                    
+                    if (month) {
+                        // Format month name in English (e.g., "Oct - 2025")
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const monthName = monthNames[month.month - 1] + ' - ' + month.year;
+                        $('#currentMonthDisplay').text(monthName);
+                    } else {
+                        // Fallback to current date
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const monthName = monthNames[currentDate.getMonth()] + ' - ' + currentDate.getFullYear();
+                        $('#currentMonthDisplay').text(monthName);
+                    }
                 } else {
-                    // Fallback to current date
-                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    const monthName = monthNames[currentDate.getMonth()] + ' - ' + currentDate.getFullYear();
-                    $('#currentMonthDisplay').text(monthName);
+                    // Grid view display - show range
+                    if (calendarData.months.length > 0) {
+                        const firstMonth = calendarData.months[0];
+                        const lastMonth = calendarData.months[calendarData.months.length - 1];
+                        
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        
+                        let displayText;
+                        if (firstMonth.year === lastMonth.year) {
+                            // Same year
+                            displayText = `${monthNames[firstMonth.month - 1]} - ${monthNames[lastMonth.month - 1]} ${firstMonth.year}`;
+                        } else {
+                            // Different years
+                            displayText = `${monthNames[firstMonth.month - 1]} ${firstMonth.year} - ${monthNames[lastMonth.month - 1]} ${lastMonth.year}`;
+                        }
+                        
+                        $('#currentMonthDisplay').text(displayText);
+                    }
                 }
             }
             
             function createMonthHtml(month, type = 'current') {
                 console.log('Creating month HTML for:', month);
-                const showWeekends = $('#showWeekendsSwitch').is(':checked');
+                const showWeekends = true; // Always show weekends since we removed the switch
                 const today = new Date();
                 
                 // Get first day of month and calculate starting day
@@ -734,6 +843,7 @@
                 
                 console.log(`Month: ${month.month}, Year: ${month.year}, Days in month: ${daysInMonth}, Start day: ${startDay}`);
                 console.log('Month days data:', month.days);
+                console.log(`Total cells needed: ${startDay + daysInMonth} (${startDay} empty + ${daysInMonth} days)`);
                 
                 let html = `
                     <div class="calendar-month ${type}">
@@ -754,7 +864,9 @@
                 for (let i = 0; i < startDay; i++) {
                     html += '<div class="calendar-day other-month"></div>';
                 }
+                console.log(`Added ${startDay} empty cells`);
                 
+                let daysAdded = 0;
                 // Add days of the month
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(month.year, month.month - 1, day);
@@ -766,13 +878,9 @@
                                apiDate.getFullYear() === month.year;
                     }) : null;
                     
-                    // Debug logging
-                    if (day === 1) {
-                        console.log('Month days data:', month.days);
-                        console.log('Looking for day:', day, 'in month:', month.month, 'year:', month.year);
-                    }
-                    if (dayData) {
-                        console.log(`Found dayData for day ${day}:`, dayData);
+                    // Debug logging for first few days
+                    if (day <= 5) {
+                        console.log(`Day ${day}: date=${date.toDateString()}, dayData=`, dayData);
                     }
                     
                     let dayClass = 'calendar-day';
@@ -812,7 +920,10 @@
                     }
                     
                     html += '</div>';
+                    daysAdded++;
                 }
+                
+                console.log(`Added ${daysAdded} days out of ${daysInMonth} total days`);
                 
                 html += `
                         </div>
@@ -1048,6 +1159,36 @@
             
             function getAuthToken() {
                 return localStorage.getItem('authToken') || getCookie('authToken');
+            }
+            
+            function setupViewModeHandlers() {
+                $('input[name="viewMode"]').on('change', function() {
+                    currentViewMode = parseInt($(this).val());
+                    console.log('View mode changed to:', currentViewMode);
+                    loadCalendarForCurrentViewMode();
+                });
+            }
+            
+            function loadCalendarForCurrentViewMode() {
+                const today = new Date();
+                let startDate, endDate;
+                
+                if (currentViewMode === 1) {
+                    // Single month
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                } else if (currentViewMode === 3) {
+                    // 3 months
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 3, 0);
+                } else if (currentViewMode === 6) {
+                    // 6 months
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 6, 0);
+                }
+                
+                console.log(`Loading ${currentViewMode} month(s) from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+                loadCalendarForMonth(startDate, endDate);
             }
             
             function getCookie(name) {
