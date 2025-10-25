@@ -465,11 +465,11 @@ namespace barefoot_travel.Services
                 Console.WriteLine($"startDate.Date: {startDate.Date:yyyy-MM-dd}, endDate.Date: {endDate.Date:yyyy-MM-dd}");
                 
                 // Validate date range (max 3 months)
-                var maxEndDate = startDate.AddMonths(3);
-                if (endDate > maxEndDate)
-                {
-                    return new ApiResponse(false, "Date range cannot exceed 3 months");
-                }
+                //var maxEndDate = startDate.AddMonths(3);
+                //if (endDate > maxEndDate)
+                //{
+                //    return new ApiResponse(false, "Date range cannot exceed 3 months");
+                //}
 
                 // Get bookings in date range
                 var bookings = await _bookingRepository.GetBookingsByDateRangeAsync(startDate, endDate);
