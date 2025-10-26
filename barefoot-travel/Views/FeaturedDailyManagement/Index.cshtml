@@ -1,0 +1,1039 @@
+@{
+    ViewData["Title"] = "Featured & Daily Tours Management";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<div class="row">
+    <!-- Featured Tours Section -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-md-flex align-items-center mb-4">
+                    <div>
+                        <h4 class="card-title">Featured Tours</h4>
+                        <p class="card-subtitle">Manage featured tours displayed on homepage (Max 2 tours)</p>
+                    </div>
+                    <div class="ms-auto mt-3 mt-md-0">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#featuredTourModal">
+                            <i class="ti ti-plus me-2"></i>Add Featured Tour
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Featured Tours List -->
+                <div id="featuredToursList" class="row">
+                    <!-- Featured tours will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Tours Section -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-md-flex align-items-center mb-4">
+                    <div>
+                        <h4 class="card-title">Daily Tours</h4>
+                        <p class="card-subtitle">Manage daily tours displayed on homepage (Max 3 tours)</p>
+                    </div>
+                    <div class="ms-auto mt-3 mt-md-0">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dailyTourModal">
+                            <i class="ti ti-plus me-2"></i>Add Daily Tour
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daily Tours List -->
+                <div id="dailyToursList" class="row">
+                    <!-- Daily tours will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Featured Tour Configuration -->
+<div class="modal fade" id="featuredTourModal" tabindex="-1" aria-labelledby="featuredTourModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="featuredTourModalLabel">Configure Featured Tour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="featuredTourForm">
+                    <input type="hidden" id="ftTourId">
+                    <input type="hidden" id="ftEditId">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Select Tour <span class="text-danger">*</span></label>
+                            <select class="form-select" id="ftTourSelect" required>
+                                <option value="">Choose a tour...</option>
+                                <!-- Tours will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="ftDisplayOrder" value="0" min="0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Card CSS Class</label>
+                            <input type="text" class="form-control" id="ftCardClass" placeholder="e.g., ha-long">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Badge Text (card-category) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ftBadge" placeholder="e.g., IN THE SPOTLIGHTS" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title (h3) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ftTitle" placeholder="e.g., Ha Long Bay" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image URL <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" id="ftImageUrl" placeholder="/uploads/..." required>
+                                <button type="button" class="btn btn-outline-primary" onclick="openImageGallery('ftImageUrl', 'ftImagePreview', 'ftImagePreviewImg')">
+                                    <i class="ti ti-photo"></i>
+                                </button>
+                            </div>
+                            <div id="ftImagePreview" class="mt-2" style="display:none;">
+                                <img id="ftImagePreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Description (p) <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="ftDescription" rows="3" placeholder="Enter description..." required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveFeaturedTourBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Daily Tour Configuration -->
+<div class="modal fade" id="dailyTourModal" tabindex="-1" aria-labelledby="dailyTourModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dailyTourModalLabel">Configure Daily Tour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="dailyTourForm">
+                    <input type="hidden" id="dtCategoryId">
+                    <input type="hidden" id="dtEditId">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Select Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="dtCategorySelect" required>
+                                <option value="">Choose a category...</option>
+                                <!-- Categories will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="dtDisplayOrder" value="0" min="0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Card CSS Class</label>
+                            <input type="text" class="form-control" id="dtCardClass" placeholder="e.g., north-vietnam">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Badge Text (daily-card-category) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="dtBadge" placeholder="e.g., DAILY TOURS" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title (h3) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="dtTitle" placeholder="e.g., North Vietnam" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image URL <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" id="dtImageUrl" placeholder="/uploads/..." required>
+                                <button type="button" class="btn btn-outline-primary" onclick="openImageGallery('dtImageUrl', 'dtImagePreview', 'dtImagePreviewImg')">
+                                    <i class="ti ti-photo"></i>
+                                </button>
+                            </div>
+                            <div id="dtImagePreview" class="mt-2" style="display:none;">
+                                <img id="dtImagePreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Description (p) <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="dtDescription" rows="3" placeholder="Enter description..." required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveDailyTourBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Image Gallery (reuse from HomePageContent) -->
+<div class="modal fade" id="imageGalleryModal" tabindex="-1" aria-labelledby="imageGalleryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageGalleryModalLabel">Select Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3" id="imageTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="uploaded-tab" data-bs-toggle="tab" data-bs-target="#uploaded" type="button" role="tab">Uploaded Images</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab">Upload New</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="imageTabContent">
+                    <div class="tab-pane fade show active" id="uploaded" role="tabpanel">
+                        <div class="row g-2" id="uploadedImagesGrid">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="upload" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label">Upload New Image</label>
+                            <input type="file" class="form-control" id="newImageUpload" accept="image/*">
+                            <small class="text-muted">Allowed: JPG, PNG, GIF, WebP (Max: 10MB)</small>
+                        </div>
+                        <div id="newImagePreview" style="display:none;">
+                            <img id="newImagePreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 300px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="selectImageBtn" disabled>Select This Image</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden input for selected image -->
+<input type="hidden" id="selectedImageUrl">
+
+@section Scripts {
+    <style>
+        .image-select-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .image-select-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            transform: translateY(-2px);
+        }
+    </style>
+    <script>
+        let allFeaturedTours = [];
+        let allDailyTours = [];
+        let currentImageGalleryTarget = null;
+        let currentImagePreviewDiv = null;
+        let currentImagePreviewImg = null;
+
+        $(document).ready(function() {
+            loadTours();
+            loadCategories();
+            loadFeaturedTours();
+            loadDailyTours();
+        });
+
+        // Load tours for Featured Tours dropdown
+        function loadTours() {
+            $.ajax({
+                url: '/api/Tour',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const select = $('#ftTourSelect');
+                        select.empty();
+                        select.append('<option value="">Choose a tour...</option>');
+                        
+                        response.data.forEach(function(tour) {
+                            select.append(`<option value="${tour.id}">${tour.title}</option>`);
+                        });
+                    }
+                },
+                error: function() {
+                    showToast('Error loading tours', 'danger');
+                }
+            });
+        }
+
+        // Load categories for Daily Tours dropdown
+        function loadCategories() {
+            $.ajax({
+                url: '/api/Category',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const select = $('#dtCategorySelect');
+                        select.empty();
+                        select.append('<option value="">Choose a category...</option>');
+                        
+                        response.data.forEach(function(category) {
+                            select.append(`<option value="${category.id}">${category.categoryName} (Type: ${category.type})</option>`);
+                        });
+                    }
+                },
+                error: function() {
+                    showToast('Error loading categories', 'danger');
+                }
+            });
+        }
+
+        // Load Featured Tours
+        function loadFeaturedTours() {
+            $.ajax({
+                url: '/api/FeaturedDailyTours/featured-tours',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        allFeaturedTours = response.data.tours;
+                        displayFeaturedTours(allFeaturedTours);
+                        updateFeaturedTourButtonState(allFeaturedTours.length);
+                    }
+                },
+                error: function() {
+                    showToast('Error loading featured tours', 'danger');
+                }
+            });
+        }
+
+        // Update Featured Tour "Add" button state based on count
+        function updateFeaturedTourButtonState(currentCount) {
+            const maxCount = 2;
+            const $addButton = $('.btn-primary:has(i.ti-plus):first'); // First "Add" button
+            
+            if (currentCount >= maxCount) {
+                $addButton.prop('disabled', true)
+                    .attr('title', `Maximum ${maxCount} featured tours allowed. Please remove one before adding a new one.`)
+                    .html('<i class="ti ti-plus me-2"></i>Maximum Reached');
+            } else {
+                $addButton.prop('disabled', false)
+                    .removeAttr('title')
+                    .html('<i class="ti ti-plus me-2"></i>Add Featured Tour');
+            }
+        }
+
+        // Display Featured Tours
+        function displayFeaturedTours(tours) {
+            const container = $('#featuredToursList');
+            container.empty();
+
+            if (!tours || tours.length === 0) {
+                container.append(`
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="ti ti-info-circle me-2"></i>
+                            No featured tours configured yet.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
+            tours.sort((a, b) => a.displayOrder - b.displayOrder);
+
+            tours.forEach(function(tour) {
+                container.append(`
+                    <div class="col-md-6 mb-4">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">${tour.categoryName || 'Unnamed'}</h6>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <small class="text-muted">Badge:</small>
+                                    <div><span class="badge bg-primary">${tour.badge}</span></div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Description:</small>
+                                    <div>${tour.description}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Image:</small>
+                                    <img src="${tour.imageUrl}" alt="Image" class="img-thumbnail" style="max-width: 150px;">
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Order:</small>
+                                    <div>${tour.displayOrder}</div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editFeaturedTour(${tour.id})">
+                                        <i class="ti ti-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="moveFeaturedTourUp(${tour.id})">
+                                        <i class="ti ti-arrow-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="moveFeaturedTourDown(${tour.id})">
+                                        <i class="ti ti-arrow-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteFeaturedTour(${tour.id})">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Load Daily Tours
+        function loadDailyTours() {
+            $.ajax({
+                url: '/api/FeaturedDailyTours/daily-tours',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        allDailyTours = response.data.tours;
+                        displayDailyTours(allDailyTours);
+                        updateDailyTourButtonState(allDailyTours.length);
+                    }
+                },
+                error: function() {
+                    showToast('Error loading daily tours', 'danger');
+                }
+            });
+        }
+
+        // Update Daily Tour "Add" button state based on count
+        function updateDailyTourButtonState(currentCount) {
+            const maxCount = 3;
+            const $addButton = $('.btn-success:has(i.ti-plus):first'); // First "Add" button for Daily Tours
+            
+            if (currentCount >= maxCount) {
+                $addButton.prop('disabled', true)
+                    .attr('title', `Maximum ${maxCount} daily tours allowed. Please remove one before adding a new one.`)
+                    .html('<i class="ti ti-plus me-2"></i>Maximum Reached');
+            } else {
+                $addButton.prop('disabled', false)
+                    .removeAttr('title')
+                    .html('<i class="ti ti-plus me-2"></i>Add Daily Tour');
+            }
+        }
+
+        // Display Daily Tours
+        function displayDailyTours(tours) {
+            const container = $('#dailyToursList');
+            container.empty();
+
+            if (!tours || tours.length === 0) {
+                container.append(`
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="ti ti-info-circle me-2"></i>
+                            No daily tours configured yet.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
+            tours.sort((a, b) => a.displayOrder - b.displayOrder);
+
+            tours.forEach(function(tour) {
+                container.append(`
+                    <div class="col-md-4 mb-4">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">${tour.categoryName}</h6>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <small class="text-muted">Badge:</small>
+                                    <div><span class="badge bg-primary">${tour.badge}</span></div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Description:</small>
+                                    <div>${tour.description}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Image:</small>
+                                    <img src="${tour.imageUrl}" alt="Image" class="img-thumbnail" style="max-width: 150px;">
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Order:</small>
+                                    <div>${tour.displayOrder}</div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editDailyTour(${tour.id})">
+                                        <i class="ti ti-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="moveDailyTourUp(${tour.id})">
+                                        <i class="ti ti-arrow-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="moveDailyTourDown(${tour.id})">
+                                        <i class="ti ti-arrow-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteDailyTour(${tour.id})">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Open image gallery modal
+        window.openImageGallery = function(targetInputId, previewDivId, previewImgId) {
+            currentImageGalleryTarget = targetInputId;
+            currentImagePreviewDiv = previewDivId;
+            currentImagePreviewImg = previewImgId;
+            
+            $('#imageGalleryModal').modal('show');
+            loadUploadedImages();
+        };
+
+        // Load uploaded images
+        function loadUploadedImages() {
+            const grid = $('#uploadedImagesGrid');
+            grid.empty();
+            grid.append('<div class="col-12 text-center"><p>Loading images...</p></div>');
+
+            $.ajax({
+                url: '/api/FileUpload/images',
+                type: 'GET',
+                success: function(response) {
+                    grid.empty();
+                    
+                    if (response.success && response.data && response.data.length > 0) {
+                        response.data.forEach(function(image) {
+                            grid.append(`
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="card image-select-card" onclick="selectUploadedImage('${image.fileUrl}')">
+                                        <img src="${image.fileUrl}" class="card-img-top" alt="Image" style="height: 150px; object-fit: cover;">
+                                        <div class="card-body p-2 text-center">
+                                            <small class="text-muted">${image.fileName}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        grid.append('<div class="col-12 text-center"><p class="text-muted">No uploaded images found.</p></div>');
+                    }
+                },
+                error: function() {
+                    grid.empty();
+                    grid.append('<div class="col-12 text-center"><p class="text-danger">Error loading images</p></div>');
+                }
+            });
+        }
+
+        // Select uploaded image
+        window.selectUploadedImage = function(imageUrl) {
+            $('#' + currentImageGalleryTarget).val(imageUrl);
+            $('#' + currentImagePreviewDiv).show();
+            $('#' + currentImagePreviewImg).attr('src', imageUrl);
+            $('#selectImageBtn').prop('disabled', false);
+            $('#selectedImageUrl').val(imageUrl);
+        };
+
+        // Handle new image upload
+        $('#newImageUpload').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    showToast('Invalid file type. Please select an image file.', 'danger');
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('File size too large. Maximum 10MB allowed.', 'danger');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                $('#selectImageBtn').prop('disabled', true).text('Uploading...');
+
+                $.ajax({
+                    url: '/api/FileUpload/image',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            const imageUrl = response.data.fileUrl;
+                            $('#selectedImageUrl').val(imageUrl);
+                            $('#newImagePreview').show();
+                            $('#newImagePreviewImg').attr('src', imageUrl);
+                            $('#selectImageBtn').prop('disabled', false).text('Select This Image');
+                            showToast('Image uploaded successfully!', 'success');
+                        } else {
+                            showToast(response.message || 'Failed to upload image', 'danger');
+                            $('#selectImageBtn').prop('disabled', true).text('Select This Image');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMsg = xhr.responseJSON?.message || 'Failed to upload image';
+                        showToast(errorMsg, 'danger');
+                        $('#selectImageBtn').prop('disabled', true).text('Select This Image');
+                    }
+                });
+            }
+        });
+
+        // Apply selected image
+        $('#selectImageBtn').on('click', function() {
+            const imageUrl = $('#selectedImageUrl').val() || $('#newImagePreviewImg').attr('src');
+            if (imageUrl) {
+                $('#' + currentImageGalleryTarget).val(imageUrl);
+                $('#' + currentImagePreviewDiv).show();
+                $('#' + currentImagePreviewImg).attr('src', imageUrl);
+                $('#imageGalleryModal').modal('hide');
+                
+                $('#newImageUpload').val('');
+                $('#newImagePreview').hide();
+                $('#selectImageBtn').prop('disabled', true);
+                $('#selectedImageUrl').val('');
+            }
+        });
+
+        // Save Featured Tour
+        $('#saveFeaturedTourBtn').on('click', function() {
+            const form = $('#featuredTourForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const editId = $('#ftEditId').val();
+            const tourId = $('#ftTourSelect').val();
+            
+            // Check if editing or creating
+            if (editId) {
+                // Editing: Use PATCH with the FeaturedTour ID
+                const data = {
+                    badge: $('#ftBadge').val(),
+                    categoryName: $('#ftTitle').val(),
+                    description: $('#ftDescription').val(),
+                    imageUrl: $('#ftImageUrl').val(),
+                    displayOrder: parseInt($('#ftDisplayOrder').val()),
+                    cardClass: $('#ftCardClass').val() || null,
+                    active: true
+                };
+
+                $.ajax({
+                    url: `/api/FeaturedDailyTours/featured-tours/${editId}/update`,
+                    type: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Featured tour updated successfully!', 'success');
+                            resetFeaturedTourModal();
+                            $('#featuredTourModal').modal('hide');
+                            loadFeaturedTours();
+                        } else {
+                            showToast(response.message || 'Failed to update', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMsg = xhr.responseJSON?.message || 'Failed to update';
+                        showToast(errorMsg, 'danger');
+                    }
+                });
+            } else {
+                // Creating: Use PUT with tourId (existing logic)
+                const data = {
+                    badge: $('#ftBadge').val(),
+                    categoryName: $('#ftTitle').val(),
+                    description: $('#ftDescription').val(),
+                    imageUrl: $('#ftImageUrl').val(),
+                    displayOrder: parseInt($('#ftDisplayOrder').val()),
+                    cardClass: $('#ftCardClass').val() || null,
+                    active: true
+                };
+
+                $.ajax({
+                    url: `/api/FeaturedDailyTours/featured-tours/${tourId}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Featured tour created successfully!', 'success');
+                            resetFeaturedTourModal();
+                            $('#featuredTourModal').modal('hide');
+                            loadFeaturedTours();
+                        } else {
+                            showToast(response.message || 'Failed to create', 'danger');
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMsg = xhr.responseJSON?.message || 'Failed to create';
+                        showToast(errorMsg, 'danger');
+                    }
+                });
+            }
+        });
+
+        // Save Daily Tour
+        $('#saveDailyTourBtn').on('click', function() {
+            const form = $('#dailyTourForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const categoryId = $('#dtCategorySelect').val();
+            
+            const data = {
+                badge: $('#dtBadge').val(),
+                categoryName: $('#dtTitle').val(),
+                description: $('#dtDescription').val(),
+                imageUrl: $('#dtImageUrl').val(),
+                displayOrder: parseInt($('#dtDisplayOrder').val()),
+                cardClass: $('#dtCardClass').val() || null,
+                active: true
+            };
+
+            $.ajax({
+                url: `/api/FeaturedDailyTours/daily-tours/${categoryId}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Daily tour saved successfully!', 'success');
+                        $('#dailyTourModal').modal('hide');
+                        loadDailyTours();
+                    } else {
+                        showToast(response.message || 'Failed to save', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to save';
+                    showToast(errorMsg, 'danger');
+                }
+            });
+        });
+
+        // Edit functions
+        window.editFeaturedTour = function(id) {
+            const tour = allFeaturedTours.find(t => t.id === id);
+            if (!tour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            // Store the FeaturedTour ID for editing (not tourId)
+            $('#ftEditId').val(tour.id);
+            $('#ftTourId').val(tour.tourId);
+            $('#ftTourSelect').val(tour.tourId);
+            $('#ftBadge').val(tour.badge);
+            $('#ftTitle').val(tour.categoryName);
+            $('#ftDescription').val(tour.description);
+            $('#ftImageUrl').val(tour.imageUrl);
+            $('#ftDisplayOrder').val(tour.displayOrder);
+            $('#ftCardClass').val(tour.cardClass || '');
+
+            if (tour.imageUrl) {
+                $('#ftImagePreview').show();
+                $('#ftImagePreviewImg').attr('src', tour.imageUrl);
+            }
+
+            $('#featuredTourModalLabel').text('Edit Featured Tour');
+            $('#featuredTourModal').modal('show');
+        };
+
+        window.editDailyTour = function(id) {
+            const tour = allDailyTours.find(t => t.id === id);
+            if (!tour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            $('#dtCategoryId').val(tour.categoryId);
+            $('#dtCategorySelect').val(tour.categoryId);
+            $('#dtBadge').val(tour.badge);
+            $('#dtTitle').val(tour.categoryName);
+            $('#dtDescription').val(tour.description);
+            $('#dtImageUrl').val(tour.imageUrl);
+            $('#dtDisplayOrder').val(tour.displayOrder);
+            $('#dtCardClass').val(tour.cardClass || '');
+
+            if (tour.imageUrl) {
+                $('#dtImagePreview').show();
+                $('#dtImagePreviewImg').attr('src', tour.imageUrl);
+            }
+
+            $('#dailyTourModalLabel').text('Edit Daily Tour');
+            $('#dailyTourModal').modal('show');
+        };
+
+        // Delete functions
+        window.deleteFeaturedTour = function(id) {
+            if (!confirm('Are you sure you want to remove this featured tour?')) {
+                return;
+            }
+
+            $.ajax({
+                url: `/api/FeaturedDailyTours/featured-tours/${id}`,
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Featured tour removed successfully', 'success');
+                        loadFeaturedTours();
+                    } else {
+                        showToast(response.message || 'Failed to remove', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to remove';
+                    showToast(errorMsg, 'danger');
+                }
+            });
+        };
+
+        window.deleteDailyTour = function(id) {
+            if (!confirm('Are you sure you want to remove this daily tour?')) {
+                return;
+            }
+
+            $.ajax({
+                url: `/api/FeaturedDailyTours/daily-tours/${id}`,
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Daily tour removed successfully', 'success');
+                        loadDailyTours();
+                    } else {
+                        showToast(response.message || 'Failed to remove', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to remove';
+                    showToast(errorMsg, 'danger');
+                }
+            });
+        };
+
+        // Move Featured Tour functions
+        window.moveFeaturedTourUp = function(id) {
+            const currentTour = allFeaturedTours.find(t => t.id === id);
+            if (!currentTour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            const currentOrder = currentTour.displayOrder;
+            const prevTour = allFeaturedTours.find(t => t.displayOrder === currentOrder - 1);
+
+            if (!prevTour) {
+                showToast('Cannot move up further', 'warning');
+                return;
+            }
+
+            const reorderData = [
+                { id: id, displayOrder: currentOrder - 1 },
+                { id: prevTour.id, displayOrder: currentOrder }
+            ];
+            
+            reorderFeaturedTours(reorderData);
+        };
+
+        window.moveFeaturedTourDown = function(id) {
+            const currentTour = allFeaturedTours.find(t => t.id === id);
+            if (!currentTour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            const currentOrder = currentTour.displayOrder;
+            const nextTour = allFeaturedTours.find(t => t.displayOrder === currentOrder + 1);
+
+            if (!nextTour) {
+                showToast('Cannot move down further', 'warning');
+                return;
+            }
+
+            const reorderData = [
+                { id: id, displayOrder: currentOrder + 1 },
+                { id: nextTour.id, displayOrder: currentOrder }
+            ];
+            
+            reorderFeaturedTours(reorderData);
+        };
+
+        function reorderFeaturedTours(reorderData) {
+            $.ajax({
+                url: `/api/FeaturedDailyTours/featured-tours/reorder`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(reorderData),
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Featured tours reordered successfully', 'success');
+                        loadFeaturedTours();
+                    } else {
+                        showToast(response.message || 'Failed to reorder', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to reorder';
+                    showToast(errorMsg, 'danger');
+                }
+            });
+        }
+
+        // Move Daily Tour functions
+        window.moveDailyTourUp = function(id) {
+            const currentTour = allDailyTours.find(t => t.id === id);
+            if (!currentTour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            const currentOrder = currentTour.displayOrder;
+            const prevTour = allDailyTours.find(t => t.displayOrder === currentOrder - 1);
+
+            if (!prevTour) {
+                showToast('Cannot move up further', 'warning');
+                return;
+            }
+
+            const reorderData = [
+                { id: id, displayOrder: currentOrder - 1 },
+                { id: prevTour.id, displayOrder: currentOrder }
+            ];
+            
+            reorderDailyTours(reorderData);
+        };
+
+        window.moveDailyTourDown = function(id) {
+            const currentTour = allDailyTours.find(t => t.id === id);
+            if (!currentTour) {
+                showToast('Tour not found', 'danger');
+                return;
+            }
+
+            const currentOrder = currentTour.displayOrder;
+            const nextTour = allDailyTours.find(t => t.displayOrder === currentOrder + 1);
+
+            if (!nextTour) {
+                showToast('Cannot move down further', 'warning');
+                return;
+            }
+
+            const reorderData = [
+                { id: id, displayOrder: currentOrder + 1 },
+                { id: nextTour.id, displayOrder: currentOrder }
+            ];
+            
+            reorderDailyTours(reorderData);
+        };
+
+        function reorderDailyTours(reorderData) {
+            $.ajax({
+                url: `/api/FeaturedDailyTours/daily-tours/reorder`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(reorderData),
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Daily tours reordered successfully', 'success');
+                        loadDailyTours();
+                    } else {
+                        showToast(response.message || 'Failed to reorder', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to reorder';
+                    showToast(errorMsg, 'danger');
+                }
+            });
+        }
+
+        // Reset Featured Tour modal helper
+        function resetFeaturedTourModal() {
+            $('#ftEditId').val('');
+            $('#ftTourId').val('');
+            $('#ftTourSelect').val('');
+            $('#ftBadge').val('');
+            $('#ftTitle').val('');
+            $('#ftDescription').val('');
+            $('#ftImageUrl').val('');
+            $('#ftDisplayOrder').val('0');
+            $('#ftCardClass').val('');
+            $('#ftImagePreview').hide();
+        }
+
+        // Reset Daily Tour modal helper
+        function resetDailyTourModal() {
+            $('#dtEditId').val('');
+            $('#dtCategoryId').val('');
+            $('#dtCategorySelect').val('');
+            $('#dtBadge').val('');
+            $('#dtTitle').val('');
+            $('#dtDescription').val('');
+            $('#dtImageUrl').val('');
+            $('#dtDisplayOrder').val('0');
+            $('#dtCardClass').val('');
+            $('#dtImagePreview').hide();
+        }
+
+        // Reset modals when hidden
+        $('#featuredTourModal').on('hidden.bs.modal', function() {
+            resetFeaturedTourModal();
+            $('#featuredTourModalLabel').text('Add Featured Tour');
+        });
+
+        $('#dailyTourModal').on('hidden.bs.modal', function() {
+            resetDailyTourModal();
+            $('#dailyTourModalLabel').text('Add Daily Tour');
+        });
+    </script>
+}

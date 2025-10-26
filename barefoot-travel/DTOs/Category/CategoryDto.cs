@@ -16,6 +16,7 @@ namespace barefoot_travel.DTOs.Category
         public string? UpdatedBy { get; set; }
         public bool Active { get; set; }
         public int TotalChild { get; set; }
+        public int TotalTours { get; set; }
     }
 
     public class CreateCategoryDto
@@ -71,6 +72,7 @@ namespace barefoot_travel.DTOs.Category
         public DateTime? UpdatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public bool Active { get; set; }
+        public int TotalTours { get; set; }
         public List<CategoryTreeDto> Children { get; set; } = new List<CategoryTreeDto>();
     }
 }

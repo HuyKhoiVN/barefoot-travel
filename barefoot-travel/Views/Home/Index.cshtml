@@ -342,6 +342,21 @@
         </div>
     </section>
 
+    <!-- Ways to Travel Section -->
+    <section class="ways-to-travel bg-white responsive-padding">
+        <div class="bare-container">
+            <h2 class="responsive-text-lg">Ways to travel</h2>
+            <div id="travelGrid" class="travel-grid">
+                <!-- Categories will be loaded here dynamically -->
+            </div>
+
+            <!-- Daily Tours Grid -->
+            <div id="dailyTourGrid" class="daily-tours-grid mt-5">
+                <!-- Daily tours will be loaded here -->
+            </div>
+        </div>
+    </section>
+
     <!-- Homepage Sections Container -->
     <div id="homepageSectionsContainer">
         <!-- Sections will be dynamically loaded here based on homepage config -->
@@ -453,27 +468,78 @@
     
     <script>
         $(document).ready(function() {
+            loadFeaturedTours();
+            loadDailyTours();
             loadHomepageData();
+            loadWaysToTravel();
         });
 
-        // Load all homepage data from JSON file
+        // Load all homepage data from API
         function loadHomepageData() {
-            $.getJSON('/data/homepage-sections.json?v=' + new Date().getTime(), function(response) {
-                console.log('Response received:', response);
-                if (response.success) {
-                    // Render featured tours if available
-                    console.log('Featured tours count:', response.featuredTours ? response.featuredTours.length : 0);
-                    if (response.featuredTours && response.featuredTours.length > 0) {
-                        renderFeaturedTours(response.featuredTours);
+            $.ajax({
+                url: '/api/HomePage/sections',
+                type: 'GET',
+                success: function(response) {
+                    console.log('Response received:', response);
+                    if (response.success && response.data) {
+                        // Render homepage sections
+                        renderHomepageSections(response.data.sections);
                     }
-                    
-                    // Render homepage sections
-                    if (response.data) {
-                        renderHomepageSections(response.data);
-                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading homepage sections from API:', xhr);
                 }
-            }).fail(function() {
-                console.error('Error loading homepage sections from JSON');
+            });
+        }
+
+        // Load Featured Tours
+        function loadFeaturedTours() {
+            $.ajax({
+                url: '/api/FeaturedDailyTours/featured-tours',
+                type: 'GET',
+                success: function(response) {
+                    console.log('Featured Tours response:', response);
+                    if (response.success && response.data) {
+                        renderFeaturedTours(response.data.tours);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading Featured Tours:', xhr);
+                }
+            });
+        }
+
+        // Load Daily Tours
+        function loadDailyTours() {
+            $.ajax({
+                url: '/api/FeaturedDailyTours/daily-tours',
+                type: 'GET',
+                success: function(response) {
+                    console.log('Daily Tours response:', response);
+                    if (response.success && response.data) {
+                        renderDailyTours(response.data.tours);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading Daily Tours:', xhr);
+                }
+            });
+        }
+
+        // Load Ways to Travel section
+        function loadWaysToTravel() {
+            $.ajax({
+                url: '/api/HomePage/ways-to-travel',
+                type: 'GET',
+                success: function(response) {
+                    console.log('Ways to Travel response:', response);
+                    if (response.success && response.data) {
+                        renderWaysToTravelSection(response.data.categories);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading Ways to Travel:', xhr);
+                }
             });
         }
 
@@ -482,14 +548,19 @@
             const container = $('#tourCards');
             container.empty();
             
+            if (!tours || tours.length === 0) {
+                return;
+            }
+            
             tours.forEach(function(tour) {
+                const cardClass = tour.cardClass || '';
                 const cardHtml = `
-                    <div class="tour-card ${tour.cardClass}">
-                        <div class="card-background"></div>
+                    <div class="tour-card ${cardClass}">
+                        <div class="card-background" style="background-image: url('${tour.imageUrl}');"></div>
                         <div class="card-overlay"></div>
                         <div class="card-content">
-                            <div class="card-category">${tour.category}</div>
-                            <h3>${tour.title}</h3>
+                            <div class="card-category">${tour.badge}</div>
+                            <h3>${tour.categoryName}</h3>
                             <p>${tour.description}</p>
                             <button class="book-btn">BOOK NOW</button>
                         </div>
@@ -503,6 +574,10 @@
         function renderHomepageSections(sections) {
             const container = $('#homepageSectionsContainer');
             container.empty();
+
+            if (!sections || sections.length === 0) {
+                return;
+            }
 
             // Filter spotlight sections and assign positions based on display order
             const spotlightSections = [];
@@ -618,34 +693,67 @@
             return html;
         }
 
-        // Render "Ways to Travel" section with travel grid
-        function renderWaysToTravelSection(section) {
-            let html = `<section class="ways-to-travel bg-white responsive-padding">`;
-            html += `<div class="bare-container">`;
-            html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
-            html += `<div id="travelGrid" class="travel-grid">`;
-            
-            section.tours.forEach(function(tour) {
-                const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
-                const tourCount = tour.tourCount || '10+';
+        // Render "Ways to Travel" section
+        function renderWaysToTravelSection(categories) {
+            const container = $('#travelGrid');
+            if (!container.length) return;
+
+            container.empty();
+
+            if (!categories || categories.length === 0) {
+                return;
+            }
+
+            // Sort by display order
+            const sortedCategories = categories.sort((a, b) => a.displayOrder - b.displayOrder);
+
+            sortedCategories.forEach(function(category) {
+                const imageUrl = category.imageUrl1 || '/ui-user-template/images/home_background.jpg';
+                const tourCount = category.totalTours || 0;
                 
-                html += `
+                container.append(`
                     <div class="travel-item">
                         <div class="travel-image">
-                            <img src="${imageUrl}" alt="${tour.title}">
+                            <img src="${imageUrl}" alt="${category.categoryName}">
                         </div>
                         <div class="travel-content">
-                            <h4>${tour.title}</h4>
-                            <span>${tourCount} tours</span>
+                            <h4>${category.categoryName}</h4>
+                            <span>${tourCount}+ tours</span>
                         </div>
                     </div>
-                `;
+                `);
             });
-            
-            html += `</div>`;
-            html += `</div>`;
-            html += `</section>`;
-            return html;
+
+            // Load daily tours data
+            loadDailyTours();
+        }
+
+        // Render Daily Tours
+        function renderDailyTours(tours) {
+            const container = $('#dailyTourGrid');
+            if (!container.length) return;
+
+            container.empty();
+
+            if (!tours || tours.length === 0) {
+                return;
+            }
+
+            tours.forEach(function(tour) {
+                const cardClass = tour.cardClass || '';
+                container.append(`
+                    <div class="daily-tour-card ${cardClass}">
+                        <div class="daily-card-background" style="background-image: url('${tour.imageUrl}');"></div>
+                        <div class="daily-card-overlay"></div>
+                        <div class="daily-card-content">
+                            <div class="daily-card-category">${tour.badge}</div>
+                            <h3>${tour.categoryName}</h3>
+                            <p>${tour.description}</p>
+                            <button class="view-tours-btn">VIEW ALL TOURS</button>
+                        </div>
+                    </div>
+                `);
+            });
         }
 
         // Render spotlight layout (3 large cards) with horizontal scrolling

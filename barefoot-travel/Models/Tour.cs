@@ -30,4 +30,6 @@ public partial class Tour
     public string? UpdatedBy { get; set; }
 
     public bool Active { get; set; }
+
+    public virtual ICollection<HomePageFeaturedTour> HomePageFeaturedTours { get; set; } = new List<HomePageFeaturedTour>();
 }

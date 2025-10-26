@@ -68,6 +68,19 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<List<DTOs.HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems)
+        {
+            try
+            {
+                var tours = await _tourRepository.GetToursByCategoryForHomepageAsync(categoryId, maxItems);
+                return tours;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving tours by category: {ex.Message}");
+            }
+        }
+
         public async Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null)
         {
             try

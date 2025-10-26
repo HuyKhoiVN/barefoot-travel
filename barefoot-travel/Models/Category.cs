@@ -24,4 +24,30 @@ public partial class Category
     public string? UpdatedBy { get; set; }
 
     public bool Active { get; set; }
+
+    public string? HomepageTitle { get; set; }
+
+    public string? HomepageConfig { get; set; }
+
+    public int? HomepageOrder { get; set; }
+
+    public string? WaysToTravelImage1 { get; set; }
+
+    public string? WaysToTravelImage2 { get; set; }
+
+    public int? WaysToTravelOrder { get; set; }
+
+    public bool? ShowInWaysToTravel { get; set; }
+
+    public string? DailyTourBadge { get; set; }
+
+    public string? DailyTourDescription { get; set; }
+
+    public string? DailyTourImageUrl { get; set; }
+
+    public int? DailyTourOrder { get; set; }
+
+    public bool? ShowInDailyTours { get; set; }
+
+    public string? DailyTourCardClass { get; set; }
 }

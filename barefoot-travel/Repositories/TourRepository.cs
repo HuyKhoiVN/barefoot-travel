@@ -634,6 +634,45 @@ namespace barefoot_travel.Repositories
                 .AnyAsync();
         }
 
+        public async Task<List<HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems)
+        {
+            var tours = await (from t in _context.Tours
+                              join tc in _context.TourCategories on t.Id equals tc.TourId
+                              where tc.CategoryId == categoryId && t.Active && tc.Active
+                              orderby t.CreatedTime descending
+                              select new
+                              {
+                                  Tour = t,
+                                  BannerImage = (from ti in _context.TourImages
+                                                where ti.TourId == t.Id && ti.Active && ti.IsBanner
+                                                select ti.ImageUrl).FirstOrDefault(),
+                                  Images = (from ti in _context.TourImages
+                                           where ti.TourId == t.Id && ti.Active
+                                           orderby ti.IsBanner descending
+                                           select ti.ImageUrl).Take(3).ToList()
+                              })
+                              .Take(maxItems)
+                              .ToListAsync();
+
+            return tours.Select(t => new HomepageTourDto
+            {
+                Id = t.Tour.Id,
+                Title = t.Tour.Title,
+                PricePerPerson = t.Tour.PricePerPerson,
+                Duration = t.Tour.Duration,
+                BannerImageUrl = t.BannerImage,
+                Images = t.Images ?? new List<string>()
+            }).ToList();
+        }
+
+        public async Task<int> GetTourCountByCategoryAsync(int categoryId)
+        {
+            return await (from t in _context.Tours
+                         join tc in _context.TourCategories on t.Id equals tc.TourId
+                         where tc.CategoryId == categoryId && t.Active && tc.Active
+                         select t).CountAsync();
+        }
+
         #endregion
     }
 }

@@ -332,5 +332,45 @@ namespace barefoot_travel.Repositories
                 .ThenBy(c => c.CategoryName)
                 .ToListAsync();
         }
+
+        public async Task<List<Category>> GetCategoriesWithHomepageConfigAsync()
+        {
+            return await _context.Categories
+                .Where(c => c.HomepageTitle != null && c.Active)
+                .OrderBy(c => c.HomepageOrder ?? c.Priority)
+                .ToListAsync();
+        }
+
+        public async Task<Category?> GetCategoryWithHomepageByIdAsync(int id)
+        {
+            return await _context.Categories
+                .Where(c => c.Id == id && c.Active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Category>> GetDailyTourCategoriesAsync()
+        {
+            return await _context.Categories
+                .Where(c => c.ShowInDailyTours == true && c.Active)
+                .OrderBy(c => c.DailyTourOrder ?? c.Priority)
+                .ToListAsync();
+        }
+
+        public async Task<Category?> GetDailyTourCategoryByIdAsync(int id)
+        {
+            return await _context.Categories
+                .Where(c => c.Id == id && c.Active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<int> GetMaxDailyTourOrderAsync()
+        {
+            var maxOrder = await _context.Categories
+                .Where(c => c.ShowInDailyTours == true && c.Active)
+                .OrderByDescending(c => c.DailyTourOrder)
+                .Select(c => c.DailyTourOrder ?? 0)
+                .FirstOrDefaultAsync();
+            return maxOrder;
+        }
     }
 }

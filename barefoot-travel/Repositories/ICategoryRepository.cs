@@ -23,5 +23,14 @@ namespace barefoot_travel.Repositories
         Task<List<int>> GetDescendantCategoryIds(int parentId);
         Task<PagedResult<Category>> GetTreePagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null);
         Task<List<Category>> GetChildrenAsync(int parentId);
+        
+        // Homepage configuration methods
+        Task<List<Category>> GetCategoriesWithHomepageConfigAsync();
+        Task<Category?> GetCategoryWithHomepageByIdAsync(int id);
+        
+        // Daily Tours methods
+        Task<List<Category>> GetDailyTourCategoriesAsync();
+        Task<Category?> GetDailyTourCategoryByIdAsync(int id);
+        Task<int> GetMaxDailyTourOrderAsync();
     }
 }

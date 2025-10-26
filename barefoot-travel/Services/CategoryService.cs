@@ -9,10 +9,12 @@ namespace barefoot_travel.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ITourRepository _tourRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository)
+        public CategoryService(ICategoryRepository categoryRepository, ITourRepository tourRepository)
         {
             _categoryRepository = categoryRepository;
+            _tourRepository = tourRepository;
         }
 
         public async Task<ApiResponse> GetCategoryByIdAsync(int id)
@@ -228,6 +230,13 @@ namespace barefoot_travel.Services
             {
                 var categories = await _categoryRepository.GetAllAsync();
                 var categoryDtos = await MapToCategoryDtos(categories);
+                
+                // Get total tours for each category
+                foreach (var categoryDto in categoryDtos)
+                {
+                    categoryDto.TotalTours = await _tourRepository.GetTourCountByCategoryAsync(categoryDto.Id);
+                }
+                
                 var categoryTree = BuildCategoryTree(categoryDtos, null);
                 return new ApiResponse(true, "Category tree retrieved successfully", categoryTree);
             }
@@ -402,6 +411,7 @@ namespace barefoot_travel.Services
                     UpdatedTime = c.UpdatedTime,
                     UpdatedBy = c.UpdatedBy,
                     Active = c.Active,
+                    TotalTours = c.TotalTours,
                     Children = BuildCategoryTree(categories, c.Id)
                 })
                 .ToList();

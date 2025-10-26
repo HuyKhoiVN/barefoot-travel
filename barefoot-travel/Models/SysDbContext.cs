@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
+
 namespace barefoot_travel.Models;
 
 public partial class SysDbContext : DbContext
@@ -24,6 +25,8 @@ public partial class SysDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<CompanyInfo> CompanyInfos { get; set; }
+
+    public virtual DbSet<HomePageFeaturedTour> HomePageFeaturedTours { get; set; }
 
     public virtual DbSet<Permission> Permissions { get; set; }
 
@@ -65,7 +68,6 @@ public partial class SysDbContext : DbContext
                         }, nullable: true, new List<bool>(), type: typeof(string), typeMapping: new StringTypeMapping("", DbType.String));
             });
         modelBuilder.UseCollation("Latin1_General_CI_AS");
-
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Account__3214EC0780E3BA5A");
@@ -137,15 +139,30 @@ public partial class SysDbContext : DbContext
 
             entity.ToTable("Category");
 
+            entity.HasIndex(e => new { e.ShowInDailyTours, e.DailyTourOrder }, "IX_Category_DailyTours");
+
+            entity.HasIndex(e => new { e.HomepageTitle, e.Active, e.HomepageOrder }, "IX_Category_HomepageDisplay");
+
+            entity.HasIndex(e => new { e.ShowInWaysToTravel, e.WaysToTravelOrder }, "IX_Category_WaysToTravel");
+
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CategoryName).HasMaxLength(255);
             entity.Property(e => e.CreatedTime)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.DailyTourBadge).HasMaxLength(100);
+            entity.Property(e => e.DailyTourCardClass).HasMaxLength(100);
+            entity.Property(e => e.DailyTourDescription).HasMaxLength(500);
+            entity.Property(e => e.DailyTourImageUrl).HasMaxLength(500);
             entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.HomepageTitle).HasMaxLength(200);
+            entity.Property(e => e.ShowInDailyTours).HasDefaultValue(false);
+            entity.Property(e => e.ShowInWaysToTravel).HasDefaultValue(false);
             entity.Property(e => e.Type).HasMaxLength(50);
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+            entity.Property(e => e.WaysToTravelImage1).HasMaxLength(500);
+            entity.Property(e => e.WaysToTravelImage2).HasMaxLength(500);
         });
 
         modelBuilder.Entity<CompanyInfo>(entity =>
@@ -164,6 +181,31 @@ public partial class SysDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(255);
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<HomePageFeaturedTour>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HomePage__3214EC07F9A7D438");
+
+            entity.HasIndex(e => new { e.DisplayOrder, e.Active }, "IX_FeaturedTour_DisplayOrder");
+
+            entity.HasIndex(e => e.TourId, "IX_FeaturedTour_TourId");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.CardClass).HasMaxLength(100);
+            entity.Property(e => e.Category).HasMaxLength(100);
+            entity.Property(e => e.CreatedTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.UpdatedBy).HasMaxLength(100);
+            entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Tour).WithMany(p => p.HomePageFeaturedTours)
+                .HasForeignKey(d => d.TourId)
+                .HasConstraintName("FK_FeaturedTour_Tour");
         });
 
         modelBuilder.Entity<Permission>(entity =>

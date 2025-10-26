@@ -1,6 +1,7 @@
 using barefoot_travel.Models;
 using barefoot_travel.DTOs;
 using barefoot_travel.DTOs.Tour;
+using HomepageTourDto = barefoot_travel.DTOs.HomepageTourDto;
 
 namespace barefoot_travel.Repositories
 {
@@ -56,5 +57,9 @@ namespace barefoot_travel.Repositories
         Task<bool> PriceTypeExistsAsync(int id);
         Task<bool> PolicyExistsAsync(int id);
         Task<bool> IsMarketingCategoryAsync(int categoryId);
+
+        // Homepage methods
+        Task<List<HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems);
+        Task<int> GetTourCountByCategoryAsync(int categoryId);
     }
 }

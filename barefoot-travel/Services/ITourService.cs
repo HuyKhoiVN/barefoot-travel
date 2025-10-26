@@ -9,6 +9,7 @@ namespace barefoot_travel.Services
         // Tour CRUD operations
         Task<ApiResponse> GetTourByIdAsync(int id);
         Task<ApiResponse> GetAllToursAsync();
+        Task<List<DTOs.HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems);
         Task<PagedResult<TourDto>> GetToursPagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null);
         Task<ApiResponse> CreateTourAsync(CreateTourDto dto, string adminUsername);
         Task<ApiResponse> UpdateTourAsync(int id, UpdateTourDto dto, string adminUsername);

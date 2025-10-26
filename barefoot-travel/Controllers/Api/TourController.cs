@@ -47,6 +47,28 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
+        /// Get tours by category ID for homepage preview
+        /// </summary>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="maxItems">Maximum items to return (default: 20)</param>
+        /// <returns>List of tours for homepage display</returns>
+        [HttpGet("by-category/{categoryId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetToursByCategory(int categoryId, [FromQuery] int maxItems = 20)
+        {
+            try
+            {
+                var tours = await _tourService.GetToursByCategoryForHomepageAsync(categoryId, maxItems);
+                return Ok(new ApiResponse(true, "Tours retrieved successfully", tours));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting tours by category");
+                return BadRequest(new ApiResponse(false, "Failed to get tours"));
+            }
+        }
+
+        /// <summary>
         /// Get paginated list of tours with filtering and sorting
         /// </summary>
         /// <param name="page">Page number (default: 1)</param>
