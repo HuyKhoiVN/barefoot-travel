@@ -1,0 +1,74 @@
+/* Section color theming inspired by VivaTech palette without changing hero */
+
+:root {
+  --vt-primary: #6a5cff; /* vivid violet */
+  --vt-secondary: #1da388; /* teal (site’s brand) */
+  --vt-accent: #ff4d6d; /* pink/red accent */
+  --vt-bg-1: #0e0e12; /* deep charcoal */
+  --vt-bg-2: #11131a; /* slightly lighter */
+  --vt-light: #f8f9fb;
+  --vt-muted: #8b90a0;
+}
+
+/* Keep .hero untouched */
+
+/* Featured tours: dark gradient on image-like backgrounds */
+.featured-tours {
+  background: linear-gradient(135deg, rgba(17, 19, 26, 0.92), rgba(14, 14, 18, 0.85));
+}
+
+/* Ways to travel: light surface */
+.ways-to-travel {
+  background: var(--vt-light);
+}
+.ways-to-travel h2 { color: #111; }
+
+/* Daily tours lives inside ways-to-travel container styles already */
+
+/* Indochina: soft light surface */
+.indochina-packages {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f6fb 100%);
+}
+.indochina-right h2 { color: #0f1220; }
+
+/* Top packages: tinted dark for contrast */
+.top-vietnam-packages {
+  background: linear-gradient(135deg, #0f1120, #15182a);
+}
+.top-vietnam-packages .section-header h2,
+.top-vietnam-packages .browse-all { color: #ffffff; }
+.top-vietnam-packages .divider { background: linear-gradient(90deg, var(--vt-primary), transparent); }
+
+/* Tours we love: light to keep rhythm */
+.tours-we-love { background: #f6f7fb; }
+
+/* About Compass: white surface */
+.about-compass { background: #ffffff; }
+.about-left h3 { color: #0f1220; }
+.about-left p { color: #475069; }
+
+/* Contact Us: subtle paper */
+.contact-us { background: #f4f6fb; }
+.contact-us-card h4 { color: #0f1220; }
+.contact-us-card p { color: #58607a; }
+
+/* Footer ending palette */
+.footer-ending {
+  background: linear-gradient(180deg, #0f1120, #0b0c14);
+}
+.footer-links-col h4 { color: var(--vt-secondary); }
+.footer-links-col a:hover { color: var(--vt-primary); }
+.footer-legal a:hover { color: var(--vt-primary); }
+
+/* Accent elements */
+.spotlight-badge { background: rgba(106, 92, 255, 0.18); }
+.book-btn,
+.read-more-btn,
+.view-tours-btn,
+.book-now-btn { background: var(--vt-secondary); }
+.book-btn:hover,
+.read-more-btn:hover,
+.view-tours-btn:hover,
+.book-now-btn:hover { background: #00b894; }
+
+

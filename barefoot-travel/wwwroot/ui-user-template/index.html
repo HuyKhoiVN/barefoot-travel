@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compass Travel - Book Your Favorite Boat Trip</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./responsive.css">
+    <link rel="stylesheet" href="./sections-theme.css">
+    <link href="./assets/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="./assets/font/css2.css?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="./assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+     Header 
+    <header class="header">
+        <div class="bare-container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-compass"></i>
+                    <span>compass travel</span>
+                </div>
+
+                <nav class="main-nav" id="mainNav">
+                    <div class="nav-item dropdown">
+                        <span>Type of tours <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Adventure Tours</a>
+                            <a href="#">Cultural Tours</a>
+                            <a href="#">Beach Tours</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>North Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hanoi</a>
+                            <a href="#">Halong Bay</a>
+                            <a href="#">Sapa</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Central Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hue</a>
+                            <a href="#">Hoi An</a>
+                            <a href="#">Da Nang</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>South Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Ho Chi Minh City</a>
+                            <a href="#">Mekong Delta</a>
+                            <a href="#">Phu Quoc</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Packages <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Family Packages</a>
+                            <a href="#">Honeymoon Packages</a>
+                            <a href="#">Group Packages</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Services <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hotel Booking</a>
+                            <a href="#">Transportation</a>
+                            <a href="#">Tour Guide</a>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box hide-mobile">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="language-selector">
+                        <span>EN</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="currency-selector">
+                        <span>$</span>
+                    </div>
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-overlay"></div>
+        <div class="bare-container">
+            <div class="hero-content">
+                <div class="hero-badges">
+                    <div class="badge">
+                        <i class="fas fa-check-circle"></i>
+                        <span>250+ trips throughout Vietnam</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-headset"></i>
+                        <span>24/7 support</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-heart"></i>
+                        <span>Local Experts</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-star"></i>
+                        <span>Competitive pricing</span>
+                    </div>
+                </div>
+
+                <div class="hero-text">
+                    <h1 class="responsive-text-xl">Book your favorite<br>boat trip</h1>
+                    <p class="responsive-text-md">Book instantly. More than <strong>250+ tours</strong> across Vietnam</p>
+                </div>
+
+                <div class="search-form">
+                    <input type="text" placeholder="Where do you want to go?">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                        <span class="show-mobile">Search</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-compass animate-on-scroll responsive-padding">
+        <div class="bare-container">
+            <div class="section-header">
+                <h2 class="responsive-text-lg">About Compass Travel</h2>
+                <a href="#" class="browse-all">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Learn more</span>
+                </a>
+            </div>
+            <div class="divider"></div>
+            <div class="about-compass-grid">
+                <div class="about-left">
+                    <div class="spotlight-badge">LOCAL EXPERTS</div>
+                    <h3 class="responsive-text-lg">10+ Years Crafting Journeys</h3>
+                    <p>With over a decade of experience, we design meaningful Vietnam trips that blend culture,
+                        landscapes, and authentic local encounters. Our team of passionate travel experts ensures every
+                        detail is taken care of for a seamless experience.</p>
+                    <ul class="about-highlights">
+                        <li><i class="fas fa-check"></i> Tailor-made itineraries</li>
+                        <li><i class="fas fa-check"></i> Trusted local partners</li>
+                        <li><i class="fas fa-check"></i> 24/7 customer support</li>
+                    </ul>
+                    <button class="book-now-btn">Get in touch</button>
+                </div>
+                <div class="about-right">
+                    <div class="about-visual">
+                        <div class="about-bg"></div>
+                        <div class="about-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-us animate-on-scroll responsive-padding">
+        <div class="bare-container">
+            <div class="section-header">
+                <h2 class="responsive-text-lg">Contact Us</h2>
+                <a href="#" class="browse-all">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Get support</span>
+                </a>
+            </div>
+            <div class="divider"></div>
+            <div class="contact-us-grid">
+                <div class="contact-us-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h4>Head Office</h4>
+                    <p>123 Nguyen Hue Street, District 1<br>Ho Chi Minh City, Vietnam</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-phone"></i>
+                    <h4>Phone</h4>
+                    <p>+84 28 3822 8888<br>+84 901 234 567</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-envelope"></i>
+                    <h4>Email</h4>
+                    <p>info@compasstravel.vn<br>booking@compasstravel.vn</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>Working Hours</h4>
+                    <p>Mon - Fri: 8:00 AM - 6:00 PM<br>Sat - Sun: 8:00 AM - 5:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-tours responsive-padding">
+        <div class="bare-container">
+            <div id="tourCards" class="tour-cards">
+                <div class="tour-card ninh-binh">
+                    <div class="card-background"></div>
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                        <div class="card-category">IN THE SPOTLIGHTS</div>
+                        <h3>Ninh Binh</h3>
+                        <p>Book now for an unforgettable one-day Ninh Binh trip and don't miss out on this amazing
+                            adventure!</p>
+                        <button class="book-btn">BOOK NOW</button>
+                    </div>
+                </div>
+
+                <div class="tour-card ha-long">
+                    <div class="card-background"></div>
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                        <div class="card-category">IN THE SPOTLIGHTS</div>
+                        <h3>Ha Long Bay</h3>
+                        <p>Experience the wonder of a UNESCO World Heritage Site that you can't afford to miss!</p>
+                        <button class="book-btn">BOOK NOW</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="indicators-grid m-3">
+                <div class="indicator-item">
+                    <i class="fas fa-star"></i>
+                    <span>563+ Customer reviews 5/10</span>
+                </div>
+                <div class="indicator-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Easy Whatsapp & Messenger support</span>
+                </div>
+                <div class="indicator-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Free Tailor-made Trips</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ways-to-travel bg-white responsive-padding">
+        <div class="bare-container">
+            <h2 class="responsive-text-lg">Ways to travel</h2>
+            <div id="travelGrid" class="travel-grid">
+                <div class="travel-item">
+                    <div class="travel-image">
+                        <img src="./images/home_background.jpg" alt="Adventure">
+                    </div>
+                    <div class="travel-content">
+                        <h4>Adventure</h4>
+                        <span>10+ tours</span>
+                    </div>
+                </div>
+
+                <div class="travel-item">
+                    <div class="travel-image">
+                        <img src="./images/home_background.jpg" alt="Beach">
+                    </div>
+                    <div class="travel-content">
+                        <h4>Beach</h4>
+                        <span>10+ tours</span>
+                    </div>
+                </div>
+
+                <div class="travel-item">
+                    <div class="travel-image">
+                        <img src="./images/home_background.jpg" alt="Cruising">
+                    </div>
+                    <div class="travel-content">
+                        <h4>Cruising</h4>
+                        <span>10+ tours</span>
+                    </div>
+                </div>
+
+                <div class="travel-item">
+                    <div class="travel-image">
+                        <img src="./images/home_background.jpg" alt="Family">
+                    </div>
+                    <div class="travel-content">
+                        <h4>Family</h4>
+                        <span>10+ tours</span>
+                    </div>
+                </div>
+
+                <div class="travel-item">
+                    <div class="travel-image">
+                        <img src="./images/home_background.jpg" alt="Honeymoon">
+                    </div>
+                    <div class="travel-content">
+                        <h4>Honeymoon</h4>
+                        <span>10+ tours</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dailyTourGrid" class="daily-tours-grid mt-5">
+                <div class="daily-tour-card north-vietnam">
+                    <div class="daily-card-background"></div>
+                    <div class="daily-card-overlay"></div>
+                    <div class="daily-card-content">
+                        <div class="daily-card-category">DAILY TOURS</div>
+                        <h3>North Vietnam</h3>
+                        <p>Adventurous experiences</p>
+                        <button class="view-tours-btn">VIEW ALL TOURS</button>
+                    </div>
+                </div>
+
+                <div class="daily-tour-card central-vietnam">
+                    <div class="daily-card-background"></div>
+                    <div class="daily-card-overlay"></div>
+                    <div class="daily-card-content">
+                        <div class="daily-card-category">DAILY TOURS</div>
+                        <h3>Central Vietnam</h3>
+                        <p>Charming and enriching</p>
+                        <button class="view-tours-btn">VIEW ALL TOURS</button>
+                    </div>
+                </div>
+
+                <div class="daily-tour-card south-vietnam">
+                    <div class="daily-card-background"></div>
+                    <div class="daily-card-overlay"></div>
+                    <div class="daily-card-content">
+                        <div class="daily-card-category">DAILY TOURS</div>
+                        <h3>South Vietnam</h3>
+                        <p>Relaxing paradise</p>
+                        <button class="view-tours-btn">VIEW ALL TOURS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="combinedSections">
+        <section class="no-spotlight-section responsive-padding">
+            <div class="bare-container">
+                <div class="section-header">
+                    <h2 class="responsive-text-lg">Top Vietnam packages for 2023</h2>
+                    <a href="#" class="browse-all">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Browse all tours</span>
+                    </a>
+                </div>
+                <div class="divider"></div>
+                <div class="no-spotlight-grid">
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Best of Vietnam – 10 days" class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North to South</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Best of Vietnam – 10 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">799</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Stunning Northern loop – 7D6N"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North-east Vietnam</a>, <a
+                                    href="#">North-west
+                                    Vietnam</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Stunning Northern loop – 7D6N</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">405</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Adventure Vietnam – 13 days"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North & Central Vietnam</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Adventure Vietnam – 13 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">1,550</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Vietnam Beach break – 15 days"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North to South</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Vietnam Beach break – 15 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">1,140</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="left-spotlight-section responsive-padding">
+            <div class="bare-container">
+                <div class="left-spotlight-content">
+                    <div class="left-spotlight-left">
+                        <div class="spotlight-badge">IN THE SPOTLIGHTS</div>
+                        <h1 class="responsive-text-xl">BEST CHOICE</h1>
+                        <p>Arrange your border crossings stress-free by handling everything at once!</p>
+                        <button class="book-now-btn">BOOK NOW</button>
+                    </div>
+                    <div class="left-spotlight-right">
+                        <div class="section-header">
+                            <h2 class="responsive-text-lg">Indochina packages</h2>
+                            <a href="#" class="browse-all">
+                                <i class="fas fa-arrow-right"></i>
+                                <span>Browse all tours</span>
+                            </a>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="left-spotlight-grid">
+                            <div class="product-card transition-transform-background">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg" alt="Signatures of Indochina 21 days"
+                                        class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Full Packages</a>, <a href="#">Vietnam - Laos - Cambodia</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Signatures of Indochina 21 days</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">2,688</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+
+                            <div class="product-card transition-transform-background">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg"
+                                        alt="Vietnam and Cambodia unique journey – 21 days" class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Full Packages</a>, <a href="#">Vietnam - Cambodia</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Vietnam and Cambodia unique journey – 21 days</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">2,377</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+
+                            <div class="product-card transition-transform-background">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg"
+                                        alt="Vietnam and Cambodia Explorer – 18 days" class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Full Packages</a>, <a href="#">Vietnam - Cambodia</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Vietnam and Cambodia Explorer – 18 days</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">1,880</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="no-spotlight-section responsive-padding">
+            <div class="bare-container">
+                <div class="section-header">
+                    <h2 class="responsive-text-lg">Top Vietnam packages for 2024</h2>
+                    <a href="#" class="browse-all">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Browse all tours</span>
+                    </a>
+                </div>
+                <div class="divider"></div>
+                <div class="no-spotlight-grid">
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Best of Vietnam – 10 days" class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North to South</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Best of Vietnam – 10 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">799</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Stunning Northern loop – 7D6N"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North-east Vietnam</a>, <a
+                                    href="#">North-west
+                                    Vietnam</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Stunning Northern loop – 7D6N</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">405</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Adventure Vietnam – 13 days"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North & Central Vietnam</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Adventure Vietnam – 13 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">1,550</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="./images/home_background.jpg" alt="Vietnam Beach break – 15 days"
+                                class="main-image">
+                            <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">Full Packages</a>, <a href="#">North to South</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">Vietnam Beach break – 15 days</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">1,140</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="right-spotlight-section responsive-padding">
+            <div class="bare-container">
+                <div class="right-spotlight-content">
+                    <div class="right-spotlight-left">
+                        <div class="section-header">
+                            <h2 class="responsive-text-lg">Tours we love</h2>
+                            <a href="#" class="browse-all">
+                                <i class="fas fa-arrow-right"></i>
+                                <span>Browse all tours</span>
+                            </a>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="right-spotlight-grid">
+                            <div class="product-card">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg"
+                                        alt="Ha Long bay 1D – Luxury cruise ( 8 hours )" class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Ha Long Bay</a>, <a href="#">Northern Vietnam</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Ha Long bay 1D – Luxury cruise ( 8 hours )</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">79</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+
+                            <div class="product-card">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg"
+                                        alt="Ha Long bay & Lan Ha bay 2D1N – Sena luxury boutique cruise"
+                                        class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Ha Long Bay</a>, <a href="#">Northern Vietnam</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Ha Long bay & Lan Ha bay 2D1N – Sena luxury boutique cruise</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">145</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+
+                            <div class="product-card">
+                                <div class="product-image-wrapper">
+                                    <img src="./images/home_background.jpg" alt="Ninh Binh 1D – Bai Dinh & Trang An"
+                                        class="main-image">
+                                    <img src="./images/home_background.jpg" alt="Gallery Image" class="gallery-image">
+                                    <div class="wishlist-btn">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <p class="product-categories">
+                                        <a href="#">Ninh Binh</a>, <a href="#">Northern Vietnam</a>
+                                    </p>
+                                    <h3 class="product-title">
+                                        <a href="#">Ninh Binh 1D – Bai Dinh & Trang An</a>
+                                    </h3>
+                                    <div class="product-price">
+                                        <span class="currency">$</span>
+                                        <span class="amount">60</span>
+                                    </div>
+                                    <a href="#" class="read-more-btn">Read more</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-spotlight-right">
+                        <div class="spotlight-badge">IN THE SPOTLIGHTS</div>
+                        <h1 class="responsive-text-xl">TOP LIST</h1>
+                        <p>Discover our expertly crafted top tours, honed by years of experience. Don't miss out on
+                            these
+                            unforgettable experiences!</p>
+                        <button class="book-now-btn">BOOK NOW</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-background"></div>
+        <div class="footer-overlay"></div>
+        <div class="footer-ending">
+            <div class="bare-container">
+                <div class="footer-links-grid">
+                    <div class="footer-links-col">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-tripadvisor"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Destinations</h4>
+                        <ul>
+                            <li><a href="#">North Vietnam</a></li>
+                            <li><a href="#">Central Vietnam</a></li>
+                            <li><a href="#">South Vietnam</a></li>
+                            <li><a href="#">Mekong Delta</a></li>
+                            <li><a href="#">Phu Quoc Island</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Tour Types</h4>
+                        <ul>
+                            <li><a href="#">Adventure Tours</a></li>
+                            <li><a href="#">Cultural Tours</a></li>
+                            <li><a href="#">Beach Holidays</a></li>
+                            <li><a href="#">Cruise Tours</a></li>
+                            <li><a href="#">Family Packages</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Services</h4>
+                        <ul>
+                            <li><a href="#">Hotel Booking</a></li>
+                            <li><a href="#">Transportation</a></li>
+                            <li><a href="#">Tour Guide</a></li>
+                            <li><a href="#">Travel Insurance</a></li>
+                            <li><a href="#">Visa Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Travel Tips</a></li>
+                            <li><a href="#">Booking Guide</a></li>
+                            <li><a href="#">Customer Reviews</a></li>
+                            <li><a href="#">Contact Support</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="footer-bottom-left">
+                        <div class="footer-logo">
+                            <i class="fas fa-compass"></i>
+                            <span>compass travel</span>
+                        </div>
+                        <p class="copyright">
+                            © 2025 Compass Travel Vietnam. All rights reserved.
+                            <span class="license">License No: 01-1234/2024-TCDL-GP LHQT</span>
+                        </p>
+                    </div>
+
+                    <div class="footer-bottom-center">
+                        <div class="payment-methods">
+                            <span class="payment-label">We Accept:</span>
+                            <div class="payment-icons">
+                                <i class="fab fa-cc-visa"></i>
+                                <i class="fab fa-cc-mastercard"></i>
+                                <i class="fab fa-cc-paypal"></i>
+                                <i class="fab fa-cc-amex"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-bottom-right">
+                        <div class="footer-legal">
+                            <a href="#">Privacy Policy</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Cookie Policy</a>
+                            <a href="#">Sitemap</a>
+                        </div>
+
+                        <div class="back-to-top" id="backToTop">
+                            <i class="fas fa-chevron-up"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./assets/jquery-3.6.0.min.js"></script>
+    <script src="./assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="./responsive-script.js"></script>
+    <script src="./script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,631 @@
+@{
+    ViewData["Title"] = "Homepage Content Management";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-md-flex align-items-center mb-4">
+                    <div>
+                        <h4 class="card-title">Homepage Content Management</h4>
+                        <p class="card-subtitle">Manage how categories and tours are displayed on the homepage</p>
+                    </div>
+                    <div class="ms-auto mt-3 mt-md-0">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSectionModal">
+                            <i class="ti ti-plus me-2"></i>Configure New Section
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Sections List -->
+                <div class="alert alert-info mb-4">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>How it works:</strong> Configure which categories appear on the homepage. Each section can display tours from selected categories with custom titles and layout styles.
+                </div>
+
+                <!-- Configured Sections -->
+                <div id="homepageSectionsList" class="row">
+                    <!-- Sections will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add/Edit Homepage Section -->
+<div class="modal fade" id="addSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSectionModalLabel">Configure Homepage Section</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sectionForm">
+                    <input type="hidden" id="sectionId">
+                    <input type="hidden" id="categoryId">
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Section Title (Displayed on Homepage) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sectionTitle" placeholder="e.g., Ways to Travel, Top Packages" required>
+                            <small class="text-muted">This title will be shown as the section heading on the homepage</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Select Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="categorySelect" required>
+                                <option value="">Choose a category...</option>
+                                <!-- Categories will be loaded here -->
+                            </select>
+                            <small class="text-muted">Tours from this category will be displayed</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Layout Style</label>
+                            <select class="form-select" id="layoutStyle">
+                                <option value="grid">Grid (4 columns)</option>
+                                <option value="grid-3">Grid (3 columns)</option>
+                                <option value="grid-2">Grid (2 columns)</option>
+                                <option value="spotlight">Spotlight (Large cards)</option>
+                                <option value="carousel">Carousel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Max Items to Display</label>
+                            <input type="number" class="form-control" id="maxItems" value="8" min="1" max="20">
+                            <small class="text-muted">Maximum number of tours to show</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="displayOrder" value="0">
+                            <small class="text-muted">Order on homepage (0 = first)</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="isActive">
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Section Badge Text (Optional)</label>
+                        <input type="text" class="form-control" id="badgeText" placeholder="e.g., FEATURED, NEW, BEST SELLER">
+                        <small class="text-muted">This text will appear as a badge on the section</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Custom CSS Class (Optional)</label>
+                        <input type="text" class="form-control" id="customClass" placeholder="e.g., special-section, dark-theme">
+                        <small class="text-muted">Add custom styling to this section</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSectionBtn">Save Section</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Preview Section -->
+<div class="modal fade" id="previewSectionModal" tabindex="-1" aria-labelledby="previewSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewSectionModalLabel">Section Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sectionPreview">
+                    <!-- Preview will be shown here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Delete Confirmation -->
+<div class="modal fade" id="deleteSectionModal" tabindex="-1" aria-labelledby="deleteSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteSectionModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <i class="ti ti-alert-circle fs-1 text-danger"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Are you sure you want to remove this section?</h6>
+                        <p class="text-muted mb-0" id="deleteSectionInfo">This action cannot be undone.</p>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>Note:</strong> This will only remove the section from the homepage. Tours and categories will not be affected.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="ti ti-trash me-2"></i>Delete Section
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Reorder Sections -->
+<div class="modal fade" id="reorderSectionsModal" tabindex="-1" aria-labelledby="reorderSectionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reorderSectionsModalLabel">Reorder Homepage Sections</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="ti ti-info-circle me-2"></i>
+                    Drag and drop sections to reorder them, or use the arrow buttons.
+                </div>
+                <div id="reorderSectionsList" class="list-group">
+                    <!-- Sections will be loaded here for reordering -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReorderBtn">
+                    <i class="ti ti-check me-2"></i>Save Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let allSections = []; // Store all sections globally
+
+        $(document).ready(function() {
+            loadCategories();
+            loadHomepageSections();
+        });
+
+        // Load all categories for selection
+        function loadCategories() {
+            // Mock categories data
+            const mockCategories = [
+                { id: 10, categoryName: 'Adventure', type: 'travel-style' },
+                { id: 15, categoryName: 'Full Packages', type: 'package' },
+                { id: 20, categoryName: 'Indochina', type: 'package' },
+                { id: 25, categoryName: 'Ha Long Bay', type: 'destination' },
+                { id: 30, categoryName: 'Sapa Tours', type: 'destination' },
+                { id: 35, categoryName: 'Hanoi Day Tours', type: 'daily-tour' },
+                { id: 40, categoryName: 'Beach & Relax', type: 'travel-style' },
+                { id: 45, categoryName: 'Luxury Tours', type: 'package' },
+                { id: 50, categoryName: 'Nature & Wildlife', type: 'travel-style' }
+            ];
+
+            const select = $('#categorySelect');
+            select.empty();
+            select.append('<option value="">Choose a category...</option>');
+            
+            mockCategories.forEach(function(category) {
+                select.append(`<option value="${category.id}">${category.categoryName} (Type: ${category.type})</option>`);
+            });
+        }
+
+        // Load configured homepage sections
+        function loadHomepageSections() {
+            // Mock data
+            allSections = [
+                {
+                    id: 1,
+                    categoryId: 10,
+                    categoryName: 'Adventure',
+                    sectionTitle: 'Ways to Travel',
+                    layoutStyle: 'grid',
+                    maxItems: 5,
+                    displayOrder: 1,
+                    isActive: true,
+                    badgeText: '',
+                    customClass: '',
+                    tourCount: 12
+                },
+                {
+                    id: 2,
+                    categoryId: 15,
+                    categoryName: 'Full Packages',
+                    sectionTitle: 'Top Vietnam Packages',
+                    layoutStyle: 'grid',
+                    maxItems: 4,
+                    displayOrder: 2,
+                    isActive: true,
+                    badgeText: 'BEST SELLERS',
+                    customClass: '',
+                    tourCount: 8
+                },
+                {
+                    id: 3,
+                    categoryId: 20,
+                    categoryName: 'Indochina',
+                    sectionTitle: 'Indochina Packages',
+                    layoutStyle: 'spotlight',
+                    maxItems: 3,
+                    displayOrder: 3,
+                    isActive: true,
+                    badgeText: 'PREMIUM',
+                    customClass: '',
+                    tourCount: 5
+                },
+                {
+                    id: 4,
+                    categoryId: 25,
+                    categoryName: 'Ha Long Bay',
+                    sectionTitle: 'Tours We Love',
+                    layoutStyle: 'grid-3',
+                    maxItems: 3,
+                    displayOrder: 4,
+                    isActive: true,
+                    badgeText: 'TOP RATED',
+                    customClass: '',
+                    tourCount: 10
+                }
+            ];
+
+            displayHomepageSections(allSections);
+        }
+
+        // Display homepage sections
+        function displayHomepageSections(sections) {
+            const container = $('#homepageSectionsList');
+            container.empty();
+
+            if (!sections || sections.length === 0) {
+                container.append(`
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            <i class="ti ti-info-circle me-2"></i>
+                            No sections configured yet. Click "Configure New Section" to get started.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
+            // Sort by display order
+            sections.sort((a, b) => a.displayOrder - b.displayOrder);
+
+            sections.forEach(function(section) {
+                const activeBadge = section.isActive ? 
+                    '<span class="badge bg-success">Active</span>' : 
+                    '<span class="badge bg-secondary">Inactive</span>';
+
+                const layoutBadge = getLayoutBadge(section.layoutStyle);
+
+                container.append(`
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">${section.sectionTitle}</h6>
+                                    ${activeBadge}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <small class="text-muted">Category:</small>
+                                    <div class="fw-bold">${section.categoryName}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Tours:</small>
+                                        <div>${section.tourCount} available</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Display:</small>
+                                        <div>${section.maxItems} items</div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Layout:</small>
+                                    <div>${layoutBadge}</div>
+                                </div>
+                                ${section.badgeText ? `
+                                    <div class="mb-2">
+                                        <small class="text-muted">Badge:</small>
+                                        <div><span class="badge bg-primary">${section.badgeText}</span></div>
+                                    </div>
+                                ` : ''}
+                                <div class="mb-2">
+                                    <small class="text-muted">Order:</small>
+                                    <div>${section.displayOrder}</div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editSection(${section.id})" title="Edit">
+                                        <i class="ti ti-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="previewSection(${section.id})" title="Preview">
+                                        <i class="ti ti-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="moveSectionUp(${section.id})" title="Move Up">
+                                        <i class="ti ti-arrow-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="moveSectionDown(${section.id})" title="Move Down">
+                                        <i class="ti ti-arrow-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSection(${section.id})" title="Delete">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Get layout badge styling
+        function getLayoutBadge(layoutStyle) {
+            const badges = {
+                'grid': '<span class="badge bg-primary">Grid (4 cols)</span>',
+                'grid-3': '<span class="badge bg-primary">Grid (3 cols)</span>',
+                'grid-2': '<span class="badge bg-primary">Grid (2 cols)</span>',
+                'spotlight': '<span class="badge bg-warning">Spotlight</span>',
+                'carousel': '<span class="badge bg-info">Carousel</span>'
+            };
+            return badges[layoutStyle] || '<span class="badge bg-secondary">Custom</span>';
+        }
+
+        // Handle modal reset
+        $('#addSectionModal').on('hidden.bs.modal', function () {
+            $('#sectionForm')[0].reset();
+            $('#sectionId').val('');
+            $('#categoryId').val('');
+            $('#addSectionModalLabel').text('Configure Homepage Section');
+        });
+
+        // Save section
+        $('#saveSectionBtn').on('click', function() {
+            const form = $('#sectionForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const sectionData = {
+                id: $('#sectionId').val() || null,
+                categoryId: $('#categorySelect').val(),
+                sectionTitle: $('#sectionTitle').val(),
+                layoutStyle: $('#layoutStyle').val(),
+                maxItems: parseInt($('#maxItems').val()),
+                displayOrder: parseInt($('#displayOrder').val()),
+                isActive: $('#isActive').val() === 'true',
+                badgeText: $('#badgeText').val(),
+                customClass: $('#customClass').val()
+            };
+
+            // Mock save - in real implementation, call API
+            if (sectionData.id) {
+                // Update existing
+                const index = allSections.findIndex(s => s.id === parseInt(sectionData.id));
+                if (index !== -1) {
+                    allSections[index] = { ...allSections[index], ...sectionData };
+                    toastr.success('Section updated successfully!');
+                }
+            } else {
+                // Add new
+                const newId = allSections.length > 0 ? Math.max(...allSections.map(s => s.id)) + 1 : 1;
+                const categorySelect = $('#categorySelect option:selected');
+                const categoryName = categorySelect.text().split(' (')[0];
+                
+                allSections.push({
+                    ...sectionData,
+                    id: newId,
+                    categoryName: categoryName,
+                    tourCount: Math.floor(Math.random() * 20) + 1
+                });
+                toastr.success('Section added successfully!');
+            }
+
+            $('#addSectionModal').modal('hide');
+            loadHomepageSections();
+        });
+
+        // Action functions
+        window.editSection = function(id) {
+            const section = allSections.find(s => s.id === id);
+            if (!section) {
+                toastr.error('Section not found');
+                return;
+            }
+
+            // Populate modal with section data
+            $('#addSectionModalLabel').text('Edit Homepage Section');
+            $('#sectionId').val(section.id);
+            $('#categoryId').val(section.categoryId);
+            $('#categorySelect').val(section.categoryId);
+            $('#sectionTitle').val(section.sectionTitle);
+            $('#layoutStyle').val(section.layoutStyle);
+            $('#maxItems').val(section.maxItems);
+            $('#displayOrder').val(section.displayOrder);
+            $('#isActive').val(section.isActive.toString());
+            $('#badgeText').val(section.badgeText);
+            $('#customClass').val(section.customClass);
+
+            $('#addSectionModal').modal('show');
+        };
+
+        window.previewSection = function(id) {
+            const section = allSections.find(s => s.id === id);
+            if (!section) {
+                toastr.error('Section not found');
+                return;
+            }
+
+            // Generate mock tours for preview
+            const mockTours = generateMockTours(section.maxItems, section.layoutStyle);
+
+            const previewHtml = generatePreviewHtml(section, mockTours);
+            $('#sectionPreview').html(previewHtml);
+            $('#previewSectionModal').modal('show');
+        };
+
+        window.moveSectionUp = function(id) {
+            const section = allSections.find(s => s.id === id);
+            if (!section || section.displayOrder <= 1) {
+                toastr.warning('Cannot move up further');
+                return;
+            }
+
+            const prevSection = allSections.find(s => s.displayOrder === section.displayOrder - 1);
+            if (prevSection) {
+                [section.displayOrder, prevSection.displayOrder] = [prevSection.displayOrder, section.displayOrder];
+                toastr.success('Section moved up');
+                loadHomepageSections();
+            }
+        };
+
+        window.moveSectionDown = function(id) {
+            const section = allSections.find(s => s.id === id);
+            const maxOrder = Math.max(...allSections.map(s => s.displayOrder));
+            
+            if (!section || section.displayOrder >= maxOrder) {
+                toastr.warning('Cannot move down further');
+                return;
+            }
+
+            const nextSection = allSections.find(s => s.displayOrder === section.displayOrder + 1);
+            if (nextSection) {
+                [section.displayOrder, nextSection.displayOrder] = [nextSection.displayOrder, section.displayOrder];
+                toastr.success('Section moved down');
+                loadHomepageSections();
+            }
+        };
+
+        window.deleteSection = function(id) {
+            const section = allSections.find(s => s.id === id);
+            if (!section) {
+                toastr.error('Section not found');
+                return;
+            }
+
+            $('#deleteSectionInfo').html(
+                `<strong>Section:</strong> "${section.sectionTitle}"<br>` +
+                `<strong>Category:</strong> ${section.categoryName}<br>` +
+                `<strong>Order:</strong> ${section.displayOrder}`
+            );
+
+            $('#confirmDeleteBtn').off('click').on('click', function() {
+                allSections = allSections.filter(s => s.id !== id);
+                toastr.success('Section removed from homepage');
+                $('#deleteSectionModal').modal('hide');
+                loadHomepageSections();
+            });
+
+            $('#deleteSectionModal').modal('show');
+        };
+
+        // Generate mock tours for preview
+        function generateMockTours(count, layoutStyle) {
+            const tours = [];
+            const tourTitles = [
+                'Discover Ancient Temples', 'Mountain Trekking Adventure', 'Beach Paradise Getaway',
+                'City Cultural Tour', 'Nature Wildlife Safari', 'Traditional Village Experience',
+                'Luxury Resort Escape', 'Historical Heritage Walk', 'Sunset Cruise Journey',
+                'Local Food Discovery', 'Traditional Craft Workshop', 'Scenic Photography Tour'
+            ];
+
+            for (let i = 0; i < count; i++) {
+                tours.push({
+                    id: i + 1,
+                    title: tourTitles[Math.floor(Math.random() * tourTitles.length)],
+                    pricePerPerson: Math.floor(Math.random() * 10000000) + 1000000,
+                    duration: `${Math.floor(Math.random() * 7) + 1} days`,
+                    imageUrl: 'https://via.placeholder.com/400x300?text=Tour+Image'
+                });
+            }
+            return tours;
+        }
+
+        // Generate preview HTML
+        function generatePreviewHtml(section, tours) {
+            let html = `
+                <div class="mb-3">
+                    <h4>${section.sectionTitle}</h4>
+                    ${section.badgeText ? `<span class="badge bg-primary mb-2">${section.badgeText}</span>` : ''}
+                </div>
+            `;
+
+            if (section.layoutStyle === 'spotlight') {
+                html += '<div class="row g-3">';
+                tours.forEach(tour => {
+                    html += `
+                        <div class="col-md-4">
+                            <div class="card">
+                                <img src="${tour.imageUrl}" class="card-img-top" alt="${tour.title}" height="200">
+                                <div class="card-body">
+                                    <h6 class="card-title">${tour.title}</h6>
+                                    <p class="text-muted mb-2">${tour.duration}</p>
+                                    <p class="text-primary fw-bold mb-0">${tour.pricePerPerson.toLocaleString()} VND</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else if (section.layoutStyle === 'grid-3') {
+                html += '<div class="row g-3">';
+                tours.forEach(tour => {
+                    html += `
+                        <div class="col-md-4">
+                            <div class="card">
+                                <img src="${tour.imageUrl}" class="card-img-top" alt="${tour.title}" height="150">
+                                <div class="card-body">
+                                    <h6 class="card-title">${tour.title}</h6>
+                                    <p class="text-primary fw-bold mb-0">${tour.pricePerPerson.toLocaleString()} VND</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html += '<div class="row g-3">';
+                tours.forEach(tour => {
+                    html += `
+                        <div class="col-md-3">
+                            <div class="card">
+                                <img src="${tour.imageUrl}" class="card-img-top" alt="${tour.title}" height="150">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title small">${tour.title}</h6>
+                                    <p class="text-primary fw-bold small mb-0">${tour.pricePerPerson.toLocaleString()} VND</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            return html;
+        }
+    </script>
+}

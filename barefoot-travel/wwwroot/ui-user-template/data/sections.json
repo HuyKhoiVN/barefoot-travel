@@ -1,0 +1,118 @@
+{
+  "featuredTours": [
+    {
+      "id": 1,
+      "tourName": "Ninh Binh",
+      "tourDescription": "Book now for an unforgettable one-day Ninh Binh trip and don't miss out on this amazing adventure!",
+      "tourImageUrl": ["./images/home_background.jpg", "./images/sapa_terraces.jpg", "./images/hoi_an.jpg"]
+    },
+    
+    {
+      "id": 3,
+      "tourName": "Sapa Terraces",
+      "tourDescription": "Spectacular rice terraces and ethnic culture.",
+      "tourImageUrl": ["./images/sapa_terraces.jpg", "./images/home_background.jpg"]
+    }
+  ],
+  "waysToTravel": [
+    { "id": 1, "travelName": "Adventure", "tourTotalCount": 24, "tourImageUrl": ["./images/home_background.jpg", "./images/sapa_terraces.jpg"] },
+    { "id": 2, "travelName": "Beach", "tourTotalCount": 32, "tourImageUrl": ["./images/phu_quoc.jpg", "./images/hoi_an.jpg"] },
+    { "id": 3, "travelName": "Cruising", "tourTotalCount": 28, "tourImageUrl": ["./images/halong_bay.jpg", "./images/halongbg.jpg"] },
+    { "id": 4, "travelName": "Family", "tourTotalCount": 19, "tourImageUrl": ["./images/mekong_delta.jpg"] },
+    { "id": 5, "travelName": "Honeymoon", "tourTotalCount": 17, "tourImageUrl": ["./images/hoi_an.jpg"] },
+    { "id": 6, "travelName": "Wellness", "tourTotalCount": 21, "tourImageUrl": ["./images/phu_quoc.jpg"] },
+    { "id": 7, "travelName": "Culture", "tourTotalCount": 35, "tourImageUrl": ["./images/home_background.jpg"] },
+    { "id": 8, "travelName": "Photography", "tourTotalCount": 12, "tourImageUrl": ["./images/sapa_terraces.jpg"] },
+    { "id": 9, "travelName": "Culinary", "tourTotalCount": 27, "tourImageUrl": ["./images/hoi_an.jpg"] }
+  ],
+  "dailyTours": [
+    { "id": 1, "dailyTourName": "North Vietnam", "dailyDescription": "Adventurous experiences", "tourImageUrl": ["./images/sapa_terraces.jpg"] },
+    { "id": 2, "dailyTourName": "Central Vietnam", "dailyDescription": "Charming and enriching", "tourImageUrl": ["./images/hoi_an.jpg"] },
+    { "id": 3, "dailyTourName": "South Vietnam", "dailyDescription": "Relaxing paradise", "tourImageUrl": ["./images/mekong_delta.jpg"] },
+    { "id": 4, "dailyTourName": "Ha Long Bay", "dailyDescription": "World Heritage cruise", "tourImageUrl": ["./images/halong_bay.jpg"] },
+    { "id": 5, "dailyTourName": "Mekong Delta", "dailyDescription": "Floating markets & local life", "tourImageUrl": ["./images/mekong_delta.jpg"] },
+    { "id": 6, "dailyTourName": "Hoi An", "dailyDescription": "Ancient town & lanterns", "tourImageUrl": ["./images/hoi_an.jpg"] }
+  ],
+  "combinedSections": [
+    {
+      "id": 101,
+      "categoryName": "Best Sellers",
+      "spotlightBadge": "",
+      "spotlightTitle": "",
+      "spotlightDescription": "",
+      "spotlightBtnText": "",
+      "spotlightImageUrl": "",
+      "totalTourCount": 45,
+      "tourList": [
+        { "Id": 1, "CategoryListName": ["Ninh Binh", "Northern Vietnam"], "TourName": "Ninh Binh 1D – Bai Dinh Trang An & Mua Cave", "Price": 65, "IsLove": false, "ImageUrl": ["./images/home_background.jpg", "./images/sapa_terraces.jpg"] },
+        { "Id": 2, "CategoryListName": ["Ha Long Bay", "Northern Vietnam"], "TourName": "Ha Long bay 1D – Excursion cruise (6 hours)", "Price": 60, "IsLove": true, "ImageUrl": ["./images/halong_bay.jpg", "./images/halongbg.jpg"] },
+        { "Id": 3, "CategoryListName": ["Cat Ba", "Ha Long Bay"], "TourName": "Lan Ha bay 2D1N – La Regina cruise 5*", "Price": 165, "IsLove": false, "ImageUrl": ["./images/home_background.jpg", "./images/halong_bay.jpg"] },
+        { "Id": 4, "CategoryListName": ["Ninh Binh"], "TourName": "Hoa Lu Tam Coc & Mua Cave", "Price": 60, "IsLove": true, "ImageUrl": ["./images/home_background.jpg"] },
+        { "Id": 15, "CategoryListName": ["Phu Quoc"], "TourName": "Island Escape 4D3N", "Price": 420, "IsLove": false, "ImageUrl": ["./images/phu_quoc.jpg"] }
+      ]
+    },
+    {
+      "id": 102,
+      "categoryName": "Indochina packages",
+      "spotlightBadge": "IN THE SPOTLIGHTS",
+      "spotlightTitle": "BEST CHOICE",
+      "spotlightDescription": "Arrange your border crossings stress-free by handling everything at once!",
+      "spotlightBtnText": "BOOK NOW",
+      "spotlightImageUrl": "./images/hoi_an.jpg",
+      "totalTourCount": 21,
+      "tourList": [
+        { "Id": 5, "CategoryListName": ["Full Packages", "VN-LA-KH"], "TourName": "Signatures of Indochina 21 days", "Price": 2688, "IsLove": false, "ImageUrl": ["./images/home_background.jpg"] },
+        { "Id": 6, "CategoryListName": ["Full Packages", "VN-KH"], "TourName": "Vietnam and Cambodia unique journey – 21 days", "Price": 2377, "IsLove": false, "ImageUrl": ["./images/hoi_an.jpg"] },
+        { "Id": 7, "CategoryListName": ["Full Packages", "VN-KH"], "TourName": "Vietnam and Cambodia Explorer – 18 days", "Price": 1880, "IsLove": true, "ImageUrl": ["./images/mekong_delta.jpg"] },
+        { "Id": 16, "CategoryListName": ["Full Packages", "VN"], "TourName": "Vietnam Highlights – 14 days", "Price": 1899, "IsLove": false, "ImageUrl": ["./images/home_background.jpg"] }
+      ]
+    },
+    {
+      "id": 103,
+      "categoryName": "Top Vietnam packages for 2024",
+      "spotlightBadge": "",
+      "spotlightTitle": "",
+      "spotlightDescription": "",
+      "spotlightBtnText": "",
+      "spotlightImageUrl": "",
+      "totalTourCount": 32,
+      "tourList": [
+        { "Id": 8, "CategoryListName": ["Full Packages", "North to South"], "TourName": "Best of Vietnam – 10 days", "Price": 799, "IsLove": false, "ImageUrl": ["./images/home_background.jpg", "./images/hoi_an.jpg"] },
+        { "Id": 9, "CategoryListName": ["Full Packages", "North"], "TourName": "Stunning Northern loop – 7D6N", "Price": 405, "IsLove": true, "ImageUrl": ["./images/sapa_terraces.jpg"] },
+        { "Id": 10, "CategoryListName": ["Full Packages", "North & Central"], "TourName": "Adventure Vietnam – 13 days", "Price": 1550, "IsLove": false, "ImageUrl": ["./images/halong_bay.jpg"] },
+        { "Id": 11, "CategoryListName": ["Full Packages", "North to South"], "TourName": "Vietnam Beach break – 15 days", "Price": 1140, "IsLove": true, "ImageUrl": ["./images/phu_quoc.jpg"] },
+        { "Id": 17, "CategoryListName": ["Full Packages", "Central"], "TourName": "Central Charm – 8 days", "Price": 680, "IsLove": false, "ImageUrl": ["./images/hoi_an.jpg"] }
+      ]
+    },
+    {
+      "id": 104,
+      "categoryName": "Tours we love",
+      "spotlightBadge": "IN THE SPOTLIGHTS",
+      "spotlightTitle": "TOP LIST",
+      "spotlightDescription": "Discover our expertly crafted top tours, honed by years of experience. Don't miss out on these unforgettable experiences!",
+      "spotlightBtnText": "BOOK NOW",
+      "spotlightImageUrl": "./images/phu_quoc.jpg",
+      "totalTourCount": 15,
+      "tourList": [
+        { "Id": 12, "CategoryListName": ["Ha Long Bay", "Northern Vietnam"], "TourName": "Luxury cruise (8 hours)", "Price": 79, "IsLove": false, "ImageUrl": ["./images/halongbg.jpg", "./images/halong_bay.jpg"] },
+        { "Id": 13, "CategoryListName": ["Ha Long Bay"], "TourName": "Sena boutique cruise 2D1N", "Price": 145, "IsLove": true, "ImageUrl": ["./images/home_background.jpg"] },
+        { "Id": 14, "CategoryListName": ["Ninh Binh"], "TourName": "Bai Dinh & Trang An", "Price": 60, "IsLove": false, "ImageUrl": ["./images/home_background.jpg"] },
+        { "Id": 18, "CategoryListName": ["Sapa"], "TourName": "Terrace Trails 2D1N", "Price": 129, "IsLove": true, "ImageUrl": ["./images/sapa_terraces.jpg"] }
+      ]
+    },
+    {
+      "id": 105,
+      "categoryName": "Summer Specials",
+      "spotlightBadge": "IN THE SPOTLIGHTS",
+      "spotlightTitle": "HOT DEALS",
+      "spotlightDescription": "Limited-time offers for your summer escape.",
+      "spotlightBtnText": "BOOK NOW",
+      "spotlightImageUrl": "./images/halongbg.jpg",
+      "totalTourCount": 12,
+      "tourList": [
+        { "Id": 19, "CategoryListName": ["Beach", "South"], "TourName": "Phu Quoc Getaway 5D4N", "Price": 520, "IsLove": false, "ImageUrl": ["./images/phu_quoc.jpg"] },
+        { "Id": 20, "CategoryListName": ["Cruise", "North"], "TourName": "Ha Long Sunset 1D", "Price": 85, "IsLove": false, "ImageUrl": ["./images/halong_bay.jpg"] }
+      ]
+    }
+  ]
+}

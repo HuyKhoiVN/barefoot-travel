@@ -1,0 +1,680 @@
+/* ===================================
+   RESPONSIVE DESIGN ENHANCEMENTS
+   =================================== */
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1002;
+}
+
+.mobile-menu-toggle:hover {
+  color: #00d4aa;
+}
+
+/* ===================================
+   TABLET STYLES (768px - 1024px)
+   =================================== */
+@media (max-width: 1024px) {
+  /* Header adjustments */
+  .nav-wrapper {
+    padding: 12px 0;
+  }
+
+  .main-nav {
+    gap: 20px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+  }
+
+  .search-box input {
+    width: 150px;
+  }
+
+  .search-box input:focus {
+    width: 180px;
+  }
+
+  /* Hero section */
+  .hero-text h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero-badges {
+    gap: 15px;
+  }
+
+  .badge {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  /* Featured tours */
+  .tour-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .tour-card {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Travel grid */
+  .travel-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .daily-tours-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  /* Product grids */
+  .no-spotlight-grid,
+  .left-spotlight-grid,
+  .right-spotlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  /* Spotlight sections */
+  .left-spotlight-content,
+  .right-spotlight-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .left-spotlight-left,
+  .right-spotlight-right {
+    text-align: center;
+    padding: 40px 30px;
+  }
+
+  .left-spotlight-left h1,
+  .right-spotlight-right h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* ===================================
+   MOBILE STYLES (max-width: 768px)
+   =================================== */
+@media (max-width: 768px) {
+  /* Container adjustments */
+  .bare-container {
+    padding: 0 20px;
+  }
+
+  /* Header - Mobile Navigation */
+  .header {
+    padding: 0;
+  }
+
+  .nav-wrapper {
+    padding: 15px 20px;
+    position: relative;
+  }
+
+  .main-nav {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 80px 30px 30px;
+    gap: 0;
+    transition: left 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+  }
+
+  .main-nav.active {
+    left: 0;
+  }
+
+  .nav-item {
+    width: 100%;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-item:hover {
+    transform: none;
+    padding-left: 10px;
+  }
+
+  .dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: 10px;
+    border-radius: 8px;
+    box-shadow: none;
+    display: none;
+  }
+
+  .nav-item.active .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-menu a {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px 15px;
+    margin: 2px;
+  }
+
+  .dropdown-menu a:hover {
+    background: rgba(0, 212, 170, 0.3);
+    color: white;
+    transform: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .header-actions {
+    gap: 15px;
+  }
+
+  .search-box {
+    display: none;
+  }
+
+  .language-selector,
+  .currency-selector {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Hero section mobile */
+  .hero {
+    height: 80vh;
+    min-height: 600px;
+  }
+
+  .hero-content {
+    padding: 0 20px;
+  }
+
+  .hero-badges {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .badge {
+    padding: 10px 20px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+
+  .hero-text h1 {
+    font-size: 2.2rem;
+    line-height: 1.2;
+    margin-bottom: 15px;
+  }
+
+  .hero-text p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+
+  .search-form {
+    max-width: 100%;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 15px;
+    gap: 15px;
+  }
+
+  .search-form input {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+  }
+
+  .search-form button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 25px;
+    font-size: 16px;
+  }
+
+  /* About section mobile */
+  .about-compass-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .about-left {
+    text-align: center;
+  }
+
+  .about-left h3 {
+    font-size: 1.8rem;
+  }
+
+  .about-highlights {
+    justify-content: center;
+  }
+
+  /* Contact section mobile */
+  .contact-us-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .contact-us-card {
+    text-align: center;
+    padding: 25px 20px;
+  }
+
+  /* Featured tours mobile */
+  .tour-cards {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .tour-card {
+    height: 400px;
+  }
+
+  .card-content {
+    padding: 30px 25px;
+  }
+
+  .card-content h3 {
+    font-size: 1.5rem;
+  }
+
+  /* Indicators mobile */
+  .indicators-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .indicator-item {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  /* Travel grid mobile */
+  .travel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .travel-item {
+    aspect-ratio: 1;
+  }
+
+  .travel-content h4 {
+    font-size: 1rem;
+  }
+
+  .travel-content span {
+    font-size: 0.9rem;
+  }
+
+  /* Daily tours mobile */
+  .daily-tours-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .daily-tour-card {
+    height: 300px;
+  }
+
+  /* Product grids mobile */
+  .no-spotlight-grid,
+  .left-spotlight-grid,
+  .right-spotlight-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .product-card {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Spotlight sections mobile */
+  .left-spotlight-content,
+  .right-spotlight-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .left-spotlight-left,
+  .right-spotlight-right {
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  .left-spotlight-left h1,
+  .right-spotlight-right h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+
+  .left-spotlight-left p,
+  .right-spotlight-right p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+
+  /* Section headers mobile */
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .section-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .browse-all {
+    align-self: center;
+  }
+
+  /* Footer mobile adjustments */
+  .footer-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .footer-bottom {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    text-align: center;
+  }
+
+  .footer-bottom-center {
+    order: -1;
+  }
+
+  .payment-methods {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .footer-legal {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+/* ===================================
+   SMALL MOBILE STYLES (max-width: 480px)
+   =================================== */
+@media (max-width: 480px) {
+  /* Container */
+  .bare-container {
+    padding: 0 15px;
+  }
+
+  /* Header */
+  .nav-wrapper {
+    padding: 12px 15px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .main-nav {
+    width: 100%;
+    left: -100%;
+    padding: 70px 20px 20px;
+  }
+
+  /* Hero section */
+  .hero {
+    height: 70vh;
+    min-height: 500px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .badge {
+    padding: 8px 15px;
+    font-size: 13px;
+  }
+
+  /* Travel grid */
+  .travel-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  /* Cards */
+  .tour-card,
+  .daily-tour-card {
+    height: 350px;
+  }
+
+  .card-content {
+    padding: 25px 20px;
+  }
+
+  .card-content h3 {
+    font-size: 1.3rem;
+  }
+
+  /* Spotlight sections */
+  .left-spotlight-left,
+  .right-spotlight-right {
+    padding: 25px 15px;
+  }
+
+  .left-spotlight-left h1,
+  .right-spotlight-right h1 {
+    font-size: 1.7rem;
+  }
+
+  /* Section headers */
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Footer */
+  .footer-links-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .footer-links-col h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+
+  .payment-icons {
+    gap: 10px;
+  }
+
+  .payment-icons i {
+    font-size: 18px;
+  }
+}
+
+/* ===================================
+   LANDSCAPE MOBILE STYLES
+   =================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero {
+    height: 100vh;
+  }
+
+  .hero-badges {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .badge {
+    width: auto;
+    max-width: none;
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .search-form {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .search-form input {
+    flex: 1;
+  }
+
+  .search-form button {
+    width: auto;
+    padding: 15px 25px;
+  }
+}
+
+/* ===================================
+   UTILITY CLASSES FOR RESPONSIVE
+   =================================== */
+.hide-mobile {
+  display: block;
+}
+
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  .show-mobile {
+    display: block;
+  }
+}
+
+/* Responsive text sizes */
+.responsive-text-xl {
+  font-size: 2.5rem;
+}
+
+.responsive-text-lg {
+  font-size: 1.5rem;
+}
+
+.responsive-text-md {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .responsive-text-xl {
+    font-size: 2rem;
+  }
+
+  .responsive-text-lg {
+    font-size: 1.3rem;
+  }
+
+  .responsive-text-md {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-text-xl {
+    font-size: 1.7rem;
+  }
+
+  .responsive-text-lg {
+    font-size: 1.2rem;
+  }
+
+  .responsive-text-md {
+    font-size: 1rem;
+  }
+}
+
+/* Responsive spacing */
+.responsive-padding {
+  padding: 60px 0;
+}
+
+.responsive-margin {
+  margin: 40px 0;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 40px 0;
+  }
+
+  .responsive-margin {
+    margin: 25px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-padding {
+    padding: 30px 0;
+  }
+
+  .responsive-margin {
+    margin: 20px 0;
+  }
+}

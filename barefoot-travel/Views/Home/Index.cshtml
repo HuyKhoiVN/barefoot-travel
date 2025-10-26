@@ -1,8 +1,955 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
+    Layout = null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compass Travel - Book Your Favorite Boat Trip</title>
+    <link rel="stylesheet" href="~/ui-user-template/style.css">
+    <link rel="stylesheet" href="~/ui-user-template/responsive.css">
+    <link rel="stylesheet" href="~/ui-user-template/sections-theme.css">
+    <link href="~/ui-user-template/assets/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="~/ui-user-template/assets/font/css2.css?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/ui-user-template/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Horizontal scrollable tour grid styles */
+        .tour-grid-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tour-grid-wrapper {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+            padding-bottom: 10px;
+            gap: 20px;
+        }
+
+        .tour-grid-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tour-grid-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tour-grid-wrapper::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .tour-grid-wrapper .product-card {
+            flex: 0 0 auto;
+            min-width: 280px;
+            max-width: 280px;
+        }
+
+        .scroll-arrow-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .scroll-arrow-btn:hover {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .scroll-arrow-btn.prev {
+            left: -10px;
+        }
+
+        .scroll-arrow-btn.next {
+            right: -10px;
+        }
+
+        .scroll-arrow-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .scroll-arrow-btn i {
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Hide arrows when not needed */
+        .tour-grid-container:not(:hover) .scroll-arrow-btn {
+            opacity: 0.6;
+        }
+
+        @@media (max-width: 768px) {
+            .tour-grid-wrapper .product-card {
+                min-width: 250px;
+                max-width: 250px;
+            }
+
+            .scroll-arrow-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .scroll-arrow-btn.prev {
+                left: -5px;
+            }
+
+            .scroll-arrow-btn.next {
+                right: -5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="bare-container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-compass"></i>
+                    <span>compass travel</span>
+                </div>
+
+                <nav class="main-nav" id="mainNav">
+                    <div class="nav-item dropdown">
+                        <span>Type of tours <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Adventure Tours</a>
+                            <a href="#">Cultural Tours</a>
+                            <a href="#">Beach Tours</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>North Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hanoi</a>
+                            <a href="#">Halong Bay</a>
+                            <a href="#">Sapa</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Central Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hue</a>
+                            <a href="#">Hoi An</a>
+                            <a href="#">Da Nang</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>South Vietnam <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Ho Chi Minh City</a>
+                            <a href="#">Mekong Delta</a>
+                            <a href="#">Phu Quoc</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Packages <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Family Packages</a>
+                            <a href="#">Honeymoon Packages</a>
+                            <a href="#">Group Packages</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <span>Services <i class="fas fa-chevron-down"></i></span>
+                        <div class="dropdown-menu">
+                            <a href="#">Hotel Booking</a>
+                            <a href="#">Transportation</a>
+                            <a href="#">Tour Guide</a>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box hide-mobile">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="language-selector">
+                        <span>EN</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="currency-selector">
+                        <span>$</span>
+                    </div>
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-overlay"></div>
+        <div class="bare-container">
+            <div class="hero-content">
+                <div class="hero-badges">
+                    <div class="badge">
+                        <i class="fas fa-check-circle"></i>
+                        <span>250+ trips throughout Vietnam</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-headset"></i>
+                        <span>24/7 support</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-heart"></i>
+                        <span>Local Experts</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-star"></i>
+                        <span>Competitive pricing</span>
+                    </div>
+                </div>
+
+                <div class="hero-text">
+                    <h1 class="responsive-text-xl">Book your favorite<br>boat trip</h1>
+                    <p class="responsive-text-md">Book instantly. More than <strong>250+ tours</strong> across Vietnam</p>
+                </div>
+
+                <div class="search-form">
+                    <input type="text" placeholder="Where do you want to go?">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                        <span class="show-mobile">Search</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Compass Section -->
+    <section class="about-compass animate-on-scroll responsive-padding">
+        <div class="bare-container">
+            <div class="section-header">
+                <h2 class="responsive-text-lg">About Compass Travel</h2>
+                <a href="#" class="browse-all">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Learn more</span>
+                </a>
+            </div>
+            <div class="divider"></div>
+            <div class="about-compass-grid">
+                <div class="about-left">
+                    <div class="spotlight-badge">LOCAL EXPERTS</div>
+                    <h3 class="responsive-text-lg">10+ Years Crafting Journeys</h3>
+                    <p>With over a decade of experience, we design meaningful Vietnam trips that blend culture,
+                        landscapes, and authentic local encounters. Our team of passionate travel experts ensures every
+                        detail is taken care of for a seamless experience.</p>
+                    <ul class="about-highlights">
+                        <li><i class="fas fa-check"></i> Tailor-made itineraries</li>
+                        <li><i class="fas fa-check"></i> Trusted local partners</li>
+                        <li><i class="fas fa-check"></i> 24/7 customer support</li>
+                    </ul>
+                    <button class="book-now-btn">Get in touch</button>
+                </div>
+                <div class="about-right">
+                    <div class="about-visual">
+                        <div class="about-bg"></div>
+                        <div class="about-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section class="contact-us animate-on-scroll responsive-padding">
+        <div class="bare-container">
+            <div class="section-header">
+                <h2 class="responsive-text-lg">Contact Us</h2>
+                <a href="#" class="browse-all">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Get support</span>
+                </a>
+            </div>
+            <div class="divider"></div>
+            <div class="contact-us-grid">
+                <div class="contact-us-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h4>Head Office</h4>
+                    <p>123 Nguyen Hue Street, District 1<br>Ho Chi Minh City, Vietnam</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-phone"></i>
+                    <h4>Phone</h4>
+                    <p>+84 28 3822 8888<br>+84 901 234 567</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-envelope"></i>
+                    <h4>Email</h4>
+                    <p>info@compasstravel.vn<br>booking@compasstravel.vn</p>
+                </div>
+                <div class="contact-us-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>Working Hours</h4>
+                    <p>Mon - Fri: 8:00 AM - 6:00 PM<br>Sat - Sun: 8:00 AM - 5:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Tours Section (Will be populated by JSON) -->
+    <section id="featuredToursSection" class="featured-tours responsive-padding">
+        <div class="bare-container">
+            <div id="tourCards" class="tour-cards">
+                <!-- Tour cards will be dynamically generated from JSON -->
+            </div>
+
+            <div class="indicators-grid m-3">
+                <div class="indicator-item">
+                    <i class="fas fa-star"></i>
+                    <span>563+ Customer reviews 5/10</span>
+                </div>
+                <div class="indicator-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Easy Whatsapp & Messenger support</span>
+                </div>
+                <div class="indicator-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Free Tailor-made Trips</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Homepage Sections Container -->
+    <div id="homepageSectionsContainer">
+        <!-- Sections will be dynamically loaded here based on homepage config -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-background"></div>
+        <div class="footer-overlay"></div>
+        <div class="footer-ending">
+            <div class="bare-container">
+                <div class="footer-links-grid">
+                    <div class="footer-links-col">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-tripadvisor"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Destinations</h4>
+                        <ul>
+                            <li><a href="#">North Vietnam</a></li>
+                            <li><a href="#">Central Vietnam</a></li>
+                            <li><a href="#">South Vietnam</a></li>
+                            <li><a href="#">Mekong Delta</a></li>
+                            <li><a href="#">Phu Quoc Island</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Tour Types</h4>
+                        <ul>
+                            <li><a href="#">Adventure Tours</a></li>
+                            <li><a href="#">Cultural Tours</a></li>
+                            <li><a href="#">Beach Holidays</a></li>
+                            <li><a href="#">Cruise Tours</a></li>
+                            <li><a href="#">Family Packages</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Services</h4>
+                        <ul>
+                            <li><a href="#">Hotel Booking</a></li>
+                            <li><a href="#">Transportation</a></li>
+                            <li><a href="#">Tour Guide</a></li>
+                            <li><a href="#">Travel Insurance</a></li>
+                            <li><a href="#">Visa Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Travel Tips</a></li>
+                            <li><a href="#">Booking Guide</a></li>
+                            <li><a href="#">Customer Reviews</a></li>
+                            <li><a href="#">Contact Support</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="footer-bottom-left">
+                        <div class="footer-logo">
+                            <i class="fas fa-compass"></i>
+                            <span>compass travel</span>
+                        </div>
+                        <p class="copyright">
+                            © 2025 Compass Travel Vietnam. All rights reserved.
+                            <span class="license">License No: 01-1234/2024-TCDL-GP LHQT</span>
+                        </p>
+                    </div>
+
+                    <div class="footer-bottom-center">
+                        <div class="payment-methods">
+                            <span class="payment-label">We Accept:</span>
+                            <div class="payment-icons">
+                                <i class="fab fa-cc-visa"></i>
+                                <i class="fab fa-cc-mastercard"></i>
+                                <i class="fab fa-cc-paypal"></i>
+                                <i class="fab fa-cc-amex"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-bottom-right">
+                        <div class="footer-legal">
+                            <a href="#">Privacy Policy</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Cookie Policy</a>
+                            <a href="#">Sitemap</a>
+                        </div>
+
+                        <div class="back-to-top" id="backToTop">
+                            <i class="fas fa-chevron-up"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/ui-user-template/assets/jquery-3.6.0.min.js"></script>
+    <script src="~/ui-user-template/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/ui-user-template/responsive-script.js"></script>
+    <script src="~/ui-user-template/script.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            loadHomepageData();
+        });
+
+        // Load all homepage data from JSON file
+        function loadHomepageData() {
+            $.getJSON('/data/homepage-sections.json?v=' + new Date().getTime(), function(response) {
+                console.log('Response received:', response);
+                if (response.success) {
+                    // Render featured tours if available
+                    console.log('Featured tours count:', response.featuredTours ? response.featuredTours.length : 0);
+                    if (response.featuredTours && response.featuredTours.length > 0) {
+                        renderFeaturedTours(response.featuredTours);
+                    }
+                    
+                    // Render homepage sections
+                    if (response.data) {
+                        renderHomepageSections(response.data);
+                    }
+                }
+            }).fail(function() {
+                console.error('Error loading homepage sections from JSON');
+            });
+        }
+
+        // Render featured tours (2 spotlight cards)
+        function renderFeaturedTours(tours) {
+            const container = $('#tourCards');
+            container.empty();
+            
+            tours.forEach(function(tour) {
+                const cardHtml = `
+                    <div class="tour-card ${tour.cardClass}">
+                        <div class="card-background"></div>
+                        <div class="card-overlay"></div>
+                        <div class="card-content">
+                            <div class="card-category">${tour.category}</div>
+                            <h3>${tour.title}</h3>
+                            <p>${tour.description}</p>
+                            <button class="book-btn">BOOK NOW</button>
+                        </div>
+                    </div>
+                `;
+                container.append(cardHtml);
+            });
+        }
+
+        // Render all homepage sections
+        function renderHomepageSections(sections) {
+            const container = $('#homepageSectionsContainer');
+            container.empty();
+
+            // Filter spotlight sections and assign positions based on display order
+            const spotlightSections = [];
+            sections.forEach(function(section) {
+                if (section.config.layoutStyle === 'spotlight' && section.config.isActive) {
+                    spotlightSections.push(section);
+                }
+            });
+
+            // Sort spotlight sections by displayOrder to determine actual position
+            spotlightSections.sort(function(a, b) {
+                return a.config.displayOrder - b.config.displayOrder;
+            });
+
+            // Assign spotlight positions based on sorted index
+            spotlightSections.forEach(function(section, index) {
+                section.config.spotlightPosition = index;
+            });
+
+            // Sort all sections by displayOrder before rendering
+            const sortedSections = sections.slice().sort(function(a, b) {
+                return a.config.displayOrder - b.config.displayOrder;
+            });
+
+            // Render all sections
+            sortedSections.forEach(function(section) {
+                if (!section.config.isActive) return;
+
+                const sectionHtml = renderSection(section);
+                container.append(sectionHtml);
+            });
+
+            // Initialize scroll functionality after rendering
+            setTimeout(function() {
+                initTourGridScroll();
+            }, 100);
+        }
+
+        // Detect layout style to determine appropriate CSS classes
+        function getLayoutClasses(layoutStyle, maxItems) {
+            const classes = {
+                section: '',
+                grid: ''
+            };
+
+            switch(layoutStyle) {
+                case 'spotlight':
+                    classes.section = 'left-spotlight-section';
+                    classes.grid = 'left-spotlight-grid';
+                    break;
+                case 'grid':
+                    classes.section = maxItems === 4 ? 'no-spotlight-section' : 'right-spotlight-section';
+                    classes.grid = 'no-spotlight-grid';
+                    break;
+                case 'grid-2':
+                    classes.section = 'no-spotlight-section';
+                    classes.grid = 'no-spotlight-grid';
+                    break;
+                case 'grid-3':
+                    classes.section = 'right-spotlight-section';
+                    classes.grid = 'right-spotlight-grid';
+                    break;
+                default:
+                    classes.section = 'right-spotlight-section';
+                    classes.grid = 'right-spotlight-grid';
+            }
+
+            return classes;
+        }
+
+        // Render a single section based on layout style
+        function renderSection(section) {
+            const config = section.config;
+            
+            // Special handling for "Ways to Travel" section
+            if (section.homepageTitle === "Ways to Travel") {
+                return renderWaysToTravelSection(section);
+            }
+            
+            const layoutClasses = getLayoutClasses(config.layoutStyle, config.maxItems);
+            
+            // Special handling for spotlight sections with left/right layout
+            if (config.layoutStyle === 'spotlight') {
+                return renderLeftSpotlightLayout(section, layoutClasses);
+            }
+            
+            // Special handling for grid-3 (right-spotlight layout)
+            if (config.layoutStyle === 'grid-3') {
+                return renderRightSpotlightLayout(section, layoutClasses);
+            }
+            
+            let html = `<section class="${layoutClasses.section} responsive-padding ${config.customClass || ''}">`;
+            html += `<div class="bare-container">`;
+            
+            // Section header
+            html += `<div class="section-header">`;
+            html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
+            if (config.badgeText) {
+                html += `<div class="spotlight-badge">${config.badgeText}</div>`;
+            }
+            html += `<a href="#" class="browse-all">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Browse all tours</span>
+                     </a>`;
+            html += `</div>`;
+            html += `<div class="divider"></div>`;
+
+            // Section content based on layout
+            const columns = config.layoutStyle === 'grid-2' ? 2 : 4;
+            html += renderGridLayout(section, columns, layoutClasses.grid);
+
+            html += `</div></section>`;
+            return html;
+        }
+
+        // Render "Ways to Travel" section with travel grid
+        function renderWaysToTravelSection(section) {
+            let html = `<section class="ways-to-travel bg-white responsive-padding">`;
+            html += `<div class="bare-container">`;
+            html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
+            html += `<div id="travelGrid" class="travel-grid">`;
+            
+            section.tours.forEach(function(tour) {
+                const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const tourCount = tour.tourCount || '10+';
+                
+                html += `
+                    <div class="travel-item">
+                        <div class="travel-image">
+                            <img src="${imageUrl}" alt="${tour.title}">
+                        </div>
+                        <div class="travel-content">
+                            <h4>${tour.title}</h4>
+                            <span>${tourCount} tours</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            html += `</div>`;
+            html += `</section>`;
+            return html;
+        }
+
+        // Render spotlight layout (3 large cards) with horizontal scrolling
+        function renderSpotlightLayout(section, gridClass) {
+            gridClass = gridClass || 'left-spotlight-grid';
+            const uniqueId = 'spotlight-' + section.categoryId + '-' + Math.random().toString(36).substr(2, 9);
+            const tours = section.tours.slice(0, section.config.maxItems);
+            
+            let html = `<div class="tour-grid-container" data-grid-id="${uniqueId}">`;
+            html += `<button class="scroll-arrow-btn prev" data-direction="prev" style="display: none;">
+                        <i class="fas fa-chevron-left"></i>
+                     </button>`;
+            html += `<div class="tour-grid-wrapper" data-wrapper-id="${uniqueId}">`;
+            
+            tours.forEach(function(tour) {
+                const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const price = formatPrice(tour.pricePerPerson);
+                
+                html += `
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="${imageUrl}" alt="${tour.title}" class="main-image">
+                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">${section.categoryName}</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">${tour.title}</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">${price}</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            html += `<button class="scroll-arrow-btn next" data-direction="next" style="display: none;">
+                        <i class="fas fa-chevron-right"></i>
+                     </button>`;
+            html += '</div>';
+            return html;
+        }
+
+                 // Render right spotlight layout (tours left, content right)
+        function renderRightSpotlightLayout(section, layoutClasses) {
+            let html = `<section class="${layoutClasses.section} responsive-padding ${section.config.customClass || ''}">`;
+            html += `<div class="bare-container">`;
+            html += `<div class="right-spotlight-content">`;
+            
+            // Left side: tours with header
+            html += `<div class="right-spotlight-left">`;
+            html += `<div class="section-header">`;
+            html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
+            html += `<a href="#" class="browse-all">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Browse all tours</span>
+                     </a>`;
+            html += `</div>`;
+            html += `<div class="divider"></div>`;
+            
+            // Render grid WITHOUT horizontal scroll wrapper for right-spotlight
+            html += renderRightSpotlightGrid(section, layoutClasses.grid);
+            
+            html += `</div>`;
+            
+            // Right side: content with badge
+            html += `<div class="right-spotlight-right">`;
+            html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+            html += `<h1 class="responsive-text-xl">TOP LIST</h1>`;
+            html += `<p>Discover our expertly crafted top tours, honed by years of experience. Don't miss out on these unforgettable experiences!</p>`;
+            html += `<button class="book-now-btn">BOOK NOW</button>`;
+            html += `</div>`;
+            
+            html += `</div>`;
+            html += `</div>`;
+            html += `</section>`;
+            return html;
+        }
+
+        // Render right spotlight grid without scroll container (for grid-3 layout)
+        function renderRightSpotlightGrid(section, gridClass) {
+            gridClass = gridClass || 'right-spotlight-grid';
+            const tours = section.tours.slice(0, section.config.maxItems);
+            
+            let html = `<div class="${gridClass}">`;
+            
+            tours.forEach(function(tour) {
+                const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const price = formatPrice(tour.pricePerPerson);
+                
+                html += `
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="${imageUrl}" alt="${tour.title}" class="main-image">
+                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">${section.categoryName}</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">${tour.title}</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">${price}</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Render left/right spotlight layout based on position
+        function renderLeftSpotlightLayout(section, layoutClasses) {
+            const spotlightPosition = section.config.spotlightPosition || 0;
+            const isLeftPosition = spotlightPosition % 2 === 0;
+            
+            let html = `<section class="left-spotlight-section responsive-padding ${section.config.customClass || ''}">`;
+            html += `<div class="bare-container">`;
+            html += `<div class="left-spotlight-content">`;
+            
+            // Left section (content on left, tours on right) - for even positions
+            if (isLeftPosition) {
+                html += `<div class="left-spotlight-left">`;
+                html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+                html += `<h1 class="responsive-text-xl">BEST CHOICE</h1>`;
+                html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
+                html += `<button class="book-now-btn">BOOK NOW</button>`;
+                html += `</div>`;
+                html += `<div class="left-spotlight-right">`;
+                html += `<div class="section-header">`;
+                html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
+                html += `<a href="#" class="browse-all">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Browse all tours</span>
+                         </a>`;
+                html += `</div>`;
+                html += `<div class="divider"></div>`;
+                html += renderSpotlightLayout(section, layoutClasses.grid);
+                html += `</div>`;
+            } else {
+                // Right section (tours on left, content on right) - for odd positions
+                html += `<div class="left-spotlight-right">`;
+                html += `<div class="section-header">`;
+                html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
+                html += `<a href="#" class="browse-all">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Browse all tours</span>
+                         </a>`;
+                html += `</div>`;
+                html += `<div class="divider"></div>`;
+                html += renderSpotlightLayout(section, layoutClasses.grid);
+                html += `</div>`;
+                html += `<div class="left-spotlight-left">`;
+                html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+                html += `<h1 class="responsive-text-xl">BEST CHOICE</h1>`;
+                html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
+                html += `<button class="book-now-btn">BOOK NOW</button>`;
+                html += `</div>`;
+            }
+            
+            html += `</div>`;
+            html += `</div>`;
+            html += `</section>`;
+            return html;
+        }
+
+        // Render grid layout with horizontal scrolling
+        function renderGridLayout(section, columns, gridClass) {
+            gridClass = gridClass || 'no-spotlight-grid';
+            const uniqueId = 'grid-' + section.categoryId + '-' + Math.random().toString(36).substr(2, 9);
+            const tours = section.tours.slice(0, section.config.maxItems);
+            
+            let html = `<div class="tour-grid-container" data-grid-id="${uniqueId}">`;
+            html += `<button class="scroll-arrow-btn prev" data-direction="prev" style="display: none;">
+                        <i class="fas fa-chevron-left"></i>
+                     </button>`;
+            html += `<div class="tour-grid-wrapper" data-wrapper-id="${uniqueId}">`;
+            
+            tours.forEach(function(tour) {
+                const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const price = formatPrice(tour.pricePerPerson);
+                
+                html += `
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="${imageUrl}" alt="${tour.title}" class="main-image">
+                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <div class="wishlist-btn">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-categories">
+                                <a href="#">${section.categoryName}</a>
+                            </p>
+                            <h3 class="product-title">
+                                <a href="#">${tour.title}</a>
+                            </h3>
+                            <div class="product-price">
+                                <span class="currency">$</span>
+                                <span class="amount">${price}</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read more</a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            html += `<button class="scroll-arrow-btn next" data-direction="next" style="display: none;">
+                        <i class="fas fa-chevron-right"></i>
+                     </button>`;
+            html += '</div>';
+            return html;
+        }
+
+        // Initialize scroll functionality for tour grids
+        function initTourGridScroll() {
+            $('.tour-grid-container').each(function() {
+                const container = $(this);
+                const wrapper = container.find('.tour-grid-wrapper');
+                const prevBtn = container.find('.scroll-arrow-btn.prev');
+                const nextBtn = container.find('.scroll-arrow-btn.next');
+
+                // Scroll amount (scroll by one card width + gap)
+                const scrollAmount = 300;
+
+                // Check and update button states
+                function updateButtons() {
+                    const scrollLeft = wrapper.scrollLeft();
+                    const scrollWidth = wrapper[0].scrollWidth;
+                    const clientWidth = wrapper[0].clientWidth;
+
+                    // Show/hide buttons based on whether scrolling is needed
+                    if (scrollWidth > clientWidth) {
+                        // Enable/disable prev button
+                        if (scrollLeft === 0) {
+                            prevBtn.prop('disabled', true).hide();
+                        } else {
+                            prevBtn.prop('disabled', false).show();
+                        }
+
+                        // Enable/disable next button
+                        if (scrollLeft >= scrollWidth - clientWidth - 10) {
+                            nextBtn.prop('disabled', true).hide();
+                        } else {
+                            nextBtn.prop('disabled', false).show();
+                        }
+                    } else {
+                        // No scrolling needed, hide both buttons
+                        prevBtn.hide();
+                        nextBtn.hide();
+                    }
+                }
+
+                // Initialize button states
+                updateButtons();
+
+                // Scroll event listener
+                wrapper.on('scroll', updateButtons);
+
+                // Click handlers
+                prevBtn.on('click', function() {
+                    wrapper.animate({ scrollLeft: wrapper.scrollLeft() - scrollAmount }, 300);
+                });
+
+                nextBtn.on('click', function() {
+                    wrapper.animate({ scrollLeft: wrapper.scrollLeft() + scrollAmount }, 300);
+                });
+
+                // Resize event listener to update button states
+                $(window).on('resize', updateButtons);
+            });
+        }
+
+        // Format price with commas for thousands
+        function formatPrice(price) {
+            if (!price) return '0';
+            // If price is in VND (large number), format with commas
+            if (price > 10000) {
+                return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            // If price is in USD format, show as is
+            return price.toString();
+        }
+    </script>
+</body>
+
+</html>
