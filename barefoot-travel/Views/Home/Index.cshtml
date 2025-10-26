@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compass Travel - Book Your Favorite Boat Trip</title>
-    <link rel="stylesheet" href="~/ui-user-template/style.css">
+    <link href="~/ui-user-template/style.css?v=2" rel="stylesheet">
     <link rel="stylesheet" href="~/ui-user-template/responsive.css">
     <link rel="stylesheet" href="~/ui-user-template/sections-theme.css">
     <link href="~/ui-user-template/assets/fontawesome/css/all.min.css" rel="stylesheet">
@@ -629,7 +629,8 @@
                     classes.grid = 'left-spotlight-grid';
                     break;
                 case 'grid':
-                    classes.section = maxItems === 4 ? 'no-spotlight-section' : 'right-spotlight-section';
+                    // Always use no-spotlight-section for grid layout (not spotlight)
+                    classes.section = 'no-spotlight-section';
                     classes.grid = 'no-spotlight-grid';
                     break;
                 case 'grid-2':
@@ -675,9 +676,6 @@
             // Section header
             html += `<div class="section-header">`;
             html += `<h2 class="responsive-text-lg">${section.homepageTitle}</h2>`;
-            if (config.badgeText) {
-                html += `<div class="spotlight-badge">${config.badgeText}</div>`;
-            }
             html += `<a href="#" class="browse-all">
                         <i class="fas fa-arrow-right"></i>
                         <span>Browse all tours</span>
@@ -830,10 +828,16 @@
             
             // Right side: content with badge
             html += `<div class="right-spotlight-right">`;
-            html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+            html += `<div class="right-spotlight-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+            html += '<div class="right-spotlight-overlay"></div>';
+            html += '<div class="right-spotlight-card-content">';
+            if (section.config.badgeText) {
+                html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+            }
             html += `<h1 class="responsive-text-xl">TOP LIST</h1>`;
             html += `<p>Discover our expertly crafted top tours, honed by years of experience. Don't miss out on these unforgettable experiences!</p>`;
             html += `<button class="book-now-btn">BOOK NOW</button>`;
+            html += '</div>';
             html += `</div>`;
             
             html += `</div>`;
@@ -895,10 +899,16 @@
             // Left section (content on left, tours on right) - for even positions
             if (isLeftPosition) {
                 html += `<div class="left-spotlight-left">`;
-                html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+                html += `<div class="spotlight-card-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+                html += '<div class="spotlight-card-overlay"></div>';
+                html += '<div class="spotlight-card-content">';
+                if (section.config.badgeText) {
+                    html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+                }
                 html += `<h1 class="responsive-text-xl">${section.homepageTitle || 'BEST CHOICE'}</h1>`;
                 html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
                 html += `<button class="book-now-btn">BOOK NOW</button>`;
+                html += '</div>';
                 html += `</div>`;
                 html += `<div class="left-spotlight-right">`;
                 html += `<div class="section-header">`;
@@ -925,10 +935,16 @@
                 html += renderSpotlightLayout(section, layoutClasses.grid);
                 html += `</div>`;
                 html += `<div class="left-spotlight-left">`;
-                html += `<div class="spotlight-badge">${section.config.badgeText || 'FEATURED'}</div>`;
+                html += `<div class="spotlight-card-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+                html += '<div class="spotlight-card-overlay"></div>';
+                html += '<div class="spotlight-card-content">';
+                if (section.config.badgeText) {
+                    html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+                }
                 html += `<h1 class="responsive-text-xl">${section.homepageTitle || 'BEST CHOICE'}</h1>`;
                 html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
                 html += `<button class="book-now-btn">BOOK NOW</button>`;
+                html += '</div>';
                 html += `</div>`;
             }
             

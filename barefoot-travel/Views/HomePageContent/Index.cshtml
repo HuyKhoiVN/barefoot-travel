@@ -117,6 +117,23 @@
                         <input type="text" class="form-control" id="customClass" placeholder="e.g., special-section, dark-theme">
                         <small class="text-muted">Add custom styling to this section</small>
                     </div>
+
+                    <!-- Spotlight Image (only for Spotlight layout) -->
+                    <div class="mb-3" id="spotlightImageContainer" style="display: none;">
+                        <label class="form-label">Spotlight Background Image <span class="text-danger">*</span></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="spotlightImagePreview" class="mb-2" style="display: none;">
+                                    <img id="spotlightImagePreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="openSpotlightImageGallery()">
+                                    <i class="ti ti-photo me-1"></i>Select Image
+                                </button>
+                                <input type="hidden" id="spotlightImageUrl">
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-2">This image will be used as the background for the spotlight card (Required for Spotlight layout)</small>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -417,6 +434,21 @@
             
             // Layout Style Hover Demo
             initLayoutDemo();
+            
+            // Toggle spotlight image field based on layout style
+            $('#layoutStyle').on('change', function() {
+                const layoutStyle = $(this).val();
+                if (layoutStyle === 'spotlight') {
+                    $('#spotlightImageContainer').slideDown(300);
+                } else {
+                    $('#spotlightImageContainer').slideUp(300);
+                }
+            });
+            
+            // Initial check on page load
+            if ($('#layoutStyle').val() === 'spotlight') {
+                $('#spotlightImageContainer').show();
+            }
         });
         
         // Initialize Layout Demo
@@ -804,6 +836,16 @@
             $('#imageGalleryModal').modal('show');
             loadUploadedImages();
         };
+        
+        // Open spotlight image gallery
+        window.openSpotlightImageGallery = function() {
+            currentImageGalleryTarget = 'spotlightImageUrl';
+            currentImagePreviewDiv = 'spotlightImagePreview';
+            currentImagePreviewImg = 'spotlightImagePreviewImg';
+            
+            $('#imageGalleryModal').modal('show');
+            loadUploadedImages();
+        };
 
         // Load uploaded images
         function loadUploadedImages() {
@@ -1134,6 +1176,7 @@
                                 isActive: section.config.isActive,
                                 badgeText: section.config.badgeText || '',
                                 customClass: section.config.customClass || '',
+                                spotlightImageUrl: section.config.spotlightImageUrl || '',
                                 tourCount: section.tourCount
                             };
                         });
@@ -1264,6 +1307,10 @@
             $('#categoryTree').css('pointer-events', 'auto');
             // Restore original helper text
             $('#categoryTree').next('small').text('Tours from this category will be displayed (Only TOURS type)');
+            // Reset spotlight image
+            $('#spotlightImageUrl').val('');
+            $('#spotlightImagePreview').hide();
+            $('#spotlightImageContainer').hide();
         });
 
         // Save section
@@ -1283,14 +1330,24 @@
                 return;
             }
             
+            // Validate spotlight image if spotlight layout
+            const layoutStyle = $('#layoutStyle').val();
+            const spotlightImageUrl = $('#spotlightImageUrl').val();
+            
+            if (layoutStyle === 'spotlight' && !spotlightImageUrl) {
+                showToast('Please select a spotlight background image', 'danger');
+                return;
+            }
+            
             const sectionData = {
                 homepageTitle: $('#sectionTitle').val(),
-                layoutStyle: $('#layoutStyle').val(),
+                layoutStyle: layoutStyle,
                 maxItems: parseInt($('#maxItems').val()),
                 displayOrder: parseInt($('#displayOrder').val()),
                 isActive: $('#isActive').val() === 'true',
                 badgeText: $('#badgeText').val() || null,
-                customClass: $('#customClass').val() || null
+                customClass: $('#customClass').val() || null,
+                spotlightImageUrl: spotlightImageUrl || null
             };
 
             // Call API
@@ -1335,6 +1392,20 @@
             $('#isActive').val(section.isActive.toString());
             $('#badgeText').val(section.badgeText);
             $('#customClass').val(section.customClass);
+            
+            // Handle spotlight image
+            if (section.spotlightImageUrl) {
+                $('#spotlightImageUrl').val(section.spotlightImageUrl);
+                $('#spotlightImagePreview').show();
+                $('#spotlightImagePreviewImg').attr('src', section.spotlightImageUrl);
+            }
+            
+            // Show spotlight image container if spotlight layout
+            if (section.layoutStyle === 'spotlight') {
+                $('#spotlightImageContainer').show();
+            } else {
+                $('#spotlightImageContainer').hide();
+            }
 
             // Disable category tree when editing (can't change category)
             $('#categoryTree').css('opacity', '0.5');

@@ -986,25 +986,62 @@ body {
 }
 
 .left-spotlight-left {
-  background: linear-gradient(135deg, rgba(0, 212, 170, 0.9) 0%, rgba(0, 150, 120, 0.9) 100%);
+  position: relative;
   padding: 60px 40px;
   border-radius: 20px;
   height: 100%;
   color: white;
   text-align: left;
-  position: relative;
   overflow: hidden;
+  /* Override old styles that may interfere */
+  background: none !important;
 }
 
+/* Remove old pseudo-element overlay */
 .left-spotlight-left::before {
-  content: "";
+  display: none !important;
+}
+
+/* Background image for spotlight card */
+.spotlight-card-background {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("./images/home_background.jpg") center / cover;
-  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease;
+  z-index: 0;
+}
+
+.left-spotlight-left:hover .spotlight-card-background {
+  transform: scale(1.05);
+}
+
+/* Overlay for spotlight card */
+.spotlight-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 1;
+}
+
+/* Content wrapper */
+.spotlight-card-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Override old styles for h1 and p inside spotlight cards */
+.left-spotlight-left > h1,
+.left-spotlight-left > p,
+.right-spotlight-right > h1,
+.right-spotlight-right > p {
+  display: none !important;
 }
 
 .spotlight-badge {
@@ -1020,18 +1057,23 @@ body {
   backdrop-filter: blur(10px);
 }
 
-.left-spotlight-left h1 {
+/* Spotlight card content styling */
+.spotlight-card-content h1,
+.right-spotlight-card-content h1 {
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 20px;
   line-height: 1.2;
+  color: white;
 }
 
-.left-spotlight-left p {
+.spotlight-card-content p,
+.right-spotlight-card-content p {
   font-size: 16px;
   margin-bottom: 30px;
   opacity: 0.9;
   line-height: 1.6;
+  color: white;
 }
 
 .book-now-btn {
@@ -1388,39 +1430,54 @@ body {
 }
 
 .right-spotlight-right {
-  background: linear-gradient(135deg, rgba(0, 212, 170, 0.9) 0%, rgba(0, 150, 120, 0.9) 100%);
+  position: relative;
   padding: 60px 40px;
   border-radius: 20px;
   height: 100%;
   color: white;
   text-align: left;
-  position: relative;
   overflow: hidden;
+  /* Override old styles that may interfere */
+  background: none !important;
 }
 
+/* Remove old pseudo-element overlay */
 .right-spotlight-right::before {
-  content: "";
+  display: none !important;
+}
+
+/* Background image for right spotlight card */
+.right-spotlight-background {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("./images/home_background.jpg") center / cover;
-  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease;
+  z-index: 0;
 }
 
-.right-spotlight-right h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 20px;
-  line-height: 1.2;
+.right-spotlight-right:hover .right-spotlight-background {
+  transform: scale(1.05);
 }
 
-.right-spotlight-right p {
-  font-size: 16px;
-  margin-bottom: 30px;
-  opacity: 0.9;
-  line-height: 1.6;
+/* Overlay for right spotlight card */
+.right-spotlight-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 1;
+}
+
+/* Content wrapper for right spotlight card */
+.right-spotlight-card-content {
+  position: relative;
+  z-index: 2;
 }
 
 /* About Compass Section */

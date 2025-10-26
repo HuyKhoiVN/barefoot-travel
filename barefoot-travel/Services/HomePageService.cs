@@ -72,7 +72,8 @@ namespace barefoot_travel.Services
                 IsActive = dto.IsActive,
                 BadgeText = dto.BadgeText,
                 CustomClass = dto.CustomClass,
-                DisplayOrder = dto.DisplayOrder
+                DisplayOrder = dto.DisplayOrder,
+                SpotlightImageUrl = dto.SpotlightImageUrl
             };
 
             var configJson = JsonSerializer.Serialize(config);

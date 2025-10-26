@@ -21,6 +21,8 @@ namespace barefoot_travel.DTOs
         
         [JsonPropertyName("customClass")]
         public string? CustomClass { get; set; }
+        [JsonPropertyName("spotlightImageUrl")]
+        public string? SpotlightImageUrl { get; set; }
     }
 
     public class ConfigureHomepageDto
@@ -32,6 +34,7 @@ namespace barefoot_travel.DTOs
         public bool IsActive { get; set; } = true;
         public string? BadgeText { get; set; }
         public string? CustomClass { get; set; }
+        public string? SpotlightImageUrl { get; set; }
     }
 
     public class HomepageSectionDto
