@@ -64,7 +64,7 @@
                             </div>
                             <small class="text-muted">Tours from this category will be displayed (Only TOURS type)</small>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3 position-relative">
                             <label class="form-label">Layout Style</label>
                             <select class="form-select" id="layoutStyle">
                                 <option value="grid">Grid (4 columns)</option>
@@ -73,6 +73,16 @@
                                 <option value="spotlight">Spotlight (Large cards)</option>
                                 <option value="carousel">Carousel</option>
                             </select>
+                            <!-- Layout Demo Tooltip -->
+                            <div id="layoutDemo" class="layout-demo-tooltip" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 5px; z-index: 1050; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 15px; min-width: 350px; max-width: 500px;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="mb-0" id="demoTitle">Layout Preview</h6>
+                                    <button type="button" class="btn-close" onclick="$('#layoutDemo').hide();"></button>
+                                </div>
+                                <div id="demoContent" style="font-size: 12px;">
+                                    <!-- Demo content will be inserted here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -404,7 +414,145 @@
             loadHomepageSections();
             loadWaysToTravelCategories();
             loadCategoriesForWaysToTravel();
+            
+            // Layout Style Hover Demo
+            initLayoutDemo();
         });
+        
+        // Initialize Layout Demo
+        function initLayoutDemo() {
+            const $layoutStyle = $('#layoutStyle');
+            const $demo = $('#layoutDemo');
+            let hoverTimeout;
+            
+            // Show demo on hover
+            $layoutStyle.on('mouseenter', function() {
+                clearTimeout(hoverTimeout);
+                const selectedValue = $(this).val();
+                showLayoutDemo(selectedValue);
+            });
+            
+            // Hide demo on mouse leave
+            $layoutStyle.on('mouseleave', function() {
+                hoverTimeout = setTimeout(function() {
+                    $demo.fadeOut(200);
+                }, 300);
+            });
+            
+            // Keep demo visible when hovering over it
+            $demo.on('mouseenter', function() {
+                clearTimeout(hoverTimeout);
+                $(this).show();
+            });
+            
+            $demo.on('mouseleave', function() {
+                $(this).fadeOut(200);
+            });
+        }
+        
+        // Show layout demo
+        function showLayoutDemo(layoutType) {
+            const $demo = $('#layoutDemo');
+            const $title = $('#demoTitle');
+            const $content = $('#demoContent');
+            
+            let title = '';
+            let description = '';
+            let demoHtml = '';
+            
+            switch(layoutType) {
+                case 'grid':
+                    title = 'Grid (4 columns)';
+                    description = 'Displays tours in a responsive 4-column grid layout with horizontal scrolling.';
+                    demoHtml = `
+                        <div class="border rounded p-2" style="background: #f8f9fa;">
+                            <div class="d-flex gap-2 mb-2">
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 40px;">Card 1</div>
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 40px;">Card 2</div>
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 40px;">Card 3</div>
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 40px;">Card 4</div>
+                            </div>
+                            <div class="text-center text-muted small">← Swipe to see more →</div>
+                        </div>
+                    `;
+                    break;
+                case 'grid-3':
+                    title = 'Grid (3 columns)';
+                    description = 'Displays tours in a 3-column grid with a featured content panel on the right.';
+                    demoHtml = `
+                        <div class="border rounded p-2" style="background: #f8f9fa;">
+                            <div class="d-flex gap-2">
+                                <div style="flex: 2;">
+                                    <div class="d-flex gap-2 mb-2">
+                                        <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 50px;">1</div>
+                                        <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 50px;">2</div>
+                                        <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 50px;">3</div>
+                                    </div>
+                                </div>
+                                <div style="flex: 1; background: #0d6efd; border-radius: 4px; color: white; padding: 8px; font-size: 10px;">
+                                    <strong>Featured</strong><br>
+                                    Content Panel
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'grid-2':
+                    title = 'Grid (2 columns)';
+                    description = 'Displays tours in a simple 2-column grid layout.';
+                    demoHtml = `
+                        <div class="border rounded p-2" style="background: #f8f9fa;">
+                            <div class="d-flex gap-2 mb-2">
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 60px;">Card 1</div>
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 60px;">Card 2</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 60px;">Card 3</div>
+                                <div class="border rounded p-1 bg-white text-center" style="flex: 1; min-height: 60px;">Card 4</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'spotlight':
+                    title = 'Spotlight (Large cards)';
+                    description = 'Displays large promotional cards with content panel on left/right, alternating layout.';
+                    demoHtml = `
+                        <div class="border rounded p-2" style="background: #f8f9fa;">
+                            <div class="d-flex gap-2 mb-2">
+                                <div style="flex: 1; background: #0d6efd; border-radius: 4px; color: white; padding: 8px; font-size: 10px;">
+                                    <strong>FEATURED</strong><br>
+                                    <small>Promo Content Panel</small>
+                                </div>
+                                <div style="flex: 2;">
+                                    <div class="border rounded p-1 bg-white" style="min-height: 50px;">Large Tour Card</div>
+                                </div>
+                            </div>
+                            <div class="text-center text-muted small">Next section: Content on right</div>
+                        </div>
+                    `;
+                    break;
+                case 'carousel':
+                    title = 'Carousel';
+                    description = 'Displays tours in a carousel/slider with navigation arrows.';
+                    demoHtml = `
+                        <div class="border rounded p-2" style="background: #f8f9fa;">
+                            <div class="position-relative">
+                                <div class="d-flex gap-2 overflow-hidden" style="max-width: 100%;">
+                                    <div class="border rounded p-1 bg-white text-center" style="flex: 0 0 100%; min-height: 50px;">Slide 1</div>
+                                </div>
+                                <button class="btn btn-sm btn-primary position-absolute" style="left: -10px; top: 50%; transform: translateY(-50%); border-radius: 50%; width: 24px; height: 24px; padding: 0; font-size: 10px;">‹</button>
+                                <button class="btn btn-sm btn-primary position-absolute" style="right: -10px; top: 50%; transform: translateY(-50%); border-radius: 50%; width: 24px; height: 24px; padding: 0; font-size: 10px;">›</button>
+                            </div>
+                            <div class="text-center text-muted small mt-2">← Click arrows to navigate →</div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            $title.text(title);
+            $content.html(`<p class="small text-muted mb-2">${description}</p>${demoHtml}`);
+            $demo.fadeIn(200);
+        }
 
         // Load all categories for selection (with tree structure)
         function loadCategories() {

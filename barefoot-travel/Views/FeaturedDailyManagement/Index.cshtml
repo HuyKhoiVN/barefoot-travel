@@ -99,7 +99,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Image URL <span class="text-danger">*</span></label>
                             <div class="d-flex gap-2">
-                                <input type="text" class="form-control" id="ftImageUrl" placeholder="/uploads/..." required>
+                                <input type="text" class="form-control" id="ftImageUrl" placeholder="/uploads/..." required readonly>
                                 <button type="button" class="btn btn-outline-primary" onclick="openImageGallery('ftImageUrl', 'ftImagePreview', 'ftImagePreviewImg')">
                                     <i class="ti ti-photo"></i>
                                 </button>
@@ -172,7 +172,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Image URL <span class="text-danger">*</span></label>
                             <div class="d-flex gap-2">
-                                <input type="text" class="form-control" id="dtImageUrl" placeholder="/uploads/..." required>
+                                <input type="text" class="form-control" id="dtImageUrl" placeholder="/uploads/..." required readonly>
                                 <button type="button" class="btn btn-outline-primary" onclick="openImageGallery('dtImageUrl', 'dtImagePreview', 'dtImagePreviewImg')">
                                     <i class="ti ti-photo"></i>
                                 </button>
@@ -248,6 +248,16 @@
 
 @section Scripts {
     <style>
+        :root {
+            --vt-primary: #6a5cff;
+            --vt-secondary: #1da388;
+            --vt-accent: #ff4d6d;
+            --vt-bg-1: #0e0e12;
+            --vt-bg-2: #11131a;
+            --vt-light: #f8f9fb;
+            --vt-muted: #8b90a0;
+        }
+
         .image-select-card {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -256,6 +266,182 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
             transform: translateY(-2px);
+        }
+
+        /* Featured Tour Card Styling - Match User Template */
+        .tour-card-wrapper {
+            transition: transform 0.2s ease;
+        }
+        .tour-card-wrapper:hover {
+            transform: scale(1.02);
+        }
+        .tour-card {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .tour-card:hover {
+            transform: translateY(-10px);
+        }
+        .card-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+        }
+        .card-content {
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+        .card-category {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .card-content h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: white;
+        }
+        .card-content p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .book-btn {
+            background: var(--vt-secondary);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+        .book-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        /* Daily Tour Card Styling - Match User Template */
+        .daily-tour-card-wrapper {
+            transition: transform 0.2s ease;
+        }
+        .daily-tour-card-wrapper:hover {
+            transform: scale(1.02);
+        }
+        .daily-tour-card {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .daily-tour-card:hover {
+            transform: translateY(-10px);
+        }
+        .daily-card-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        .daily-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
+        }
+        .daily-card-content {
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+        .daily-card-category {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .daily-card-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .daily-card-content p {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        .view-tours-btn {
+            background: var(--vt-secondary);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+        .view-tours-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .card-actions .btn {
+            flex: 1;
         }
     </style>
     <script>
@@ -370,49 +556,32 @@
             tours.sort((a, b) => a.displayOrder - b.displayOrder);
 
             tours.forEach(function(tour) {
+                const cardClass = tour.cardClass || '';
                 container.append(`
-                    <div class="col-md-6 mb-4">
-                        <div class="card border h-100">
-                            <div class="card-header bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">${tour.categoryName || 'Unnamed'}</h6>
-                                    <span class="badge bg-success">Active</span>
-                                </div>
+                    <div class="col-md-6 mb-4 tour-card-wrapper" onclick="editFeaturedTour(${tour.id})" style="cursor: pointer;">
+                        <div class="tour-card ${cardClass}">
+                            <div class="card-background" style="background-image: url('${tour.imageUrl}');"></div>
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <div class="card-category">${tour.badge}</div>
+                                <h3>${tour.categoryName}</h3>
+                                <p>${tour.description}</p>
+                                <button class="book-btn" onclick="event.stopPropagation(); return false;">BOOK NOW</button>
                             </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <small class="text-muted">Badge:</small>
-                                    <div><span class="badge bg-primary">${tour.badge}</span></div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Description:</small>
-                                    <div>${tour.description}</div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Image:</small>
-                                    <img src="${tour.imageUrl}" alt="Image" class="img-thumbnail" style="max-width: 150px;">
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Order:</small>
-                                    <div>${tour.displayOrder}</div>
-                                </div>
-                            </div>
-                            <div class="card-footer bg-transparent border-0 pt-0">
-                                <div class="btn-group w-100" role="group">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editFeaturedTour(${tour.id})">
-                                        <i class="ti ti-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="moveFeaturedTourUp(${tour.id})">
-                                        <i class="ti ti-arrow-up"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="moveFeaturedTourDown(${tour.id})">
-                                        <i class="ti ti-arrow-down"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteFeaturedTour(${tour.id})">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="card-actions mt-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editFeaturedTour(${tour.id})">
+                                <i class="ti ti-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation(); moveFeaturedTourUp(${tour.id})">
+                                <i class="ti ti-arrow-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation(); moveFeaturedTourDown(${tour.id})">
+                                <i class="ti ti-arrow-down"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteFeaturedTour(${tour.id})">
+                                <i class="ti ti-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `);
@@ -473,49 +642,32 @@
             tours.sort((a, b) => a.displayOrder - b.displayOrder);
 
             tours.forEach(function(tour) {
+                const cardClass = tour.cardClass || '';
                 container.append(`
-                    <div class="col-md-4 mb-4">
-                        <div class="card border h-100">
-                            <div class="card-header bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">${tour.categoryName}</h6>
-                                    <span class="badge bg-success">Active</span>
-                                </div>
+                    <div class="col-md-4 mb-4 daily-tour-card-wrapper" onclick="editDailyTour(${tour.id})" style="cursor: pointer;">
+                        <div class="daily-tour-card ${cardClass}">
+                            <div class="daily-card-background" style="background-image: url('${tour.imageUrl}');"></div>
+                            <div class="daily-card-overlay"></div>
+                            <div class="daily-card-content">
+                                <div class="daily-card-category">${tour.badge}</div>
+                                <h3>${tour.categoryName}</h3>
+                                <p>${tour.description}</p>
+                                <button class="view-tours-btn" onclick="event.stopPropagation(); return false;">VIEW ALL TOURS</button>
                             </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <small class="text-muted">Badge:</small>
-                                    <div><span class="badge bg-primary">${tour.badge}</span></div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Description:</small>
-                                    <div>${tour.description}</div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Image:</small>
-                                    <img src="${tour.imageUrl}" alt="Image" class="img-thumbnail" style="max-width: 150px;">
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Order:</small>
-                                    <div>${tour.displayOrder}</div>
-                                </div>
-                            </div>
-                            <div class="card-footer bg-transparent border-0 pt-0">
-                                <div class="btn-group w-100" role="group">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editDailyTour(${tour.id})">
-                                        <i class="ti ti-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="moveDailyTourUp(${tour.id})">
-                                        <i class="ti ti-arrow-up"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="moveDailyTourDown(${tour.id})">
-                                        <i class="ti ti-arrow-down"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteDailyTour(${tour.id})">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="card-actions mt-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editDailyTour(${tour.id})">
+                                <i class="ti ti-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation(); moveDailyTourUp(${tour.id})">
+                                <i class="ti ti-arrow-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation(); moveDailyTourDown(${tour.id})">
+                                <i class="ti ti-arrow-down"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDailyTour(${tour.id})">
+                                <i class="ti ti-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `);
@@ -527,6 +679,9 @@
             currentImageGalleryTarget = targetInputId;
             currentImagePreviewDiv = previewDivId;
             currentImagePreviewImg = previewImgId;
+            
+            // Temporarily remove readonly to allow selection
+            $('#' + targetInputId).prop('readonly', false);
             
             $('#imageGalleryModal').modal('show');
             loadUploadedImages();
@@ -632,6 +787,8 @@
                 $('#' + currentImageGalleryTarget).val(imageUrl);
                 $('#' + currentImagePreviewDiv).show();
                 $('#' + currentImagePreviewImg).attr('src', imageUrl);
+                // Add readonly back after selection
+                $('#' + currentImageGalleryTarget).prop('readonly', true);
                 $('#imageGalleryModal').modal('hide');
                 
                 $('#newImageUpload').val('');
@@ -785,6 +942,9 @@
                 $('#ftImagePreviewImg').attr('src', tour.imageUrl);
             }
 
+            // Set readonly after loading data
+            $('#ftImageUrl').prop('readonly', true);
+
             $('#featuredTourModalLabel').text('Edit Featured Tour');
             $('#featuredTourModal').modal('show');
         };
@@ -809,6 +969,9 @@
                 $('#dtImagePreview').show();
                 $('#dtImagePreviewImg').attr('src', tour.imageUrl);
             }
+
+            // Set readonly after loading data
+            $('#dtImageUrl').prop('readonly', true);
 
             $('#dailyTourModalLabel').text('Edit Daily Tour');
             $('#dailyTourModal').modal('show');
@@ -1009,6 +1172,8 @@
             $('#ftDisplayOrder').val('0');
             $('#ftCardClass').val('');
             $('#ftImagePreview').hide();
+            // Reset readonly after reset
+            $('#ftImageUrl').prop('readonly', true);
         }
 
         // Reset Daily Tour modal helper
@@ -1023,6 +1188,8 @@
             $('#dtDisplayOrder').val('0');
             $('#dtCardClass').val('');
             $('#dtImagePreview').hide();
+            // Reset readonly after reset
+            $('#dtImageUrl').prop('readonly', true);
         }
 
         // Reset modals when hidden
