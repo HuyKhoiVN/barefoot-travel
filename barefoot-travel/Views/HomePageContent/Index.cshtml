@@ -48,21 +48,59 @@
                     <input type="hidden" id="categoryId">
                     
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Section Name (Identifier) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sectionName" placeholder="e.g., adventure-tours, top-packages" required>
+                            <small class="text-muted">Unique identifier for this section (no spaces, lowercase)</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Section Title (Displayed on Homepage) <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="sectionTitle" placeholder="e.g., Ways to Travel, Top Packages" required>
                             <small class="text-muted">This title will be shown as the section heading on the homepage</small>
                         </div>
                     </div>
 
+                    <!-- Tour Selection Mode Toggle -->
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Select Category <span class="text-danger">*</span></label>
-                            <input type="hidden" id="categorySelect" required>
-                            <div id="categoryTree" class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
-                                <div class="text-center text-muted">Loading categories...</div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Tour Selection Mode</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="tourSelectionMode" id="autoMode" value="auto" checked>
+                                <label class="btn btn-outline-primary" for="autoMode">
+                                    <i class="ti ti-settings me-2"></i>Auto (Use All Tours)
+                                </label>
+                                <input type="radio" class="btn-check" name="tourSelectionMode" id="manualMode" value="manual">
+                                <label class="btn btn-outline-primary" for="manualMode">
+                                    <i class="ti ti-hand-finger me-2"></i>Manual (Select Tours)
+                                </label>
                             </div>
-                            <small class="text-muted">Tours from this category will be displayed (Only TOURS type)</small>
+                            <small class="text-muted">Choose whether to use all tours from category (Auto) or select specific tours (Manual)</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3" id="categorySelectionContainer">
+                            <!-- Auto Mode: Single Category Selection -->
+                            <div id="autoModeCategory">
+                                <label class="form-label">Select Category <span class="text-danger">*</span></label>
+                                <input type="hidden" id="categorySelect" required>
+                                <div id="categoryTree" class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
+                                    <div class="text-center text-muted">Loading categories...</div>
+                                </div>
+                                <small class="text-muted">Select category for auto tour display</small>
+                            </div>
+                            
+                            <!-- Manual Mode: Multiple Category Selection -->
+                            <div id="manualModeCategories" style="display: none;">
+                                <label class="form-label">Select Categories (Multiple) <span class="text-danger">*</span></label>
+                                <div id="categoryTreeMulti" class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
+                                    <div class="text-center text-muted">Loading categories...</div>
+                                </div>
+                                <small class="text-muted">Select one or more categories to choose tours from (including parent categories)</small>
+                                <div id="selectedCategoriesList" class="mt-2">
+                                    <!-- Selected categories will show here -->
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6 mb-3 position-relative">
                             <label class="form-label">Layout Style</label>
@@ -81,6 +119,27 @@
                                 </div>
                                 <div id="demoContent" style="font-size: 12px;">
                                     <!-- Demo content will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Tour Selection Panel -->
+                    <div id="manualTourSelectionPanel" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Available Tours in Category</label>
+                                <div id="availableToursContainer" class="border rounded p-3 bg-light" style="max-height: 400px; overflow-y: auto;">
+                                    <div class="text-center text-muted">Select a category first</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Selected Tours <span class="badge bg-success" id="selectedToursCount">0</span></label>
+                                <div id="selectedToursContainer" class="border rounded p-2 bg-light" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
+                                    <div class="text-center text-muted p-4">
+                                        <i class="ti ti-inbox fs-1"></i>
+                                        <p class="mt-2 mb-0">No tours selected</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -425,6 +484,11 @@
         let currentImageGalleryTarget = null;
         let currentImagePreviewDiv = null;
         let currentImagePreviewImg = null;
+        
+        // Manual Tour Selection Variables
+        let availableTours = []; // All tours from all selected categories
+        let selectedTours = []; // Array of {id, title, pricePerPerson, duration, bannerImageUrl, images}
+        let selectedCategoryIds = []; // Array of selected category IDs for manual mode
 
         $(document).ready(function() {
             loadCategories();
@@ -449,6 +513,37 @@
             if ($('#layoutStyle').val() === 'spotlight') {
                 $('#spotlightImageContainer').show();
             }
+            
+            // Toggle manual tour selection panel and category selection mode based on tour selection mode
+            $('input[name="tourSelectionMode"]').on('change', function() {
+                const mode = $(this).val();
+                
+                if (mode === 'manual') {
+                    // Show manual mode UI
+                    $('#manualTourSelectionPanel').slideDown(300);
+                    $('#autoModeCategory').hide();
+                    $('#manualModeCategories').show();
+                    
+                    // Load categories for multi-select
+                    loadCategoriesForMultiSelect();
+                    
+                    // Clear and reload if categories selected
+                    if (selectedCategoryIds.length > 0) {
+                        loadToursFromMultipleCategories(selectedCategoryIds);
+                    }
+                } else {
+                    // Show auto mode UI
+                    $('#manualTourSelectionPanel').slideUp(300);
+                    $('#autoModeCategory').show();
+                    $('#manualModeCategories').hide();
+                    
+                    // Clear manual mode selections
+                    selectedTours = [];
+                    selectedCategoryIds = [];
+                    renderSelectedTours();
+                    renderSelectedCategories();
+                }
+            });
         });
         
         // Initialize Layout Demo
@@ -658,15 +753,296 @@
             }
         };
 
-        // Select category
+        // Select category (for Auto mode - single selection)
         window.selectCategory = function(categoryId, categoryName) {
             $('#categorySelect').val(categoryId);
             
             // Visual feedback - highlight selected
-            $('.category-item-row').removeClass('bg-primary text-white');
-            $(`.category-tree-item[data-category-id="${categoryId}"] .category-item-row`).addClass('bg-primary text-white');
+            $('#categoryTree .category-item-row').removeClass('bg-primary text-white');
+            $(`#categoryTree .category-tree-item[data-category-id="${categoryId}"] .category-item-row`).addClass('bg-primary text-white');
             
             showToast(`Selected category: ${categoryName}`, 'success');
+        };
+        
+        // Load categories for multi-select (Manual mode)
+        function loadCategoriesForMultiSelect() {
+            $.ajax({
+                url: '/api/Category/tree',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const container = $('#categoryTreeMulti');
+                        container.empty();
+                        
+                        if (response.data.length === 0) {
+                            container.append('<div class="text-muted text-center">No categories available</div>');
+                            return;
+                        }
+                        
+                        // Build category tree with checkboxes - ALLOW parent categories
+                        function buildMultiSelectCategoryTree(categories, container, level = 0) {
+                            categories.forEach(function(category) {
+                                // Show ALL TOURS type categories (including parents)
+                                if (category.type === 'TOURS') {
+                                    const hasChildren = category.children && category.children.filter(c => c.type === 'TOURS').length > 0;
+                                    const validChildren = hasChildren ? category.children.filter(c => c.type === 'TOURS') : [];
+                                    
+                                    const item = $(`
+                                        <div class="category-tree-item" data-category-id="${category.id}" style="padding-left: ${level * 20}px;">
+                                            <div class="d-flex align-items-center mb-1 category-item-row" style="padding: 5px; border-radius: 4px;">
+                                                ${hasChildren ? '<i class="ti ti-plus me-2 expand-icon" style="width: 16px; text-align: center; cursor: pointer;" onclick="toggleCategoryMulti(this, event)"></i>' : '<span class="me-2" style="width: 16px;"></span>'}
+                                                <input type="checkbox" class="form-check-input me-2" data-category-id="${category.id}" data-category-name="${category.categoryName.replace(/"/g, '&quot;')}" onchange="toggleCategorySelection(${category.id}, '${category.categoryName.replace(/'/g, "\\'")}', this.checked)">
+                                                <span class="category-name flex-grow-1">${category.categoryName}</span>
+                                                <span class="badge bg-info ms-1">${category.totalTours} tours</span>
+                                            </div>
+                                            <div class="category-children" style="display: none;"></div>
+                                        </div>
+                                    `);
+                                    
+                                    container.append(item);
+                                    
+                                    // If has children, populate them
+                                    if (hasChildren) {
+                                        buildMultiSelectCategoryTree(validChildren, item.find('.category-children'), level + 1);
+                                    }
+                                }
+                            });
+                        }
+                        
+                        buildMultiSelectCategoryTree(response.data, container);
+                    }
+                },
+                error: function() {
+                    $('#categoryTreeMulti').html('<div class="text-danger text-center">Error loading categories</div>');
+                }
+            });
+        }
+        
+        // Toggle category expansion for multi-select
+        window.toggleCategoryMulti = function(iconElement, event) {
+            event.stopPropagation();
+            const $icon = $(iconElement);
+            const $children = $icon.closest('.category-tree-item').find('> .category-children');
+            
+            if ($children.is(':visible')) {
+                $children.slideUp(200);
+                $icon.removeClass('ti-minus').addClass('ti-plus');
+            } else {
+                $children.slideDown(200);
+                $icon.removeClass('ti-plus').addClass('ti-minus');
+            }
+        };
+        
+        // Toggle category selection for manual mode
+        window.toggleCategorySelection = function(categoryId, categoryName, isChecked) {
+            if (isChecked) {
+                // Add to selected categories
+                if (!selectedCategoryIds.includes(categoryId)) {
+                    selectedCategoryIds.push(categoryId);
+                }
+            } else {
+                // Remove from selected categories
+                selectedCategoryIds = selectedCategoryIds.filter(id => id !== categoryId);
+            }
+            
+            // Update UI
+            renderSelectedCategories();
+            
+            // Reload tours from all selected categories
+            if (selectedCategoryIds.length > 0) {
+                loadToursFromMultipleCategories(selectedCategoryIds);
+            } else {
+                availableTours = [];
+                renderAvailableTours();
+            }
+        };
+        
+        // Render selected categories
+        function renderSelectedCategories() {
+            const container = $('#selectedCategoriesList');
+            container.empty();
+            
+            if (selectedCategoryIds.length === 0) {
+                return;
+            }
+            
+            container.append('<div class="mt-2"><strong>Selected Categories:</strong></div>');
+            const badges = $('<div class="d-flex flex-wrap gap-1 mt-1"></div>');
+            
+            selectedCategoryIds.forEach(function(catId) {
+                const checkbox = $(`#categoryTreeMulti input[data-category-id="${catId}"]`);
+                const categoryName = checkbox.data('category-name');
+                badges.append(`<span class="badge bg-primary">${categoryName}</span>`);
+            });
+            
+            container.append(badges);
+        }
+        
+        // Load tours from multiple categories
+        function loadToursFromMultipleCategories(categoryIds) {
+            const container = $('#availableToursContainer');
+            container.html('<div class="text-center text-muted p-4"><div class="spinner-border" role="status"></div><p class="mt-2">Loading tours...</p></div>');
+            
+            // Fetch tours from all categories
+            const promises = categoryIds.map(catId => 
+                $.ajax({
+                    url: `/api/Tour/by-category/${catId}`,
+                    type: 'GET',
+                    data: { maxItems: 100 }
+                })
+            );
+            
+            Promise.all(promises).then(responses => {
+                const allTours = [];
+                responses.forEach(response => {
+                    if (response.success && response.data) {
+                        allTours.push(...response.data);
+                    }
+                });
+                
+                // Remove duplicates by ID
+                const uniqueToursMap = new Map();
+                allTours.forEach(tour => {
+                    if (!uniqueToursMap.has(tour.id)) {
+                        uniqueToursMap.set(tour.id, tour);
+                    }
+                });
+                
+                availableTours = Array.from(uniqueToursMap.values());
+                renderAvailableTours();
+                
+                if (availableTours.length === 0) {
+                    container.html('<div class="text-center text-muted">No tours available in selected categories</div>');
+                }
+            }).catch(error => {
+                container.html('<div class="text-center text-danger">Error loading tours</div>');
+            });
+        }
+
+        // Load available tours for category
+        function loadAvailableTours(categoryId) {
+            const container = $('#availableToursContainer');
+            container.html('<div class="text-center text-muted p-4"><div class="spinner-border" role="status"></div><p class="mt-2">Loading tours...</p></div>');
+            
+            $.ajax({
+                url: `/api/Tour/by-category/${categoryId}`,
+                type: 'GET',
+                data: { maxItems: 100 }, // Get all tours
+                success: function(response) {
+                    if (response.success && response.data) {
+                        availableTours = response.data;
+                        renderAvailableTours();
+                    } else {
+                        container.html('<div class="text-center text-muted">No tours available in this category</div>');
+                    }
+                },
+                error: function() {
+                    container.html('<div class="text-center text-danger">Error loading tours</div>');
+                }
+            });
+        }
+
+        // Render available tours
+        function renderAvailableTours() {
+            const container = $('#availableToursContainer');
+            container.empty();
+            
+            if (availableTours.length === 0) {
+                container.html('<div class="text-center text-muted">No tours available</div>');
+                return;
+            }
+            
+            availableTours.forEach(function(tour) {
+                // Check if tour is already selected
+                const isSelected = selectedTours.some(st => st.id === tour.id);
+                const imageUrl = tour.bannerImageUrl || (tour.images && tour.images.length > 0 ? tour.images[0] : '/images/placeholder.jpg');
+                
+                const tourCard = $(`
+                    <div class="card mb-2 ${isSelected ? 'border-success' : ''}" style="cursor: ${isSelected ? 'not-allowed' : 'pointer'}; opacity: ${isSelected ? '0.5' : '1'};" ${isSelected ? '' : `onclick="selectTour(${tour.id})"`}>
+                        <div class="card-body p-2">
+                            <div class="d-flex align-items-center">
+                                <img src="${imageUrl}" alt="${tour.title}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" style="font-size: 0.9rem;">${tour.title}</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">${tour.pricePerPerson ? tour.pricePerPerson.toLocaleString() + ' VND' : 'N/A'}</span>
+                                        ${isSelected ? '<span class="badge bg-success"><i class="ti ti-check"></i> Selected</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                
+                container.append(tourCard);
+            });
+        }
+
+        // Select tour
+        window.selectTour = function(tourId) {
+            // Find tour in availableTours
+            const tour = availableTours.find(t => t.id === tourId);
+            if (!tour) return;
+            
+            // Check if already selected
+            if (selectedTours.some(st => st.id === tourId)) return;
+            
+            // Add to selected
+            selectedTours.push(tour);
+            
+            // Re-render
+            renderAvailableTours();
+            renderSelectedTours();
+        };
+
+        // Render selected tours
+        function renderSelectedTours() {
+            const container = $('#selectedToursContainer');
+            const count = $('#selectedToursCount');
+            count.text(selectedTours.length);
+            
+            container.empty();
+            
+            if (selectedTours.length === 0) {
+                container.html(`
+                    <div class="text-center text-muted p-4">
+                        <i class="ti ti-inbox fs-1"></i>
+                        <p class="mt-2 mb-0">No tours selected</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            selectedTours.forEach(function(tour, index) {
+                const imageUrl = tour.bannerImageUrl || (tour.images && tour.images.length > 0 ? tour.images[0] : '/images/placeholder.jpg');
+                
+                const selectedCard = $(`
+                    <div class="card mb-2" data-tour-id="${tour.id}">
+                        <div class="card-body p-2">
+                            <div class="d-flex align-items-center">
+                                <div class="me-2 text-muted">${index + 1}</div>
+                                <img src="${imageUrl}" alt="${tour.title}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0" style="font-size: 0.85rem;">${tour.title}</h6>
+                                    <small class="text-muted">${tour.pricePerPerson ? tour.pricePerPerson.toLocaleString() + ' VND' : 'N/A'}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeTour(${tour.id})" title="Remove">
+                                    <i class="ti ti-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                
+                container.append(selectedCard);
+            });
+        }
+
+        // Remove tour from selected
+        window.removeTour = function(tourId) {
+            selectedTours = selectedTours.filter(st => st.id !== tourId);
+            renderAvailableTours();
+            renderSelectedTours();
         };
 
                  // Load categories for Ways to Travel (with tree structure)
@@ -1163,20 +1539,24 @@
                 type: 'GET',
                 success: function(response) {
                     if (response.success && response.data) {
-                        // Convert API response to local format
-                        allSections = response.data.sections.map(function(section, index) {
+                        // Map new API response structure
+                        allSections = response.data.map(function(section) {
                             return {
-                                id: index + 1, // Use index as ID
-                                categoryId: section.categoryId,
-                                categoryName: section.categoryName,
+                                id: section.id,
+                                sectionName: section.sectionName,
                                 sectionTitle: section.homepageTitle,
-                                layoutStyle: section.config.layoutStyle,
-                                maxItems: section.config.maxItems,
-                                displayOrder: section.config.displayOrder,
-                                isActive: section.config.isActive,
-                                badgeText: section.config.badgeText || '',
-                                customClass: section.config.customClass || '',
-                                spotlightImageUrl: section.config.spotlightImageUrl || '',
+                                layoutStyle: section.layoutStyle,
+                                maxItems: section.maxItems,
+                                displayOrder: section.displayOrder,
+                                isActive: section.isActive,
+                                badgeText: section.badgeText || '',
+                                customClass: section.customClass || '',
+                                spotlightImageUrl: section.spotlightImageUrl || '',
+                                selectionMode: section.selectionMode,
+                                primaryCategoryId: section.primaryCategoryId,
+                                primaryCategoryName: section.primaryCategoryName,
+                                categoryIds: section.categoryIds || [],
+                                categoryNames: section.categoryNames || [],
                                 tourCount: section.tourCount
                             };
                         });
@@ -1228,8 +1608,12 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-2">
-                                    <small class="text-muted">Category:</small>
-                                    <div class="fw-bold">${section.categoryName}</div>
+                                    <small class="text-muted">Mode:</small>
+                                    <div><span class="badge ${section.selectionMode === 'auto' ? 'bg-info' : 'bg-warning'}">${section.selectionMode === 'auto' ? 'Auto' : 'Manual'}</span></div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">${section.selectionMode === 'auto' ? 'Category:' : 'Categories:'}</small>
+                                    <div class="fw-bold">${section.selectionMode === 'auto' ? (section.primaryCategoryName || 'N/A') : (section.categoryNames.join(', ') || 'N/A')}</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-6">
@@ -1297,20 +1681,38 @@
         $('#addSectionModal').on('hidden.bs.modal', function () {
             $('#sectionForm')[0].reset();
             $('#sectionId').val('');
-            $('#categoryId').val('');
+            $('#sectionName').val('');
             $('#categorySelect').val('');
             $('#addSectionModalLabel').text('Configure Homepage Section');
-            // Clear category selection highlight
-            $('.category-item-row').removeClass('bg-primary text-white');
-            // Re-enable category tree
-            $('#categoryTree').css('opacity', '1');
-            $('#categoryTree').css('pointer-events', 'auto');
-            // Restore original helper text
-            $('#categoryTree').next('small').text('Tours from this category will be displayed (Only TOURS type)');
+            
+            // Clear category selection highlights
+            $('#categoryTree .category-item-row').removeClass('bg-primary text-white');
+            $('#categoryTreeMulti input[type="checkbox"]').prop('checked', false);
+            
             // Reset spotlight image
             $('#spotlightImageUrl').val('');
             $('#spotlightImagePreview').hide();
             $('#spotlightImageContainer').hide();
+            
+            // Re-enable selection mode toggle
+            $('input[name="tourSelectionMode"]').prop('disabled', false);
+            
+            // Reset to auto mode
+            $('#autoMode').prop('checked', true);
+            $('#autoModeCategory').show();
+            $('#manualModeCategories').hide();
+            $('#manualTourSelectionPanel').hide();
+            
+            // Clear all selections
+            selectedTours = [];
+            selectedCategoryIds = [];
+            availableTours = [];
+            
+            // Clear containers
+            $('#availableToursContainer').html('<div class="text-center text-muted">Select categories first</div>');
+            $('#selectedToursContainer').html('<div class="text-center text-muted p-4"><i class="ti ti-inbox fs-1"></i><p class="mt-2 mb-0">No tours selected</p></div>');
+            $('#selectedCategoriesList').empty();
+            $('#selectedToursCount').text('0');
         });
 
         // Save section
@@ -1321,13 +1723,34 @@
                 return;
             }
 
-            // Use categoryId from hidden input if editing, otherwise use categorySelect
-            const editCategoryId = $('#categoryId').val();
-            const categoryId = editCategoryId || $('#categorySelect').val();
+            const sectionId = $('#sectionId').val();
+            const isEditMode = !!sectionId;
+            const selectionMode = $('input[name="tourSelectionMode"]:checked').val();
             
-            if (!categoryId) {
-                showToast('Please select a category', 'danger');
+            // Validate section name
+            const sectionName = $('#sectionName').val().trim();
+            if (!sectionName) {
+                showToast('Please enter section name', 'danger');
                 return;
+            }
+            
+            // Validate category selection based on mode
+            let primaryCategoryId = null;
+            let categoryIds = null;
+            
+            if (selectionMode === 'auto') {
+                primaryCategoryId = $('#categorySelect').val();
+                if (!primaryCategoryId) {
+                    showToast('Please select a category for auto mode', 'danger');
+                    return;
+                }
+            } else {
+                // Manual mode
+                if (selectedCategoryIds.length === 0) {
+                    showToast('Please select at least one category for manual mode', 'danger');
+                    return;
+                }
+                categoryIds = selectedCategoryIds;
             }
             
             // Validate spotlight image if spotlight layout
@@ -1339,7 +1762,18 @@
                 return;
             }
             
+            // Check if in manual mode and has selected tours
+            let selectedTourIds = null;
+            if (selectionMode === 'manual') {
+                if (selectedTours.length === 0) {
+                    showToast('Please select at least one tour in manual mode', 'danger');
+                    return;
+                }
+                selectedTourIds = selectedTours.map(st => st.id);
+            }
+            
             const sectionData = {
+                sectionName: sectionName,
                 homepageTitle: $('#sectionTitle').val(),
                 layoutStyle: layoutStyle,
                 maxItems: parseInt($('#maxItems').val()),
@@ -1347,13 +1781,17 @@
                 isActive: $('#isActive').val() === 'true',
                 badgeText: $('#badgeText').val() || null,
                 customClass: $('#customClass').val() || null,
-                spotlightImageUrl: spotlightImageUrl || null
+                spotlightImageUrl: spotlightImageUrl || null,
+                selectionMode: selectionMode,
+                primaryCategoryId: primaryCategoryId,
+                categoryIds: categoryIds,
+                selectedTourIds: selectedTourIds
             };
 
-            // Call API
+            // Call new API
             $.ajax({
-                url: `/api/HomePage/category/${categoryId}/homepage`,
-                type: 'PUT',
+                url: isEditMode ? `/api/HomePage/sections/${sectionId}` : '/api/HomePage/sections',
+                type: isEditMode ? 'PUT' : 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(sectionData),
                 success: function(response) {
@@ -1383,8 +1821,7 @@
             // Populate modal with section data
             $('#addSectionModalLabel').text('Edit Homepage Section');
             $('#sectionId').val(section.id);
-            $('#categoryId').val(section.categoryId);
-            $('#categorySelect').val(section.categoryId);
+            $('#sectionName').val(section.sectionName);
             $('#sectionTitle').val(section.sectionTitle);
             $('#layoutStyle').val(section.layoutStyle);
             $('#maxItems').val(section.maxItems);
@@ -1407,21 +1844,88 @@
                 $('#spotlightImageContainer').hide();
             }
 
-            // Disable category tree when editing (can't change category)
-            $('#categoryTree').css('opacity', '0.5');
-            $('#categoryTree').css('pointer-events', 'none');
+            // Set selection mode (DISABLE when editing - cannot change)
+            const selectionMode = section.selectionMode || 'auto';
+            if (selectionMode === 'manual') {
+                $('#manualMode').prop('checked', true);
+                $('#autoMode').prop('checked', false);
+                
+                // Show manual mode UI
+                $('#autoModeCategory').hide();
+                $('#manualModeCategories').show();
+                $('#manualTourSelectionPanel').show();
+                
+                // Load categories and pre-select
+                loadCategoriesForMultiSelect();
+                
+                // Set selected categories
+                selectedCategoryIds = section.categoryIds || [];
+                
+                setTimeout(() => {
+                    // Check the selected categories
+                    selectedCategoryIds.forEach(catId => {
+                        $(`#categoryTreeMulti input[data-category-id="${catId}"]`).prop('checked', true);
+                    });
+                    renderSelectedCategories();
+                    
+                    // Load tours from selected categories
+                    if (selectedCategoryIds.length > 0) {
+                        loadToursFromMultipleCategories(selectedCategoryIds);
+                    }
+                    
+                    // Load already selected tours for this section
+                    loadSelectedToursForSection(section.id, selectionMode);
+                }, 500);
+                
+            } else {
+                $('#autoMode').prop('checked', true);
+                $('#manualMode').prop('checked', false);
+                
+                // Show auto mode UI
+                $('#autoModeCategory').show();
+                $('#manualModeCategories').hide();
+                $('#manualTourSelectionPanel').hide();
+                
+                // Set primary category
+                $('#categorySelect').val(section.primaryCategoryId);
+                
+                // Highlight selected category in tree
+                setTimeout(() => {
+                    $('#categoryTree .category-item-row').removeClass('bg-primary text-white');
+                    $(`#categoryTree .category-tree-item[data-category-id="${section.primaryCategoryId}"] .category-item-row`).addClass('bg-primary text-white');
+                }, 100);
+            }
             
-            // Update helper text to show category cannot be changed
-            $('#categoryTree').next('small').text('Category cannot be changed when editing');
-
-            // Highlight selected category in tree
-            $('.category-item-row').removeClass('bg-primary text-white');
-            setTimeout(() => {
-                $(`.category-tree-item[data-category-id="${section.categoryId}"] .category-item-row`).addClass('bg-primary text-white');
-            }, 100);
+            // DISABLE selection mode toggle when editing (cannot change mode)
+            $('input[name="tourSelectionMode"]').prop('disabled', true);
 
             $('#addSectionModal').modal('show');
         };
+
+        // Load selected tours for editing section
+        function loadSelectedToursForSection(sectionId, selectionMode) {
+            selectedTours = []; // Reset
+            
+            // Only load for manual mode
+            if (selectionMode !== 'manual') {
+                return;
+            }
+            
+            // Load selected tours from new API
+            $.ajax({
+                url: `/api/HomePage/sections/${sectionId}/tours`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        selectedTours = response.data;
+                        renderSelectedTours();
+                    }
+                },
+                error: function() {
+                    console.error('Error loading selected tours');
+                }
+            });
+        }
 
         window.previewSection = function(id) {
             const section = allSections.find(s => s.id === id);
@@ -1434,28 +1938,28 @@
             $('#sectionPreview').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
             $('#previewSectionModal').modal('show');
 
-            // Load real tours from API
+            // Use new preview API
             $.ajax({
-                url: `/api/Tour/by-category/${section.categoryId}`,
+                url: `/api/HomePage/sections/${section.id}/preview`,
                 type: 'GET',
-                data: { maxItems: section.maxItems },
                 success: function(response) {
                     if (response.success && response.data) {
-                        const previewHtml = generatePreviewHtml(section, response.data);
+                        const previewData = response.data;
+                        const previewHtml = generatePreviewHtml(previewData);
                         $('#sectionPreview').html(previewHtml);
                     } else {
-                        $('#sectionPreview').html('<div class="alert alert-warning">No tours found for this category.</div>');
+                        $('#sectionPreview').html('<div class="alert alert-warning">No tours found for this section.</div>');
                     }
                 },
                 error: function() {
-                    $('#sectionPreview').html('<div class="alert alert-danger">Error loading tours. Please try again.</div>');
+                    $('#sectionPreview').html('<div class="alert alert-danger">Error loading section preview. Please try again.</div>');
                 }
             });
         };
 
         window.moveSectionUp = function(id) {
             const section = allSections.find(s => s.id === id);
-            if (!section || section.displayOrder <= 1) {
+            if (!section || section.displayOrder <= 0) {
                 showToast('Cannot move up further', 'warning');
                 return;
             }
@@ -1469,8 +1973,8 @@
                 
                 // Call API to persist changes
                 const reorderData = [
-                    { categoryId: section.categoryId, displayOrder: section.displayOrder },
-                    { categoryId: prevSection.categoryId, displayOrder: prevSection.displayOrder }
+                    { sectionId: section.id, displayOrder: section.displayOrder },
+                    { sectionId: prevSection.id, displayOrder: prevSection.displayOrder }
                 ];
                 
                 $.ajax({
@@ -1484,12 +1988,12 @@
                             loadHomepageSections();
                         } else {
                             showToast(response.message || 'Failed to move section', 'danger');
-                            loadHomepageSections(); // Reload to restore original order
+                            loadHomepageSections();
                         }
                     },
                     error: function(xhr) {
                         showToast(xhr.responseJSON?.message || 'Failed to move section', 'danger');
-                        loadHomepageSections(); // Reload to restore original order
+                        loadHomepageSections();
                     }
                 });
             }
@@ -1513,8 +2017,8 @@
                 
                 // Call API to persist changes
                 const reorderData = [
-                    { categoryId: section.categoryId, displayOrder: section.displayOrder },
-                    { categoryId: nextSection.categoryId, displayOrder: nextSection.displayOrder }
+                    { sectionId: section.id, displayOrder: section.displayOrder },
+                    { sectionId: nextSection.id, displayOrder: nextSection.displayOrder }
                 ];
                 
                 $.ajax({
@@ -1528,12 +2032,12 @@
                             loadHomepageSections();
                         } else {
                             showToast(response.message || 'Failed to move section', 'danger');
-                            loadHomepageSections(); // Reload to restore original order
+                            loadHomepageSections();
                         }
                     },
                     error: function(xhr) {
                         showToast(xhr.responseJSON?.message || 'Failed to move section', 'danger');
-                        loadHomepageSections(); // Reload to restore original order
+                        loadHomepageSections();
                     }
                 });
             }
@@ -1546,16 +2050,21 @@
                 return;
             }
 
+            const categoryInfo = section.selectionMode === 'auto' 
+                ? section.primaryCategoryName 
+                : section.categoryNames.join(', ');
+
             $('#deleteSectionInfo').html(
                 `<strong>Section:</strong> "${section.sectionTitle}"<br>` +
-                `<strong>Category:</strong> ${section.categoryName}<br>` +
+                `<strong>Mode:</strong> ${section.selectionMode}<br>` +
+                `<strong>Categories:</strong> ${categoryInfo}<br>` +
                 `<strong>Order:</strong> ${section.displayOrder}`
             );
 
             $('#confirmDeleteBtn').off('click').on('click', function() {
-                // Call API to delete
+                // Call new API to delete
                 $.ajax({
-                    url: `/api/HomePage/category/${section.categoryId}/homepage`,
+                    url: `/api/HomePage/sections/${section.id}`,
                     type: 'DELETE',
                     success: function(response) {
                         if (response.success) {
@@ -1577,20 +2086,25 @@
         };
 
         // Generate preview HTML
-        function generatePreviewHtml(section, tours) {
+        function generatePreviewHtml(previewData) {
             let html = `
                 <div class="mb-3">
-                    <h4>${section.sectionTitle}</h4>
-                    ${section.badgeText ? `<span class="badge bg-primary mb-2">${section.badgeText}</span>` : ''}
+                    <h4>${previewData.homepageTitle}</h4>
+                    <div class="mb-2">
+                        <span class="badge ${previewData.selectionMode === 'auto' ? 'bg-info' : 'bg-warning'}">${previewData.selectionMode === 'auto' ? 'Auto Mode' : 'Manual Mode'}</span>
+                        <span class="badge bg-secondary">${previewData.layoutStyle}</span>
+                    </div>
                 </div>
             `;
 
+            const tours = previewData.tours || [];
+
             if (tours.length === 0) {
-                html += '<div class="alert alert-info">No tours available in this category.</div>';
+                html += '<div class="alert alert-info">No tours available in this section.</div>';
                 return html;
             }
 
-            if (section.layoutStyle === 'spotlight') {
+            if (previewData.layoutStyle === 'spotlight') {
                 html += '<div class="row g-3">';
                 tours.forEach(tour => {
                     // Get image: use bannerImageUrl first, then first image from Images array
@@ -1610,7 +2124,7 @@
                     `;
                 });
                 html += '</div>';
-            } else if (section.layoutStyle === 'grid-3') {
+            } else if (previewData.layoutStyle === 'grid-3') {
                 html += '<div class="row g-3">';
                 tours.forEach(tour => {
                     // Get image: use bannerImageUrl first, then first image from Images array

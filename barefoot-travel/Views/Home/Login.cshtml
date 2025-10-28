@@ -75,7 +75,7 @@ $(document).ready(function() {
                 success: function(response) {
                     if (response.success) {
                         // User is already logged in, redirect to admin dashboard
-                        window.location.href = '/tour-manager';
+                        window.location.href = '/tour-management';
                     } else {
                         // Token is invalid, remove it
                         localStorage.removeItem('jwt_token');
@@ -125,7 +125,7 @@ $(document).ready(function() {
                     
                     // Redirect to tour manager after short delay
                     setTimeout(function() {
-                        window.location.href = '/tour-manager';
+                        window.location.href = '/tour-management';
                     }, 1500);
                 } else {
                     showAlert('Login failed: ' + (response.message || 'Invalid credentials'), 'danger');

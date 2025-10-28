@@ -1,14 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace barefoot_travel.Controllers
 {
-    [Route("tour-management")]
-    public class TourManagerController : Controller
+    [Authorize]
+    public class ProfileController : Controller
     {
+        public ProfileController()
+        {
+        }
+
         public IActionResult Index()
         {
-            ViewData["Title"] = "Tour Management";
             return View();
         }
     }
 }
+

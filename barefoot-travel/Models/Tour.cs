@@ -31,5 +31,11 @@ public partial class Tour
 
     public bool Active { get; set; }
 
+    public string Status { get; set; } = null!;
+
     public virtual ICollection<HomePageFeaturedTour> HomePageFeaturedTours { get; set; } = new List<HomePageFeaturedTour>();
+
+    public virtual ICollection<HomePageSectionTour> HomePageSectionTours { get; set; } = new List<HomePageSectionTour>();
+
+    public virtual ICollection<HomePageSelectedTour> HomePageSelectedTours { get; set; } = new List<HomePageSelectedTour>();
 }

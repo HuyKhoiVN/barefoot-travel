@@ -60,6 +60,17 @@ namespace barefoot_travel.Repositories
 
         // Homepage methods
         Task<List<HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems);
+        Task<List<HomepageTourDto>> GetToursByIdsAsync(List<int> tourIds, int maxItems);
         Task<int> GetTourCountByCategoryAsync(int categoryId);
+
+        // Tour Status Approval Methods
+        Task<bool> ChangeStatusAsync(int tourId, string newStatus, string updatedBy, string? reason = null);
+        Task<PagedResult<TourWithStatusDto>> GetToursPagedByStatusAsync(string? status, int page, int pageSize, string? sortBy = null, string? sortOrder = "asc");
+        Task<List<TourStatusHistoryDto>> GetStatusHistoryAsync(int tourId);
+        Task<BatchOperationResultDto> BatchChangeStatusAsync(List<int> tourIds, string newStatus, string updatedBy, string? reason = null);
+        Task<BatchOperationResultDto> BatchDeleteAsync(List<int> tourIds, string updatedBy);
+        Task<bool> CanDeleteAsync(int tourId);
+        Task<string?> GetCurrentStatusAsync(int tourId);
+        Task<bool> SoftDeleteAsync(int tourId, string updatedBy);
     }
 }

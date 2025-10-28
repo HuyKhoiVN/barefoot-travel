@@ -1,0 +1,368 @@
+/* Tour Approval Custom Styles */
+/* Modern design with Roboto/Inter font, rounded corners, shadows */
+
+.tour-row {
+    transition: all 0.2s ease;
+    cursor: grab;
+}
+
+.tour-row:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tour-row.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.tour-card {
+    transition: all 0.3s ease;
+    cursor: grab;
+    border-radius: 12px;
+}
+
+.tour-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+
+.tour-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.workflow-zone {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.workflow-zone.drag-over {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.workflow-zone.drag-over .drop-indicator {
+    display: block !important;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.drop-indicator {
+    font-weight: bold;
+    color: inherit;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+}
+
+.nav-pills .nav-link {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #5a6a85;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #f5f5f9;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #5d87ff;
+    color: white;
+}
+
+.nav-pills .badge {
+    margin-left: 0.5rem;
+}
+
+.btn-light-primary {
+    color: #5d87ff;
+    background-color: rgba(93, 135, 255, 0.1);
+    border: 1px solid transparent;
+}
+
+.btn-light-primary:hover {
+    background-color: rgba(93, 135, 255, 0.2);
+    color: #5d87ff;
+}
+
+.btn-light-info {
+    color: #539bff;
+    background-color: rgba(83, 155, 255, 0.1);
+    border: 1px solid transparent;
+}
+
+.btn-light-info:hover {
+    background-color: rgba(83, 155, 255, 0.2);
+    color: #539bff;
+}
+
+.btn-light-danger {
+    color: #fa896b;
+    background-color: rgba(250, 137, 107, 0.1);
+    border: 1px solid transparent;
+}
+
+.btn-light-danger:hover {
+    background-color: rgba(250, 137, 107, 0.2);
+    color: #fa896b;
+}
+
+/* Checkbox styling */
+.form-check-input:checked {
+    background-color: #5d87ff;
+    border-color: #5d87ff;
+}
+
+.form-check-input:focus {
+    border-color: #5d87ff;
+    box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+/* Status badge colors - matching backend constants */
+.bg-draft {
+    background-color: #9e9e9e !important;
+}
+
+.bg-public {
+    background-color: #13deb9 !important;
+}
+
+.bg-hide {
+    background-color: #ffae1f !important;
+}
+
+.bg-cancelled {
+    background-color: #fa896b !important;
+}
+
+/* Card styling */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+/* Table styling */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table thead th {
+    font-weight: 600;
+    color: #2a3547;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* Workflow container responsive */
+.workflow-container {
+    gap: 0.5rem;
+}
+
+@media (max-width: 992px) {
+    .workflow-container {
+        flex-direction: column !important;
+    }
+    
+    .workflow-zone {
+        margin: 0.5rem 0 !important;
+    }
+}
+
+/* Loading indicator */
+#loadingIndicator {
+    padding: 2rem;
+}
+
+/* Empty state */
+#emptyState {
+    padding: 3rem 1rem;
+}
+
+#emptyState i {
+    font-size: 4rem;
+    color: #ccc;
+}
+
+/* Batch actions */
+#batchActionsSection {
+    background-color: #f5f5f9;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+#batchActionsSection .alert {
+    margin-bottom: 0;
+    padding: 0.5rem 1rem;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-link {
+    color: #5d87ff;
+    border-color: #e0e0e0;
+}
+
+.pagination .page-link:hover {
+    background-color: #f5f5f9;
+    color: #5d87ff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #5d87ff;
+    border-color: #5d87ff;
+}
+
+/* Modal styling */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 1rem 1.5rem;
+}
+
+/* Timeline in status history */
+.timeline {
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background-color: #2a3547;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #2a3547;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: #2a3547;
+}
+
+/* Button groups */
+.btn-group .btn {
+    border-radius: 8px;
+}
+
+.btn-group .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.btn-group .btn:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Search input */
+#searchInput {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 1rem;
+}
+
+#searchInput:focus {
+    border-color: #5d87ff;
+    box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .workflow-zone {
+        min-width: 100% !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-group, #searchInput {
+        width: 100%;
+    }
+    
+    #batchActionsSection .d-flex {
+        flex-direction: column;
+    }
+    
+    #batchActionsSection .btn {
+        width: 100%;
+    }
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+/* Focus states */
+button:focus,
+input:focus,
+select:focus {
+    outline: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+

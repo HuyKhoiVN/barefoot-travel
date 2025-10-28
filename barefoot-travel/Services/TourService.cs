@@ -663,6 +663,138 @@ namespace barefoot_travel.Services
 
         #endregion
 
+        #region Tour Status Approval Operations
+
+        public async Task<ApiResponse> ChangeStatusAsync(int tourId, string newStatus, string updatedBy, string? reason = null)
+        {
+            try
+            {
+                // Validate status
+                if (!TourStatusConstant.IsValidStatus(newStatus))
+                {
+                    return new ApiResponse(false, "Invalid status value");
+                }
+                
+                // Get current status
+                var currentStatus = await _tourRepository.GetCurrentStatusAsync(tourId);
+                if (currentStatus == null)
+                {
+                    return new ApiResponse(false, "Tour not found");
+                }
+                
+                // Check if transition is allowed
+                if (!TourStatusConstant.CanTransitionTo(currentStatus, newStatus))
+                {
+                    return new ApiResponse(false, $"Cannot transition from {TourStatusConstant.GetStatusDisplayName(currentStatus)} to {TourStatusConstant.GetStatusDisplayName(newStatus)}");
+                }
+                
+                var result = await _tourRepository.ChangeStatusAsync(tourId, newStatus, updatedBy, reason);
+                
+                if (!result)
+                {
+                    return new ApiResponse(false, "Failed to change tour status");
+                }
+                
+                return new ApiResponse(true, "Tour status changed successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"An error occurred while changing tour status: {ex.Message}");
+            }
+        }
+
+        public async Task<PagedResult<TourWithStatusDto>> GetToursPagedByStatusAsync(
+            string? status, 
+            int page, 
+            int pageSize, 
+            string? sortBy = null, 
+            string? sortOrder = "asc")
+        {
+            return await _tourRepository.GetToursPagedByStatusAsync(status, page, pageSize, sortBy, sortOrder);
+        }
+
+        public async Task<ApiResponse> GetStatusHistoryAsync(int tourId)
+        {
+            try
+            {
+                var history = await _tourRepository.GetStatusHistoryAsync(tourId);
+                return new ApiResponse(true, "Status history retrieved successfully", history);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"An error occurred while getting status history: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> BatchChangeStatusAsync(
+            List<int> tourIds, 
+            string newStatus, 
+            string updatedBy, 
+            string? reason = null)
+        {
+            try
+            {
+                if (tourIds == null || !tourIds.Any())
+                {
+                    return new ApiResponse(false, "No tours selected");
+                }
+                
+                if (!TourStatusConstant.IsValidStatus(newStatus))
+                {
+                    return new ApiResponse(false, "Invalid status value");
+                }
+                
+                var result = await _tourRepository.BatchChangeStatusAsync(tourIds, newStatus, updatedBy, reason);
+                
+                if (result.SuccessCount == 0)
+                {
+                    return new ApiResponse(false, "Failed to change status for all tours", result);
+                }
+                
+                if (result.FailCount > 0)
+                {
+                    return new ApiResponse(true, $"Status changed for {result.SuccessCount} tours, {result.FailCount} failed", result);
+                }
+                
+                return new ApiResponse(true, $"Status changed successfully for {result.SuccessCount} tours", result);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"An error occurred during batch status change: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> BatchDeleteToursAsync(List<int> tourIds, string updatedBy)
+        {
+            try
+            {
+                if (tourIds == null || !tourIds.Any())
+                {
+                    return new ApiResponse(false, "No tours selected");
+                }
+                
+                var result = await _tourRepository.BatchDeleteAsync(tourIds, updatedBy);
+                
+                if (result.SuccessCount == 0)
+                {
+                    return new ApiResponse(false, "Failed to delete all tours", result);
+                }
+                
+                if (result.FailCount > 0)
+                {
+                    return new ApiResponse(true, $"Deleted {result.SuccessCount} tours, {result.FailCount} failed", result);
+                }
+                
+                return new ApiResponse(true, $"Successfully deleted {result.SuccessCount} tours", result);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"An error occurred during batch delete: {ex.Message}");
+            }
+        }
+
+        #endregion
+
         #region Private Helper Methods
 
         private async Task CreateTourRelatedDataAsync(int tourId, CreateTourDto dto, string adminUsername)

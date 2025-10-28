@@ -50,4 +50,10 @@ public partial class Category
     public bool? ShowInDailyTours { get; set; }
 
     public string? DailyTourCardClass { get; set; }
+
+    public virtual ICollection<HomePageSectionCategory> HomePageSectionCategories { get; set; } = new List<HomePageSectionCategory>();
+
+    public virtual ICollection<HomePageSection> HomePageSections { get; set; } = new List<HomePageSection>();
+
+    public virtual ICollection<HomePageSelectedTour> HomePageSelectedTours { get; set; } = new List<HomePageSelectedTour>();
 }

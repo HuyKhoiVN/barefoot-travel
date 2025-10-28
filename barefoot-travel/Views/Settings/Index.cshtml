@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">System Settings</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="@Url.Action("Index", "Admin")">Home</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">Settings</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="text-center mb-n5">
+                        <img src="~/assets/images/breadcrumb/ChatBc.png" alt="" class="img-fluid mb-n4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <i class="ti ti-settings fs-6"></i>
+                        <h5 class="mb-0">System Configuration</h5>
+                    </div>
+                    <div class="text-center py-5">
+                        <i class="ti ti-settings-cog fs-10 text-muted"></i>
+                        <h4 class="mt-3 text-muted">System Settings</h4>
+                        <p class="text-muted">This page will contain system configuration options.</p>
+                        <p class="text-muted fst-italic">Coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Settings page scripts will go here
+    </script>
+}
+

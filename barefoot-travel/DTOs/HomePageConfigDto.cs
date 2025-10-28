@@ -23,6 +23,8 @@ namespace barefoot_travel.DTOs
         public string? CustomClass { get; set; }
         [JsonPropertyName("spotlightImageUrl")]
         public string? SpotlightImageUrl { get; set; }
+        [JsonPropertyName("selectionMode")]
+        public string? SelectionMode { get; set; }
     }
 
     public class ConfigureHomepageDto
@@ -35,6 +37,8 @@ namespace barefoot_travel.DTOs
         public string? BadgeText { get; set; }
         public string? CustomClass { get; set; }
         public string? SpotlightImageUrl { get; set; }
+        public List<int> SelectedTourIds { get; set; } = new();
+        public string? SelectionMode { get; set; }
     }
 
     public class HomepageSectionDto

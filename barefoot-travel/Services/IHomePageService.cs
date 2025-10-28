@@ -8,11 +8,12 @@ namespace barefoot_travel.Services
         Task<HomepageDataDto> GetHomepageSectionsAsync();
         Task ConfigureCategoryHomepageAsync(int categoryId, ConfigureHomepageDto dto, string userId);
         Task RemoveCategoryFromHomepageAsync(int categoryId, string userId);
-        Task ReorderSectionsAsync(List<ReorderSectionDto> sections, string userId);
+        Task ReorderSectionsAsync(List<DTOs.Category.ReorderSectionDto> sections, string userId);
         Task<object> GetCategoryHomepageConfigAsync(int categoryId);
+        Task<List<HomepageTourDto>> GetSelectedToursAsync(int categoryId);
         Task<WaysToTravelConfigDto> GetWaysToTravelCategoriesAsync();
         Task ConfigureCategoryForWaysToTravelAsync(int categoryId, ConfigureWaysToTravelDto dto, string userId);
         Task RemoveCategoryFromWaysToTravelAsync(int categoryId, string userId);
-        Task ReorderWaysToTravelCategoriesAsync(List<ReorderSectionDto> orders, string userId);
+        Task ReorderWaysToTravelCategoriesAsync(List<DTOs.Category.ReorderSectionDto> orders, string userId);
     }
 }

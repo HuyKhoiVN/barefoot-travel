@@ -139,6 +139,10 @@ builder.Services.AddScoped<barefoot_travel.Repositories.IBookingRepository, bare
 builder.Services.AddScoped<barefoot_travel.Repositories.IBookingStatusRepository, barefoot_travel.Repositories.BookingStatusRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IPriceTypeRepository, barefoot_travel.Repositories.PriceTypeRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageFeaturedTourRepository, barefoot_travel.Repositories.HomePageFeaturedTourRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSelectedTourRepository, barefoot_travel.Repositories.HomePageSelectedTourRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionRepository, barefoot_travel.Repositories.HomePageSectionRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionCategoryRepository, barefoot_travel.Repositories.HomePageSectionCategoryRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionTourRepository, barefoot_travel.Repositories.HomePageSectionTourRepository>();
 
 // Service Registration
 builder.Services.AddScoped<barefoot_travel.Services.IAuthService, barefoot_travel.Services.AuthService>();
@@ -152,6 +156,7 @@ builder.Services.AddScoped<barefoot_travel.Services.IBookingStatusService, baref
 builder.Services.AddScoped<barefoot_travel.Services.IPriceTypeService, barefoot_travel.Services.PriceTypeService>();
 builder.Services.AddScoped<barefoot_travel.Services.IFileUploadService, barefoot_travel.Services.FileUploadService>();
 builder.Services.AddScoped<barefoot_travel.Services.IHomePageService, barefoot_travel.Services.HomePageService>();
+builder.Services.AddScoped<barefoot_travel.Services.IHomePageSectionService, barefoot_travel.Services.HomePageSectionService>();
 builder.Services.AddScoped<barefoot_travel.Services.IFeaturedDailyToursService, barefoot_travel.Services.FeaturedDailyToursService>();
 
 // HTML Sanitizer for XSS protection

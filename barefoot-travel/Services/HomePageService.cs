@@ -3,6 +3,7 @@ using barefoot_travel.DTOs.Category;
 using barefoot_travel.Models;
 using barefoot_travel.Repositories;
 using System.Text.Json;
+using HomePageSelectedTour = barefoot_travel.Models.HomePageSelectedTour;
 
 namespace barefoot_travel.Services
 {
@@ -10,15 +11,18 @@ namespace barefoot_travel.Services
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITourRepository _tourRepository;
+        private readonly IHomePageSelectedTourRepository _selectedTourRepository;
         private readonly ILogger<HomePageService> _logger;
 
         public HomePageService(
             ICategoryRepository categoryRepository,
             ITourRepository tourRepository,
+            IHomePageSelectedTourRepository selectedTourRepository,
             ILogger<HomePageService> logger)
         {
             _categoryRepository = categoryRepository;
             _tourRepository = tourRepository;
+            _selectedTourRepository = selectedTourRepository;
             _logger = logger;
         }
 
@@ -35,8 +39,21 @@ namespace barefoot_travel.Services
                 // Business logic: Validate spotlight constraint
                 ValidateSpotlightConfig(config, category.Id);
 
-                // Get tours for this category
-                var tours = await _tourRepository.GetToursByCategoryForHomepageAsync(category.Id, config.MaxItems);
+                // Check for manually selected tours
+                var selectedTours = await _selectedTourRepository.GetByCategoryIdAsync(category.Id);
+                List<HomepageTourDto> tours;
+
+                if (selectedTours != null && selectedTours.Any())
+                {
+                    // Use manually selected tours
+                    var tourIds = selectedTours.OrderBy(st => st.DisplayOrder).Select(st => st.TourId).ToList();
+                    tours = await _tourRepository.GetToursByIdsAsync(tourIds, config.MaxItems);
+                }
+                else
+                {
+                    // Use category's natural tour list
+                    tours = await _tourRepository.GetToursByCategoryForHomepageAsync(category.Id, config.MaxItems);
+                }
 
                 sections.Add(new HomepageSectionDto
                 {
@@ -73,7 +90,8 @@ namespace barefoot_travel.Services
                 BadgeText = dto.BadgeText,
                 CustomClass = dto.CustomClass,
                 DisplayOrder = dto.DisplayOrder,
-                SpotlightImageUrl = dto.SpotlightImageUrl
+                SpotlightImageUrl = dto.SpotlightImageUrl,
+                SelectionMode = dto.SelectionMode ?? "auto"
             };
 
             var configJson = JsonSerializer.Serialize(config);
@@ -82,6 +100,12 @@ namespace barefoot_travel.Services
             UpdateCategoryForHomepage(category, dto.HomepageTitle, configJson, dto.DisplayOrder, userId);
 
             await _categoryRepository.UpdateAsync(category);
+            
+            // Handle manually selected tours if provided
+            if (dto.SelectedTourIds != null && dto.SelectedTourIds.Any())
+            {
+                await SaveSelectedToursAsync(categoryId, dto.SelectedTourIds, userId);
+            }
         }
 
         public async Task RemoveCategoryFromHomepageAsync(int categoryId, string userId)
@@ -99,7 +123,7 @@ namespace barefoot_travel.Services
             await _categoryRepository.UpdateAsync(category);
         }
 
-        public async Task ReorderSectionsAsync(List<ReorderSectionDto> sections, string userId)
+        public async Task ReorderSectionsAsync(List<DTOs.Category.ReorderSectionDto> sections, string userId)
         {
             foreach (var section in sections)
             {
@@ -130,6 +154,17 @@ namespace barefoot_travel.Services
                 HomepageOrder = category.HomepageOrder,
                 Config = config
             };
+        }
+
+        public async Task<List<HomepageTourDto>> GetSelectedToursAsync(int categoryId)
+        {
+            var selectedTours = await _selectedTourRepository.GetByCategoryIdAsync(categoryId);
+            if (selectedTours == null || !selectedTours.Any())
+                return new List<HomepageTourDto>();
+
+            var tourIds = selectedTours.OrderBy(st => st.DisplayOrder).Select(st => st.TourId).ToList();
+            var tours = await _tourRepository.GetToursByIdsAsync(tourIds, tourIds.Count);
+            return tours;
         }
 
         public async Task<WaysToTravelConfigDto> GetWaysToTravelCategoriesAsync()
@@ -194,7 +229,7 @@ namespace barefoot_travel.Services
             await _categoryRepository.UpdateAsync(category);
         }
 
-        public async Task ReorderWaysToTravelCategoriesAsync(List<ReorderSectionDto> orders, string userId)
+        public async Task ReorderWaysToTravelCategoriesAsync(List<DTOs.Category.ReorderSectionDto> orders, string userId)
         {
             foreach (var order in orders)
             {
@@ -281,6 +316,30 @@ namespace barefoot_travel.Services
             category.ShowInWaysToTravel = dto.ShowInWaysToTravel;
             category.UpdatedTime = DateTime.UtcNow;
             category.UpdatedBy = userId;
+        }
+
+        private async Task SaveSelectedToursAsync(int categoryId, List<int> tourIds, string userId)
+        {
+            // Delete existing selected tours for this category
+            await _selectedTourRepository.DeleteByCategoryIdAsync(categoryId);
+
+            // Create new selected tours
+            var now = DateTime.UtcNow;
+            var entities = tourIds.Select((tourId, index) => new HomePageSelectedTour
+            {
+                CategoryId = categoryId,
+                TourId = tourId,
+                DisplayOrder = index,
+                CreatedTime = now,
+                UpdatedTime = now,
+                UpdatedBy = userId,
+                Active = true
+            }).ToList();
+
+            await _selectedTourRepository.CreateRangeAsync(entities);
+            
+            _logger.LogInformation("Saved {Count} selected tours for category {CategoryId}", 
+                tourIds.Count, categoryId);
         }
 
         #endregion

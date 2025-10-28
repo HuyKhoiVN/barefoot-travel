@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-
 namespace barefoot_travel.Models;
 
 public partial class SysDbContext : DbContext
@@ -28,6 +27,14 @@ public partial class SysDbContext : DbContext
 
     public virtual DbSet<HomePageFeaturedTour> HomePageFeaturedTours { get; set; }
 
+    public virtual DbSet<HomePageSection> HomePageSections { get; set; }
+
+    public virtual DbSet<HomePageSectionCategory> HomePageSectionCategories { get; set; }
+
+    public virtual DbSet<HomePageSectionTour> HomePageSectionTours { get; set; }
+
+    public virtual DbSet<HomePageSelectedTour> HomePageSelectedTours { get; set; }
+
     public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<Policy> Policies { get; set; }
@@ -47,6 +54,8 @@ public partial class SysDbContext : DbContext
     public virtual DbSet<TourPolicy> TourPolicies { get; set; }
 
     public virtual DbSet<TourPrice> TourPrices { get; set; }
+
+    public virtual DbSet<TourStatusHistory> TourStatusHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -208,6 +217,124 @@ public partial class SysDbContext : DbContext
                 .HasConstraintName("FK_FeaturedTour_Tour");
         });
 
+        modelBuilder.Entity<HomePageSection>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HomePage__3214EC07CCA10FE2");
+
+            entity.ToTable("HomePageSection");
+
+            entity.HasIndex(e => e.DisplayOrder, "IX_HomePageSection_DisplayOrder");
+
+            entity.HasIndex(e => e.IsActive, "IX_HomePageSection_IsActive");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.BadgeText).HasMaxLength(100);
+            entity.Property(e => e.CreatedTime)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.CustomClass).HasMaxLength(255);
+            entity.Property(e => e.HomepageTitle).HasMaxLength(255);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.LayoutStyle)
+                .HasMaxLength(50)
+                .HasDefaultValue("grid");
+            entity.Property(e => e.MaxItems).HasDefaultValue(8);
+            entity.Property(e => e.SectionName).HasMaxLength(255);
+            entity.Property(e => e.SelectionMode)
+                .HasMaxLength(20)
+                .HasDefaultValue("auto");
+            entity.Property(e => e.SpotlightImageUrl).HasMaxLength(500);
+            entity.Property(e => e.UpdatedBy).HasMaxLength(255);
+            entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+
+            entity.HasOne(d => d.PrimaryCategory).WithMany(p => p.HomePageSections)
+                .HasForeignKey(d => d.PrimaryCategoryId)
+                .HasConstraintName("FK_HomePageSection_PrimaryCategory");
+        });
+
+        modelBuilder.Entity<HomePageSectionCategory>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HomePage__3214EC07D5039116");
+
+            entity.ToTable("HomePageSectionCategory");
+
+            entity.HasIndex(e => e.CategoryId, "IX_HomePageSectionCategory_CategoryId");
+
+            entity.HasIndex(e => e.SectionId, "IX_HomePageSectionCategory_SectionId");
+
+            entity.HasIndex(e => new { e.SectionId, e.CategoryId }, "UK_HomePageSectionCategory").IsUnique();
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.HomePageSectionCategories)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HomePageSectionCategory_Category");
+
+            entity.HasOne(d => d.Section).WithMany(p => p.HomePageSectionCategories)
+                .HasForeignKey(d => d.SectionId)
+                .HasConstraintName("FK_HomePageSectionCategory_Section");
+        });
+
+        modelBuilder.Entity<HomePageSectionTour>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HomePage__3214EC073DF9A60F");
+
+            entity.ToTable("HomePageSectionTour");
+
+            entity.HasIndex(e => e.SectionId, "IX_HomePageSectionTour_SectionId");
+
+            entity.HasIndex(e => e.TourId, "IX_HomePageSectionTour_TourId");
+
+            entity.HasIndex(e => new { e.SectionId, e.TourId }, "UK_HomePageSectionTour").IsUnique();
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.CreatedTime)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedBy).HasMaxLength(255);
+            entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Section).WithMany(p => p.HomePageSectionTours)
+                .HasForeignKey(d => d.SectionId)
+                .HasConstraintName("FK_HomePageSectionTour_Section");
+
+            entity.HasOne(d => d.Tour).WithMany(p => p.HomePageSectionTours)
+                .HasForeignKey(d => d.TourId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HomePageSectionTour_Tour");
+        });
+
+        modelBuilder.Entity<HomePageSelectedTour>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HomePage__3214EC079020713A");
+
+            entity.ToTable("HomePageSelectedTour");
+
+            entity.HasIndex(e => new { e.CategoryId, e.DisplayOrder }, "IX_HomePageSelectedTour_CategoryOrder");
+
+            entity.HasIndex(e => e.TourId, "IX_HomePageSelectedTour_TourId");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.CreatedTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedBy)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.HomePageSelectedTours)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HomePageSelectedTour_Category");
+
+            entity.HasOne(d => d.Tour).WithMany(p => p.HomePageSelectedTours)
+                .HasForeignKey(d => d.TourId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HomePageSelectedTour_Tour");
+        });
+
         modelBuilder.Entity<Permission>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Permissi__3214EC0733DD13B7");
@@ -290,6 +417,10 @@ public partial class SysDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tours__3214EC075316BC9A");
 
+            entity.HasIndex(e => e.Status, "IX_Tour_Status").HasFilter("([Active]=(1))");
+
+            entity.HasIndex(e => new { e.Status, e.Active }, "IX_Tour_Status_Active");
+
             entity.Property(e => e.Active).HasDefaultValue(true);
             entity.Property(e => e.CreatedTime)
                 .HasDefaultValueSql("(getdate())")
@@ -299,6 +430,9 @@ public partial class SysDbContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(false);
             entity.Property(e => e.PricePerPerson).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("draft");
             entity.Property(e => e.Title).HasMaxLength(255);
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
@@ -360,6 +494,26 @@ public partial class SysDbContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<TourStatusHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TourStat__3214EC075485286C");
+
+            entity.ToTable("TourStatusHistory");
+
+            entity.HasIndex(e => e.ChangedTime, "IX_TourStatusHistory_ChangedTime").IsDescending();
+
+            entity.HasIndex(e => e.TourId, "IX_TourStatusHistory_TourId");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.ChangedBy).HasMaxLength(100);
+            entity.Property(e => e.ChangedTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.NewStatus).HasMaxLength(50);
+            entity.Property(e => e.OldStatus).HasMaxLength(50);
+            entity.Property(e => e.Reason).HasMaxLength(500);
         });
 
         OnModelCreatingPartial(modelBuilder);

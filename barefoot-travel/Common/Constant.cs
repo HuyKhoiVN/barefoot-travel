@@ -22,4 +22,56 @@
         public const int Cancel = 4;
         public const int Complete = 5;
     }
+
+    public static class TourStatusConstant
+    {
+        public const string Draft = "draft";
+        public const string Public = "public";
+        public const string Hide = "hide";
+        public const string Cancelled = "cancelled";
+        
+        public static string GetStatusDisplayName(string status)
+        {
+            return status switch
+            {
+                "draft" => "Draft",
+                "public" => "Public",
+                "hide" => "Hidden",
+                "cancelled" => "Cancelled",
+                _ => "Unknown"
+            };
+        }
+        
+        public static bool IsValidStatus(string status)
+        {
+            return status == Draft || status == Public || status == Hide || status == Cancelled;
+        }
+        
+        public static bool CanTransitionTo(string fromStatus, string toStatus)
+        {
+            return (fromStatus, toStatus) switch
+            {
+                ("draft", "public") => true,      // Draft -> Public
+                ("draft", "hide") => true,         // Draft -> Hide
+                ("draft", "cancelled") => true,    // Draft -> Cancelled
+                ("public", "hide") => true,        // Public -> Hide
+                ("public", "cancelled") => true,   // Public -> Cancelled
+                ("hide", "public") => true,        // Hide -> Public
+                ("hide", "cancelled") => true,     // Hide -> Cancelled
+                _ => false
+            };
+        }
+        
+        public static string GetBadgeClass(string status)
+        {
+            return status switch
+            {
+                "draft" => "bg-secondary",
+                "public" => "bg-success",
+                "hide" => "bg-warning",
+                "cancelled" => "bg-danger",
+                _ => "bg-secondary"
+            };
+        }
+    }
 }

@@ -89,6 +89,7 @@ namespace barefoot_travel.Repositories
         {
             tour.CreatedTime = DateTime.UtcNow;
             tour.Active = true;
+            tour.Status = Common.TourStatusConstant.Draft; // Set default status to draft
             await _context.Tours.AddAsync(tour);
             await _context.SaveChangesAsync();
             return tour;
@@ -126,7 +127,7 @@ namespace barefoot_travel.Repositories
         public async Task<bool> TitleExistsAsync(string title, int? excludeId = null)
         {
             var query = _context.Tours.Where(t => t.Title == title && t.Active);
-            
+
             if (excludeId.HasValue)
             {
                 query = query.Where(t => t.Id != excludeId.Value);
@@ -143,26 +144,26 @@ namespace barefoot_travel.Repositories
         {
             // Single optimized query with all joins performed on server
             var tourData = await (from t in _context.Tours
-                                 where t.Id == id && t.Active
-                                 select new
-                                 {
-                                     Tour = t,
-                                     Images = (from ti in _context.TourImages
-                                              where ti.TourId == t.Id && ti.Active
-                                              select new { ti.Id, ti.TourId, ti.ImageUrl, ti.IsBanner, ti.CreatedTime }).ToList(),
-                                     Categories = (from tc in _context.TourCategories
-                                                  join c in _context.Categories on tc.CategoryId equals c.Id
-                                                  where tc.TourId == t.Id && tc.Active && c.Active
-                                                  select new { c.Id, c.CategoryName, c.Type }).ToList(),
-                                     Prices = (from tp in _context.TourPrices
-                                              join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
-                                              where tp.TourId == t.Id && tp.Active && pt.Active
-                                              select new { tp.Id, tp.TourId, tp.PriceTypeId, pt.PriceTypeName, tp.Price, tp.CreatedTime }).ToList(),
-                                     Policies = (from tpol in _context.TourPolicies
-                                                join p in _context.Policies on tpol.PolicyId equals p.Id
-                                                where tpol.TourId == t.Id && tpol.Active && p.Active
-                                                select new { p.Id, p.PolicyType }).ToList()
-                                 }).FirstOrDefaultAsync();
+                                  where t.Id == id && t.Active
+                                  select new
+                                  {
+                                      Tour = t,
+                                      Images = (from ti in _context.TourImages
+                                                where ti.TourId == t.Id && ti.Active
+                                                select new { ti.Id, ti.TourId, ti.ImageUrl, ti.IsBanner, ti.CreatedTime }).ToList(),
+                                      Categories = (from tc in _context.TourCategories
+                                                    join c in _context.Categories on tc.CategoryId equals c.Id
+                                                    where tc.TourId == t.Id && tc.Active && c.Active
+                                                    select new { c.Id, c.CategoryName, c.Type }).ToList(),
+                                      Prices = (from tp in _context.TourPrices
+                                                join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
+                                                where tp.TourId == t.Id && tp.Active && pt.Active
+                                                select new { tp.Id, tp.TourId, tp.PriceTypeId, pt.PriceTypeName, tp.Price, tp.CreatedTime }).ToList(),
+                                      Policies = (from tpol in _context.TourPolicies
+                                                  join p in _context.Policies on tpol.PolicyId equals p.Id
+                                                  where tpol.TourId == t.Id && tpol.Active && p.Active
+                                                  select new { p.Id, p.PolicyType }).ToList()
+                                  }).FirstOrDefaultAsync();
 
             if (tourData == null) return null;
 
@@ -216,24 +217,24 @@ namespace barefoot_travel.Repositories
         public async Task<List<TourDto>> GetToursWithBasicInfoAsync()
         {
             return await (from t in _context.Tours
-                         where t.Active
-                         orderby t.Title
-                         select new TourDto
-                         {
-                             Id = t.Id,
-                             Title = t.Title,
-                             Description = t.Description,
-                             MapLink = t.MapLink,
-                             PricePerPerson = t.PricePerPerson,
-                             MaxPeople = t.MaxPeople,
-                             Duration = t.Duration,
-                             StartTime = t.StartTime,
-                             ReturnTime = t.ReturnTime,
-                             CreatedTime = t.CreatedTime,
-                             UpdatedTime = t.UpdatedTime,
-                             UpdatedBy = t.UpdatedBy,
-                             Active = t.Active
-                         }).ToListAsync();
+                          where t.Active
+                          orderby t.Title
+                          select new TourDto
+                          {
+                              Id = t.Id,
+                              Title = t.Title,
+                              Description = t.Description,
+                              MapLink = t.MapLink,
+                              PricePerPerson = t.PricePerPerson,
+                              MaxPeople = t.MaxPeople,
+                              Duration = t.Duration,
+                              StartTime = t.StartTime,
+                              ReturnTime = t.ReturnTime,
+                              CreatedTime = t.CreatedTime,
+                              UpdatedTime = t.UpdatedTime,
+                              UpdatedBy = t.UpdatedBy,
+                              Active = t.Active
+                          }).ToListAsync();
         }
 
         public async Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null)
@@ -267,14 +268,14 @@ namespace barefoot_travel.Repositories
             // Apply sorting with server-side processing
             var sortedQuery = sortBy?.ToLower() switch
             {
-                "title" => sortOrder == "desc" 
-                    ? baseQuery.OrderByDescending(t => t.Title) 
+                "title" => sortOrder == "desc"
+                    ? baseQuery.OrderByDescending(t => t.Title)
                     : baseQuery.OrderBy(t => t.Title),
-                "priceperperson" => sortOrder == "desc" 
-                    ? baseQuery.OrderByDescending(t => t.PricePerPerson) 
+                "priceperperson" => sortOrder == "desc"
+                    ? baseQuery.OrderByDescending(t => t.PricePerPerson)
                     : baseQuery.OrderBy(t => t.PricePerPerson),
-                "createdtime" => sortOrder == "desc" 
-                    ? baseQuery.OrderByDescending(t => t.CreatedTime) 
+                "createdtime" => sortOrder == "desc"
+                    ? baseQuery.OrderByDescending(t => t.CreatedTime)
                     : baseQuery.OrderBy(t => t.CreatedTime),
                 _ => baseQuery.OrderBy(t => t.Title)
             };
@@ -333,25 +334,25 @@ namespace barefoot_travel.Repositories
         {
             // Optimized query with proper join and filtering
             return await (from t in _context.Tours
-                         join tc in _context.TourCategories on t.Id equals tc.TourId
-                         where tc.CategoryId == categoryId && t.Active && tc.Active
-                         orderby t.Title
-                         select new TourDto
-                         {
-                             Id = t.Id,
-                             Title = t.Title,
-                             Description = t.Description,
-                             MapLink = t.MapLink,
-                             PricePerPerson = t.PricePerPerson,
-                             MaxPeople = t.MaxPeople,
-                             Duration = t.Duration,
-                             StartTime = t.StartTime,
-                             ReturnTime = t.ReturnTime,
-                             CreatedTime = t.CreatedTime,
-                             UpdatedTime = t.UpdatedTime,
-                             UpdatedBy = t.UpdatedBy,
-                             Active = t.Active
-                         }).ToListAsync();
+                          join tc in _context.TourCategories on t.Id equals tc.TourId
+                          where tc.CategoryId == categoryId && t.Active && tc.Active
+                          orderby t.Title
+                          select new TourDto
+                          {
+                              Id = t.Id,
+                              Title = t.Title,
+                              Description = t.Description,
+                              MapLink = t.MapLink,
+                              PricePerPerson = t.PricePerPerson,
+                              MaxPeople = t.MaxPeople,
+                              Duration = t.Duration,
+                              StartTime = t.StartTime,
+                              ReturnTime = t.ReturnTime,
+                              CreatedTime = t.CreatedTime,
+                              UpdatedTime = t.UpdatedTime,
+                              UpdatedBy = t.UpdatedBy,
+                              Active = t.Active
+                          }).ToListAsync();
         }
 
         #endregion
@@ -367,26 +368,26 @@ namespace barefoot_travel.Repositories
 
             // Single query to get all tours with related data
             var toursData = await (from t in _context.Tours
-                                  where tourIds.Contains(t.Id) && t.Active
-                                  select new
-                                  {
-                                      Tour = t,
-                                      Images = (from ti in _context.TourImages
-                                               where ti.TourId == t.Id && ti.Active
-                                               select new { ti.Id, ti.TourId, ti.ImageUrl, ti.IsBanner, ti.CreatedTime }).ToList(),
-                                      Categories = (from tc in _context.TourCategories
-                                                   join c in _context.Categories on tc.CategoryId equals c.Id
-                                                   where tc.TourId == t.Id && tc.Active && c.Active
-                                                   select new { c.Id, c.CategoryName, c.Type }).ToList(),
-                                      Prices = (from tp in _context.TourPrices
-                                               join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
-                                               where tp.TourId == t.Id && tp.Active && pt.Active
-                                               select new { tp.Id, tp.TourId, tp.PriceTypeId, pt.PriceTypeName, tp.Price, tp.CreatedTime }).ToList(),
-                                      Policies = (from tpol in _context.TourPolicies
-                                                 join p in _context.Policies on tpol.PolicyId equals p.Id
-                                                 where tpol.TourId == t.Id && tpol.Active && p.Active
-                                                 select new { p.Id, p.PolicyType }).ToList()
-                                  }).ToListAsync();
+                                   where tourIds.Contains(t.Id) && t.Active
+                                   select new
+                                   {
+                                       Tour = t,
+                                       Images = (from ti in _context.TourImages
+                                                 where ti.TourId == t.Id && ti.Active
+                                                 select new { ti.Id, ti.TourId, ti.ImageUrl, ti.IsBanner, ti.CreatedTime }).ToList(),
+                                       Categories = (from tc in _context.TourCategories
+                                                     join c in _context.Categories on tc.CategoryId equals c.Id
+                                                     where tc.TourId == t.Id && tc.Active && c.Active
+                                                     select new { c.Id, c.CategoryName, c.Type }).ToList(),
+                                       Prices = (from tp in _context.TourPrices
+                                                 join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
+                                                 where tp.TourId == t.Id && tp.Active && pt.Active
+                                                 select new { tp.Id, tp.TourId, tp.PriceTypeId, pt.PriceTypeName, tp.Price, tp.CreatedTime }).ToList(),
+                                       Policies = (from tpol in _context.TourPolicies
+                                                   join p in _context.Policies on tpol.PolicyId equals p.Id
+                                                   where tpol.TourId == t.Id && tpol.Active && p.Active
+                                                   select new { p.Id, p.PolicyType }).ToList()
+                                   }).ToListAsync();
 
             // Map to DTOs after server-side data retrieval
             return toursData.Select(tourData => new TourDetailDto
@@ -590,9 +591,9 @@ namespace barefoot_travel.Repositories
         public async Task<bool> TourHasMarketingTagsAsync(int tourId)
         {
             return await (from tc in _context.TourCategories
-                         join c in _context.Categories on tc.CategoryId equals c.Id
-                         where tc.TourId == tourId && tc.Active && c.Active && c.Type == "Marketing"
-                         select tc).AnyAsync();
+                          join c in _context.Categories on tc.CategoryId equals c.Id
+                          where tc.TourId == tourId && tc.Active && c.Active && c.Type == "Marketing"
+                          select tc).AnyAsync();
         }
 
         #endregion
@@ -637,20 +638,20 @@ namespace barefoot_travel.Repositories
         public async Task<List<HomepageTourDto>> GetToursByCategoryForHomepageAsync(int categoryId, int maxItems)
         {
             var tours = await (from t in _context.Tours
-                              join tc in _context.TourCategories on t.Id equals tc.TourId
-                              where tc.CategoryId == categoryId && t.Active && tc.Active
-                              orderby t.CreatedTime descending
-                              select new
-                              {
-                                  Tour = t,
-                                  BannerImage = (from ti in _context.TourImages
-                                                where ti.TourId == t.Id && ti.Active && ti.IsBanner
-                                                select ti.ImageUrl).FirstOrDefault(),
-                                  Images = (from ti in _context.TourImages
-                                           where ti.TourId == t.Id && ti.Active
-                                           orderby ti.IsBanner descending
-                                           select ti.ImageUrl).Take(3).ToList()
-                              })
+                               join tc in _context.TourCategories on t.Id equals tc.TourId
+                               where tc.CategoryId == categoryId && t.Active && tc.Active
+                               orderby t.CreatedTime descending
+                               select new
+                               {
+                                   Tour = t,
+                                   BannerImage = (from ti in _context.TourImages
+                                                  where ti.TourId == t.Id && ti.Active && ti.IsBanner
+                                                  select ti.ImageUrl).FirstOrDefault(),
+                                   Images = (from ti in _context.TourImages
+                                             where ti.TourId == t.Id && ti.Active
+                                             orderby ti.IsBanner descending
+                                             select ti.ImageUrl).Take(3).ToList()
+                               })
                               .Take(maxItems)
                               .ToListAsync();
 
@@ -665,12 +666,370 @@ namespace barefoot_travel.Repositories
             }).ToList();
         }
 
+        public async Task<List<HomepageTourDto>> GetToursByIdsAsync(List<int> tourIds, int maxItems)
+        {
+            if (tourIds == null || tourIds.Count == 0)
+                return new List<HomepageTourDto>();
+
+            var rawTours = await (from t in _context.Tours
+                                  where tourIds.Contains(t.Id) && t.Active
+                                  select new
+                                  {
+                                      Tour = t,
+                                      BannerImage = (from ti in _context.TourImages
+                                                     where ti.TourId == t.Id && ti.Active && ti.IsBanner
+                                                     select ti.ImageUrl).FirstOrDefault(),
+                                      Images = (from ti in _context.TourImages
+                                                where ti.TourId == t.Id && ti.Active
+                                                orderby ti.IsBanner descending
+                                                select ti.ImageUrl).Take(3).ToList()
+                                  })
+                       .ToListAsync();
+
+            var tours = rawTours
+                                .Select(x => new
+                                {
+                                    x.Tour,
+                                    OrderIndex = tourIds.IndexOf(x.Tour.Id),
+                                    x.BannerImage,
+                                    x.Images
+                                })
+                                .OrderBy(x => x.OrderIndex)
+                                .Take(maxItems)
+                                .ToList();
+
+            return tours.OrderBy(t => t.OrderIndex)
+                       .Select(t => new HomepageTourDto
+                       {
+                           Id = t.Tour.Id,
+                           Title = t.Tour.Title,
+                           PricePerPerson = t.Tour.PricePerPerson,
+                           Duration = t.Tour.Duration,
+                           BannerImageUrl = t.BannerImage,
+                           Images = t.Images ?? new List<string>()
+                       }).ToList();
+        }
+
         public async Task<int> GetTourCountByCategoryAsync(int categoryId)
         {
             return await (from t in _context.Tours
-                         join tc in _context.TourCategories on t.Id equals tc.TourId
-                         where tc.CategoryId == categoryId && t.Active && tc.Active
-                         select t).CountAsync();
+                          join tc in _context.TourCategories on t.Id equals tc.TourId
+                          where tc.CategoryId == categoryId && t.Active && tc.Active
+                          select t).CountAsync();
+        }
+
+        #endregion
+
+        #region Tour Status Approval Operations
+
+        public async Task<bool> ChangeStatusAsync(int tourId, string newStatus, string updatedBy, string? reason = null)
+        {
+            var tour = await (from t in _context.Tours
+                              where t.Id == tourId && t.Active
+                              select t).FirstOrDefaultAsync();
+                
+            if (tour == null) return false;
+            
+            // Validate status transition
+            if (!Common.TourStatusConstant.IsValidStatus(newStatus))
+                return false;
+                
+            if (!Common.TourStatusConstant.CanTransitionTo(tour.Status, newStatus))
+                return false;
+            
+            // Record old status for history
+            var oldStatus = tour.Status;
+            
+            // Update tour status
+            tour.Status = newStatus;
+            tour.UpdatedTime = DateTime.UtcNow;
+            tour.UpdatedBy = updatedBy;
+            
+            // Add to history
+            var history = new Models.TourStatusHistory
+            {
+                TourId = tourId,
+                OldStatus = oldStatus,
+                NewStatus = newStatus,
+                ChangedBy = updatedBy,
+                ChangedTime = DateTime.UtcNow,
+                Reason = reason,
+                Active = true
+            };
+            
+            await _context.TourStatusHistories.AddAsync(history);
+            await _context.SaveChangesAsync();
+            
+            return true;
+        }
+
+        public async Task<PagedResult<TourWithStatusDto>> GetToursPagedByStatusAsync(
+            string? status, 
+            int page, 
+            int pageSize, 
+            string? sortBy = null, 
+            string? sortOrder = "asc")
+        {
+            // Build base query
+            var baseQuery = from t in _context.Tours
+                            where t.Active
+                            select t;
+            
+            // Filter by status if provided
+            if (!string.IsNullOrEmpty(status))
+            {
+                baseQuery = from t in baseQuery
+                            where t.Status == status
+                            select t;
+            }
+            
+            // Apply sorting
+            var sortedQuery = sortBy?.ToLower() switch
+            {
+                "title" => sortOrder == "desc" 
+                    ? from t in baseQuery orderby t.Title descending select t
+                    : from t in baseQuery orderby t.Title select t,
+                "status" => sortOrder == "desc" 
+                    ? from t in baseQuery orderby t.Status descending select t
+                    : from t in baseQuery orderby t.Status select t,
+                "createdtime" => sortOrder == "desc" 
+                    ? from t in baseQuery orderby t.CreatedTime descending select t
+                    : from t in baseQuery orderby t.CreatedTime select t,
+                _ => from t in baseQuery orderby t.CreatedTime descending select t
+            };
+            
+            var totalItems = await sortedQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            
+            var items = await (from t in sortedQuery
+                               select new TourWithStatusDto
+                               {
+                                   Id = t.Id,
+                                   Title = t.Title,
+                                   Description = t.Description,
+                                   PricePerPerson = t.PricePerPerson,
+                                   MaxPeople = t.MaxPeople,
+                                   Duration = t.Duration,
+                                   Status = t.Status,
+                                   StatusDisplayName = Common.TourStatusConstant.GetStatusDisplayName(t.Status),
+                                   Active = t.Active,
+                                   CreatedTime = t.CreatedTime,
+                                   UpdatedTime = t.UpdatedTime,
+                                   UpdatedBy = t.UpdatedBy,
+                                   BannerImageUrl = (from ti in _context.TourImages
+                                                   where ti.TourId == t.Id && ti.Active && ti.IsBanner
+                                                   select ti.ImageUrl).FirstOrDefault(),
+                                   Images = (from ti in _context.TourImages
+                                            where ti.TourId == t.Id && ti.Active
+                                            orderby ti.IsBanner descending
+                                            select ti.ImageUrl).Take(3).ToList(),
+                                   Categories = (from tc in _context.TourCategories
+                                                join c in _context.Categories on tc.CategoryId equals c.Id
+                                                where tc.TourId == t.Id && tc.Active && c.Active
+                                                select new CategoryDto
+                                                {
+                                                    Id = c.Id,
+                                                    CategoryName = c.CategoryName,
+                                                    Type = c.Type
+                                                }).ToList()
+                               })
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToListAsync();
+            
+            return new PagedResult<TourWithStatusDto>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<bool> SoftDeleteAsync(int tourId, string updatedBy)
+        {
+            var tour = await (from t in _context.Tours
+                              where t.Id == tourId && t.Active
+                              select t).FirstOrDefaultAsync();
+                
+            if (tour == null) return false;
+            
+            // Soft delete: set Active = false
+            tour.Active = false;
+            tour.UpdatedTime = DateTime.UtcNow;
+            tour.UpdatedBy = updatedBy;
+            
+            // Also soft delete related data
+            var tourImages = from ti in _context.TourImages
+                             where ti.TourId == tourId && ti.Active
+                             select ti;
+            
+            var tourCategories = from tc in _context.TourCategories
+                                 where tc.TourId == tourId && tc.Active
+                                 select tc;
+            
+            var tourPrices = from tp in _context.TourPrices
+                             where tp.TourId == tourId && tp.Active
+                             select tp;
+            
+            var tourPolicies = from tpol in _context.TourPolicies
+                               where tpol.TourId == tourId && tpol.Active
+                               select tpol;
+            
+            await tourImages.ForEachAsync(ti => 
+            {
+                ti.Active = false;
+                ti.UpdatedTime = DateTime.UtcNow;
+                ti.UpdatedBy = updatedBy;
+            });
+            
+            await tourCategories.ForEachAsync(tc => 
+            {
+                tc.Active = false;
+                tc.UpdatedTime = DateTime.UtcNow;
+                tc.UpdatedBy = updatedBy;
+            });
+            
+            await tourPrices.ForEachAsync(tp => 
+            {
+                tp.Active = false;
+                tp.UpdatedTime = DateTime.UtcNow;
+                tp.UpdatedBy = updatedBy;
+            });
+            
+            await tourPolicies.ForEachAsync(tpol => 
+            {
+                tpol.Active = false;
+                tpol.UpdatedTime = DateTime.UtcNow;
+                tpol.UpdatedBy = updatedBy;
+            });
+            
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<TourStatusHistoryDto>> GetStatusHistoryAsync(int tourId)
+        {
+            return await (from h in _context.TourStatusHistories
+                          where h.TourId == tourId && h.Active
+                          orderby h.ChangedTime descending
+                          select new TourStatusHistoryDto
+                          {
+                              Id = h.Id,
+                              TourId = h.TourId,
+                              OldStatus = h.OldStatus,
+                              OldStatusDisplayName = h.OldStatus != null 
+                                  ? Common.TourStatusConstant.GetStatusDisplayName(h.OldStatus) 
+                                  : null,
+                              NewStatus = h.NewStatus,
+                              NewStatusDisplayName = Common.TourStatusConstant.GetStatusDisplayName(h.NewStatus),
+                              ChangedBy = h.ChangedBy,
+                              ChangedTime = h.ChangedTime,
+                              Reason = h.Reason
+                          })
+                          .ToListAsync();
+        }
+
+        public async Task<BatchOperationResultDto> BatchChangeStatusAsync(
+            List<int> tourIds, 
+            string newStatus, 
+            string updatedBy, 
+            string? reason = null)
+        {
+            var result = new BatchOperationResultDto();
+            
+            foreach (var tourId in tourIds)
+            {
+                try
+                {
+                    var success = await ChangeStatusAsync(tourId, newStatus, updatedBy, reason);
+                    if (success)
+                    {
+                        result.SuccessCount++;
+                        result.SuccessfulIds.Add(tourId);
+                    }
+                    else
+                    {
+                        result.FailCount++;
+                        result.FailedIds.Add(tourId);
+                        result.Errors.Add($"Failed to change status for tour {tourId}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.FailCount++;
+                    result.FailedIds.Add(tourId);
+                    result.Errors.Add($"Error processing tour {tourId}: {ex.Message}");
+                }
+            }
+            
+            return result;
+        }
+
+        public async Task<BatchOperationResultDto> BatchDeleteAsync(List<int> tourIds, string updatedBy)
+        {
+            var result = new BatchOperationResultDto();
+            
+            foreach (var tourId in tourIds)
+            {
+                try
+                {
+                    var tour = await (from t in _context.Tours
+                                     where t.Id == tourId && t.Active
+                                     select t).FirstOrDefaultAsync();
+                    
+                    if (tour == null)
+                    {
+                        result.FailCount++;
+                        result.FailedIds.Add(tourId);
+                        result.Errors.Add($"Tour {tourId} not found");
+                        continue;
+                    }
+                    
+                    // Always soft delete
+                    var success = await SoftDeleteAsync(tourId, updatedBy);
+                    
+                    if (success)
+                    {
+                        result.SuccessCount++;
+                        result.SuccessfulIds.Add(tourId);
+                    }
+                    else
+                    {
+                        result.FailCount++;
+                        result.FailedIds.Add(tourId);
+                        result.Errors.Add($"Failed to delete tour {tourId}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.FailCount++;
+                    result.FailedIds.Add(tourId);
+                    result.Errors.Add($"Error deleting tour {tourId}: {ex.Message}");
+                }
+            }
+            
+            return result;
+        }
+
+        public async Task<bool> CanDeleteAsync(int tourId)
+        {
+            // Check if tour has active bookings using from...select syntax
+            var hasActiveBookings = await (from b in _context.Bookings
+                                           where b.TourId == tourId && b.Active && b.StatusTypeId != 4 // 4 = Cancelled
+                                           select b).AnyAsync();
+                
+            return !hasActiveBookings;
+        }
+
+        public async Task<string?> GetCurrentStatusAsync(int tourId)
+        {
+            var tour = await (from t in _context.Tours
+                              where t.Id == tourId && t.Active
+                              select t).FirstOrDefaultAsync();
+                
+            return tour?.Status;
         }
 
         #endregion

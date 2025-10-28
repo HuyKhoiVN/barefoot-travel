@@ -50,5 +50,12 @@ namespace barefoot_travel.Services
         Task<ApiResponse> CreateTourPolicyAsync(CreateTourPolicyDto dto, string adminUsername);
         Task<ApiResponse> DeleteTourPolicyAsync(int id, string adminUsername);
         Task<ApiResponse> GetTourPoliciesAsync(int tourId);
+
+        // Tour Status Approval Methods
+        Task<ApiResponse> ChangeStatusAsync(int tourId, string newStatus, string updatedBy, string? reason = null);
+        Task<PagedResult<TourWithStatusDto>> GetToursPagedByStatusAsync(string? status, int page, int pageSize, string? sortBy = null, string? sortOrder = "asc");
+        Task<ApiResponse> GetStatusHistoryAsync(int tourId);
+        Task<ApiResponse> BatchChangeStatusAsync(List<int> tourIds, string newStatus, string updatedBy, string? reason = null);
+        Task<ApiResponse> BatchDeleteToursAsync(List<int> tourIds, string updatedBy);
     }
 }

@@ -482,8 +482,8 @@
                 success: function(response) {
                     console.log('Response received:', response);
                     if (response.success && response.data) {
-                        // Render homepage sections
-                        renderHomepageSections(response.data.sections);
+                        // response.data is already the array of sections
+                        renderHomepageSections(response.data);
                     }
                 },
                 error: function(xhr) {
@@ -582,29 +582,29 @@
             // Filter spotlight sections and assign positions based on display order
             const spotlightSections = [];
             sections.forEach(function(section) {
-                if (section.config.layoutStyle === 'spotlight' && section.config.isActive) {
+                if (section.layoutStyle === 'spotlight' && section.isActive) {
                     spotlightSections.push(section);
                 }
             });
 
             // Sort spotlight sections by displayOrder to determine actual position
             spotlightSections.sort(function(a, b) {
-                return a.config.displayOrder - b.config.displayOrder;
+                return a.displayOrder - b.displayOrder;
             });
 
             // Assign spotlight positions based on sorted index
             spotlightSections.forEach(function(section, index) {
-                section.config.spotlightPosition = index;
+                section.spotlightPosition = index;
             });
 
             // Sort all sections by displayOrder before rendering
             const sortedSections = sections.slice().sort(function(a, b) {
-                return a.config.displayOrder - b.config.displayOrder;
+                return a.displayOrder - b.displayOrder;
             });
 
             // Render all sections
             sortedSections.forEach(function(section) {
-                if (!section.config.isActive) return;
+                if (!section.isActive) return;
 
                 const sectionHtml = renderSection(section);
                 container.append(sectionHtml);
@@ -651,26 +651,24 @@
 
         // Render a single section based on layout style
         function renderSection(section) {
-            const config = section.config;
-            
             // Special handling for "Ways to Travel" section
             if (section.homepageTitle === "Ways to Travel") {
                 return renderWaysToTravelSection(section);
             }
             
-            const layoutClasses = getLayoutClasses(config.layoutStyle, config.maxItems);
+            const layoutClasses = getLayoutClasses(section.layoutStyle, section.maxItems);
             
             // Special handling for spotlight sections with left/right layout
-            if (config.layoutStyle === 'spotlight') {
+            if (section.layoutStyle === 'spotlight') {
                 return renderLeftSpotlightLayout(section, layoutClasses);
             }
             
             // Special handling for grid-3 (right-spotlight layout)
-            if (config.layoutStyle === 'grid-3') {
+            if (section.layoutStyle === 'grid-3') {
                 return renderRightSpotlightLayout(section, layoutClasses);
             }
             
-            let html = `<section class="${layoutClasses.section} responsive-padding ${config.customClass || ''}">`;
+            let html = `<section class="${layoutClasses.section} responsive-padding ${section.customClass || ''}">`;
             html += `<div class="bare-container">`;
             
             // Section header
@@ -684,7 +682,7 @@
             html += `<div class="divider"></div>`;
 
             // Section content based on layout
-            const columns = config.layoutStyle === 'grid-2' ? 2 : 4;
+            const columns = section.layoutStyle === 'grid-2' ? 2 : 4;
             html += renderGridLayout(section, columns, layoutClasses.grid);
 
             html += `</div></section>`;
@@ -757,8 +755,8 @@
         // Render spotlight layout (3 large cards) with horizontal scrolling
         function renderSpotlightLayout(section, gridClass) {
             gridClass = gridClass || 'left-spotlight-grid';
-            const uniqueId = 'spotlight-' + section.categoryId + '-' + Math.random().toString(36).substr(2, 9);
-            const tours = section.tours.slice(0, section.config.maxItems);
+            const uniqueId = 'spotlight-' + section.id + '-' + Math.random().toString(36).substr(2, 9);
+            const tours = (section.selectedTours || []).slice(0, section.maxItems);
             
             let html = `<div class="tour-grid-container" data-grid-id="${uniqueId}">`;
             html += `<button class="scroll-arrow-btn prev" data-direction="prev" style="display: none;">
@@ -806,7 +804,7 @@
 
                  // Render right spotlight layout (tours left, content right)
         function renderRightSpotlightLayout(section, layoutClasses) {
-            let html = `<section class="${layoutClasses.section} responsive-padding ${section.config.customClass || ''}">`;
+            let html = `<section class="${layoutClasses.section} responsive-padding ${section.customClass || ''}">`;
             html += `<div class="bare-container">`;
             html += `<div class="right-spotlight-content">`;
             
@@ -828,11 +826,11 @@
             
             // Right side: content with badge
             html += `<div class="right-spotlight-right">`;
-            html += `<div class="right-spotlight-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+            html += `<div class="right-spotlight-background" style="background-image: url('${section.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
             html += '<div class="right-spotlight-overlay"></div>';
             html += '<div class="right-spotlight-card-content">';
-            if (section.config.badgeText) {
-                html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+            if (section.badgeText) {
+                html += `<div class="spotlight-badge">${section.badgeText}</div>`;
             }
             html += `<h1 class="responsive-text-xl">TOP LIST</h1>`;
             html += `<p>Discover our expertly crafted top tours, honed by years of experience. Don't miss out on these unforgettable experiences!</p>`;
@@ -849,13 +847,14 @@
         // Render right spotlight grid without scroll container (for grid-3 layout)
         function renderRightSpotlightGrid(section, gridClass) {
             gridClass = gridClass || 'right-spotlight-grid';
-            const tours = section.tours.slice(0, section.config.maxItems);
+            const tours = (section.selectedTours || []).slice(0, section.maxItems);
             
             let html = `<div class="${gridClass}">`;
             
             tours.forEach(function(tour) {
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
                 const price = formatPrice(tour.pricePerPerson);
+                const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
                 
                 html += `
                     <div class="product-card">
@@ -868,7 +867,7 @@
                         </div>
                         <div class="product-content">
                             <p class="product-categories">
-                                <a href="#">${section.categoryName}</a>
+                                <a href="#">${categoryName}</a>
                             </p>
                             <h3 class="product-title">
                                 <a href="#">${tour.title}</a>
@@ -889,21 +888,21 @@
 
         // Render left/right spotlight layout based on position
         function renderLeftSpotlightLayout(section, layoutClasses) {
-            const spotlightPosition = section.config.spotlightPosition || 0;
+            const spotlightPosition = section.spotlightPosition || 0;
             const isLeftPosition = spotlightPosition % 2 === 0;
             
-            let html = `<section class="left-spotlight-section responsive-padding ${section.config.customClass || ''}">`;
+            let html = `<section class="left-spotlight-section responsive-padding ${section.customClass || ''}">`;
             html += `<div class="bare-container">`;
             html += `<div class="left-spotlight-content">`;
             
             // Left section (content on left, tours on right) - for even positions
             if (isLeftPosition) {
                 html += `<div class="left-spotlight-left">`;
-                html += `<div class="spotlight-card-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+                html += `<div class="spotlight-card-background" style="background-image: url('${section.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
                 html += '<div class="spotlight-card-overlay"></div>';
                 html += '<div class="spotlight-card-content">';
-                if (section.config.badgeText) {
-                    html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+                if (section.badgeText) {
+                    html += `<div class="spotlight-badge">${section.badgeText}</div>`;
                 }
                 html += `<h1 class="responsive-text-xl">${section.homepageTitle || 'BEST CHOICE'}</h1>`;
                 html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
@@ -935,11 +934,11 @@
                 html += renderSpotlightLayout(section, layoutClasses.grid);
                 html += `</div>`;
                 html += `<div class="left-spotlight-left">`;
-                html += `<div class="spotlight-card-background" style="background-image: url('${section.config.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
+                html += `<div class="spotlight-card-background" style="background-image: url('${section.spotlightImageUrl || '/ui-user-template/images/home_background.jpg'}');"></div>`;
                 html += '<div class="spotlight-card-overlay"></div>';
                 html += '<div class="spotlight-card-content">';
-                if (section.config.badgeText) {
-                    html += `<div class="spotlight-badge">${section.config.badgeText}</div>`;
+                if (section.badgeText) {
+                    html += `<div class="spotlight-badge">${section.badgeText}</div>`;
                 }
                 html += `<h1 class="responsive-text-xl">${section.homepageTitle || 'BEST CHOICE'}</h1>`;
                 html += `<p>Arrange your border crossings stress-free by handling everything at once!</p>`;
@@ -957,8 +956,8 @@
         // Render grid layout with horizontal scrolling
         function renderGridLayout(section, columns, gridClass) {
             gridClass = gridClass || 'no-spotlight-grid';
-            const uniqueId = 'grid-' + section.categoryId + '-' + Math.random().toString(36).substr(2, 9);
-            const tours = section.tours.slice(0, section.config.maxItems);
+            const uniqueId = 'grid-' + section.id + '-' + Math.random().toString(36).substr(2, 9);
+            const tours = (section.selectedTours || []).slice(0, section.maxItems);
             
             let html = `<div class="tour-grid-container" data-grid-id="${uniqueId}">`;
             html += `<button class="scroll-arrow-btn prev" data-direction="prev" style="display: none;">
@@ -969,6 +968,7 @@
             tours.forEach(function(tour) {
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
                 const price = formatPrice(tour.pricePerPerson);
+                const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
                 
                 html += `
                     <div class="product-card">
@@ -981,7 +981,7 @@
                         </div>
                         <div class="product-content">
                             <p class="product-categories">
-                                <a href="#">${section.categoryName}</a>
+                                <a href="#">${categoryName}</a>
                             </p>
                             <h3 class="product-title">
                                 <a href="#">${tour.title}</a>
