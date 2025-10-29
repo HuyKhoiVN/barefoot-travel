@@ -51,13 +51,18 @@
         {
             return (fromStatus, toStatus) switch
             {
-                ("draft", "public") => true,      // Draft -> Public
-                ("draft", "hide") => true,         // Draft -> Hide
-                ("draft", "cancelled") => true,    // Draft -> Cancelled
-                ("public", "hide") => true,        // Public -> Hide
-                ("public", "cancelled") => true,   // Public -> Cancelled
-                ("hide", "public") => true,        // Hide -> Public
-                ("hide", "cancelled") => true,     // Hide -> Cancelled
+                // Draft can transition to all statuses
+                ("draft", "public") => true,
+                ("draft", "hide") => true,
+                ("draft", "cancelled") => true,
+                
+                // Public can only transition to Hide
+                ("public", "hide") => true,
+                
+                // Hide can only transition to Public
+                ("hide", "public") => true,
+                
+                // Cancelled cannot transition to any status (terminal state)
                 _ => false
             };
         }

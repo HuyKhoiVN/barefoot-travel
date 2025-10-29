@@ -24,10 +24,10 @@ const TourStatusBadgeClasses = {
 
 // Status Transition Rules
 const TourStatusTransitions = {
-    'draft': ['public', 'hide', 'cancelled'],
-    'public': ['hide', 'cancelled'],
-    'hide': ['public', 'cancelled'],
-    'cancelled': []
+    'draft': ['public', 'hide', 'cancelled'],  // Draft can go to all statuses
+    'public': ['hide'],                         // Public can only go to Hide
+    'hide': ['public'],                         // Hide can only go to Public
+    'cancelled': []                             // Cancelled is terminal, no transitions
 };
 
 // Authentication Functions
@@ -269,7 +269,7 @@ async function viewTourDetail(tourId) {
                     <div class="col-md-6">
                         <p><strong>Title:</strong> ${tour.title}</p>
                         <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(tour.status)}">${getStatusDisplayName(tour.status)}</span></p>
-                        <p><strong>Price:</strong> $${tour.pricePerPerson}</p>
+                        <p><strong>Price:</strong> <span class="price-display">${formatCurrency(tour.pricePerPerson)}</span></p>
                         <p><strong>Duration:</strong> ${tour.duration}</p>
                         <p><strong>Max People:</strong> ${tour.maxPeople}</p>
                     </div>
@@ -388,7 +388,7 @@ function renderTableView(tours) {
             <td>
                 <span class="badge ${getStatusBadgeClass(tour.status)}">${tour.statusDisplayName}</span>
             </td>
-            <td>$${tour.pricePerPerson.toFixed(2)}</td>
+            <td>${formatCurrency(tour.pricePerPerson)}</td>
             <td>${tour.duration}</td>
             <td><small class="text-muted">${new Date(tour.createdTime).toLocaleDateString()}</small></td>
             <td class="text-end">
@@ -455,7 +455,7 @@ function renderCardView(tours) {
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div>
                             <small class="text-muted">Price:</small>
-                            <h6 class="mb-0">$${tour.pricePerPerson.toFixed(2)}</h6>
+                            <h6 class="mb-0">${formatCurrency(tour.pricePerPerson)}</h6>
                         </div>
                         <div>
                             <small class="text-muted">${tour.duration}</small>
@@ -659,9 +659,58 @@ function handleSelectAll(e) {
 function updateBatchActionsUI() {
     const section = document.getElementById('batchActionsSection');
     const count = document.getElementById('selectedCount');
+    const statusInfo = document.getElementById('selectedStatusInfo');
     
     count.textContent = selectedTours.size;
-    section.style.display = selectedTours.size > 0 ? 'block' : 'none';
+    
+    if (selectedTours.size === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    
+    // Get the status of selected tours
+    const firstSelectedCheckbox = document.querySelector('.tour-checkbox:checked');
+    const currentStatus = firstSelectedCheckbox ? firstSelectedCheckbox.dataset.status : '';
+    
+    // Update status info
+    statusInfo.textContent = `(${getStatusDisplayName(currentStatus)} tours)`;
+    
+    // Enable/disable buttons based on current status and allowed transitions
+    const btnPublic = document.getElementById('btnBatchPublic');
+    const btnHide = document.getElementById('btnBatchHide');
+    const btnCancelled = document.getElementById('btnBatchCancelled');
+    
+    // Reset all buttons
+    [btnPublic, btnHide, btnCancelled].forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('disabled');
+    });
+    
+    // Apply transition rules
+    if (currentStatus) {
+        const allowedTransitions = TourStatusTransitions[currentStatus] || [];
+        
+        // Disable buttons for transitions that are not allowed
+        if (!allowedTransitions.includes('public')) {
+            btnPublic.disabled = true;
+            btnPublic.classList.add('disabled');
+            btnPublic.title = `Cannot change ${getStatusDisplayName(currentStatus)} tours to Public`;
+        }
+        
+        if (!allowedTransitions.includes('hide')) {
+            btnHide.disabled = true;
+            btnHide.classList.add('disabled');
+            btnHide.title = `Cannot change ${getStatusDisplayName(currentStatus)} tours to Hide`;
+        }
+        
+        if (!allowedTransitions.includes('cancelled')) {
+            btnCancelled.disabled = true;
+            btnCancelled.classList.add('disabled');
+            btnCancelled.title = `Cannot change ${getStatusDisplayName(currentStatus)} tours to Cancelled`;
+        }
+    }
 }
 
 // Load Tours

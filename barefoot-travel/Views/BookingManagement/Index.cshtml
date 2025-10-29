@@ -1529,7 +1529,7 @@
                                 <tr><td><strong>Tour:</strong></td><td>${booking.tourTitle}</td></tr>
                                 <tr><td><strong>Start Date:</strong></td><td>${formatDate(booking.startDate)}</td></tr>
                                 <tr><td><strong>People:</strong></td><td>${booking.people}</td></tr>
-                                <tr><td><strong>Total Price:</strong></td><td>$${booking.totalPrice.toFixed(2)}</td></tr>
+                                <tr><td><strong>Total Price:</strong></td><td>${formatCurrency(booking.totalPrice)}</td></tr>
                                 <tr><td><strong>Status:</strong></td><td>${getStatusBadge(booking.statusName)}</td></tr>
                                 <tr><td><strong>Payment:</strong></td><td>${getPaymentBadge(booking.paymentStatus)}</td></tr>
                             </table>

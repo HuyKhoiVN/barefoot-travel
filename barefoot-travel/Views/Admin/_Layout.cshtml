@@ -44,6 +44,7 @@
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   <script src="~/js/toast.js" asp-append-version="true"></script>
+  <script src="~/js/currency-converter.js" asp-append-version="true"></script>
   
   <!-- Global JavaScript Configuration -->
   <script>
@@ -289,7 +290,44 @@
     // Check authentication on page load
     $(document).ready(function() {
       checkAuthStatus();
+      initAdminCurrencySelector();
     });
+    
+    // Initialize admin currency selector
+    function initAdminCurrencySelector() {
+      // Set initial active state
+      const currentCurrency = CurrencyConverter.getCurrency();
+      updateCurrencyButtons(currentCurrency);
+      
+      // Add click handlers
+      $('.currency-switch-btn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const currency = $(this).data('currency');
+        CurrencyConverter.setCurrency(currency);
+        updateCurrencyButtons(currency);
+        
+        // Reload page to refresh all prices
+        setTimeout(function() {
+          location.reload();
+        }, 300);
+      });
+    }
+    
+    // Update button states
+    function updateCurrencyButtons(currency) {
+      $('.currency-switch-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
+      if (currency === 'VND') {
+        $('#btnVND').removeClass('btn-outline-secondary').addClass('btn-primary');
+      } else {
+        $('#btnUSD').removeClass('btn-outline-secondary').addClass('btn-primary');
+      }
+    }
+    
+    // Global currency format function for admin pages
+    window.formatCurrency = function(price, includeSymbol = true) {
+      return CurrencyConverter.formatPrice(price, includeSymbol);
+    };
   </script>
 
   @await RenderSectionAsync("Scripts", required: false)

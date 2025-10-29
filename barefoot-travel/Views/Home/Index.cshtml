@@ -120,6 +120,94 @@
                 right: -5px;
             }
         }
+
+        /* Currency Selector Dropdown Styles */
+        .currency-selector {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .currency-selector #currentCurrencyDisplay {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .currency-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            z-index: 1000;
+            overflow: hidden;
+            animation: fadeInDown 0.2s ease;
+        }
+
+        @@keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .currency-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: none;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .currency-option:last-child {
+            border-bottom: none;
+        }
+
+        .currency-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .currency-option:focus {
+            outline: none;
+        }
+
+        .currency-option .currency-symbol {
+            font-size: 18px;
+            font-weight: 600;
+            margin-right: 10px;
+            min-width: 24px;
+        }
+
+        .currency-option .currency-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .currency-selector:hover .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .currency-selector .fa-chevron-down {
+            transition: transform 0.2s ease;
+            font-size: 10px;
+            margin-left: 4px;
+        }
     </style>
 </head>
 
@@ -195,8 +283,19 @@
                         <span>EN</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="currency-selector">
-                        <span>$</span>
+                    <div class="currency-selector dropdown" id="currencySelector">
+                        <span id="currentCurrencyDisplay">₫</span>
+                        <i class="fas fa-chevron-down"></i>
+                        <div class="currency-dropdown-menu">
+                            <button type="button" class="currency-option" data-currency="VND">
+                                <span class="currency-symbol">₫</span>
+                                <span class="currency-name">VND</span>
+                            </button>
+                            <button type="button" class="currency-option" data-currency="USD">
+                                <span class="currency-symbol">$</span>
+                                <span class="currency-name">USD</span>
+                            </button>
+                        </div>
                     </div>
                     <button class="mobile-menu-toggle" id="mobileMenuToggle">
                         <i class="fas fa-bars"></i>
@@ -465,9 +564,11 @@
     <script src="~/ui-user-template/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/ui-user-template/responsive-script.js"></script>
     <script src="~/ui-user-template/script.js"></script>
+    <script src="~/js/currency-converter.js"></script>
     
     <script>
         $(document).ready(function() {
+            initCurrencySelector();
             loadFeaturedTours();
             loadDailyTours();
             loadHomepageData();
@@ -785,7 +886,6 @@
                                 <a href="#">${tour.title}</a>
                             </h3>
                             <div class="product-price">
-                                <span class="currency">$</span>
                                 <span class="amount">${price}</span>
                             </div>
                             <a href="#" class="read-more-btn">Read more</a>
@@ -873,7 +973,6 @@
                                 <a href="#">${tour.title}</a>
                             </h3>
                             <div class="product-price">
-                                <span class="currency">$</span>
                                 <span class="amount">${price}</span>
                             </div>
                             <a href="#" class="read-more-btn">Read more</a>
@@ -987,7 +1086,6 @@
                                 <a href="#">${tour.title}</a>
                             </h3>
                             <div class="product-price">
-                                <span class="currency">$</span>
                                 <span class="amount">${price}</span>
                             </div>
                             <a href="#" class="read-more-btn">Read more</a>
@@ -1063,15 +1161,45 @@
             });
         }
 
-        // Format price with commas for thousands
+        // Format price with commas for thousands - using CurrencyConverter
         function formatPrice(price) {
-            if (!price) return '0';
-            // If price is in VND (large number), format with commas
-            if (price > 10000) {
-                return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
-            // If price is in USD format, show as is
-            return price.toString();
+            return CurrencyConverter.formatPrice(price, true);
+        }
+        
+        // Update all prices on page when currency changes
+        function updateAllPrices() {
+            loadFeaturedTours();
+            loadDailyTours();
+            loadHomepageData();
+            loadWaysToTravel();
+        }
+        
+        // Initialize currency selector
+        function initCurrencySelector() {
+            // Set initial display
+            const currentCurrency = CurrencyConverter.getCurrency();
+            $('#currentCurrencyDisplay').text(CurrencyConverter.getSymbol());
+            
+            // Add click handlers
+            $('.currency-option').on('click', function(e) {
+                e.preventDefault();
+                const currency = $(this).data('currency');
+                CurrencyConverter.setCurrency(currency);
+                $('#currentCurrencyDisplay').text(CurrencyConverter.getSymbol());
+                $('.currency-dropdown-menu').hide();
+                updateAllPrices();
+            });
+            
+            // Toggle dropdown
+            $('#currencySelector').on('click', function(e) {
+                e.stopPropagation();
+                $('.currency-dropdown-menu').toggle();
+            });
+            
+            // Close dropdown when clicking outside
+            $(document).on('click', function() {
+                $('.currency-dropdown-menu').hide();
+            });
         }
     </script>
 </body>

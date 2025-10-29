@@ -1037,7 +1037,7 @@
                                     <br>
                                     <span class="payment-badge payment-${paymentClass}">${booking.paymentStatus}</span>
                                     <br>
-                                    <small class="text-muted">$${booking.totalPrice.toFixed(2)}</small>
+                                    <small class="text-muted">${formatCurrency(booking.totalPrice)}</small>
                                 </div>
                             </div>
                             <div class="mt-2">
@@ -1064,7 +1064,7 @@
                                 <tr><td><strong>Tour:</strong></td><td>${booking.tourTitle}</td></tr>
                                 <tr><td><strong>Start Date:</strong></td><td>${formatDateForDisplay(booking.startDate)}</td></tr>
                                 <tr><td><strong>People:</strong></td><td>${booking.people}</td></tr>
-                                <tr><td><strong>Total Price:</strong></td><td>$${booking.totalPrice.toFixed(2)}</td></tr>
+                                <tr><td><strong>Total Price:</strong></td><td>${formatCurrency(booking.totalPrice)}</td></tr>
                                 <tr><td><strong>Status:</strong></td><td><span class="booking-status-badge status-${statusClass}">${booking.statusName}</span></td></tr>
                                 <tr><td><strong>Payment:</strong></td><td><span class="payment-badge payment-${paymentClass}">${booking.paymentStatus}</span></td></tr>
                             </table>

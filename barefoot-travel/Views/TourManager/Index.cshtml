@@ -1590,7 +1590,7 @@ $(document).ready(function() {
                     <td class="px-0">
                         <h6 class="mb-0 fw-bolder">${tour.title}</h6>
                     </td>
-                            <td class="px-0">${formatCurrencyVND(tour.pricePerPerson)}</td>
+                            <td class="px-0">${formatCurrency(tour.pricePerPerson)}</td>
                     <td class="px-0">${tour.duration}</td>
                     <td class="px-0">${tour.maxPeople}</td>
                     <td class="px-0 text-end">
@@ -2212,7 +2212,7 @@ $(document).ready(function() {
                     <p class="text-muted">${tour.description}</p>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Price per Person:</strong> $${tour.pricePerPerson}</p>
+                            <p><strong>Price per Person:</strong> ${formatCurrency(tour.pricePerPerson)}</p>
                             <p><strong>Duration:</strong> ${tour.duration}</p>
                             <p><strong>Max People:</strong> ${tour.maxPeople}</p>
                         </div>
@@ -2302,10 +2302,7 @@ $(document).ready(function() {
         };
     }
 
-            function formatCurrencyVND(value) {
-            if (!value) return "0 ₫";
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-        }
+            // formatCurrency is now provided globally by currency-converter.js
 });
 </script>
 }

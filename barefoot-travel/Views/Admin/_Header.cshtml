@@ -40,6 +40,19 @@
                 <i class="ti ti-settings fs-6"></i>
                 <p class="mb-0 fs-3">Settings</p>
               </a>
+              <div class="dropdown-divider"></div>
+              <div class="px-3 py-2">
+                <p class="mb-1 fs-2 text-muted">Currency</p>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-primary currency-switch-btn" data-currency="VND" id="btnVND">
+                    <i class="ti ti-currency-dong fs-4"></i> VND
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary currency-switch-btn" data-currency="USD" id="btnUSD">
+                    <i class="ti ti-currency-dollar fs-4"></i> USD
+                  </button>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
               <a href="@Url.Action("Index", "Home")" class="d-flex align-items-center gap-2 dropdown-item">
                 <i class="ti ti-home fs-6"></i>
                 <p class="mb-0 fs-3">Back to Site</p>
