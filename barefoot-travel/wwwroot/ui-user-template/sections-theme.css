@@ -1,74 +1,315 @@
-/* Section color theming inspired by VivaTech palette without changing hero */
+/* Modern Travel Booking Website Theme - Enhanced Color Palette */
 
 :root {
-  --vt-primary: #6a5cff; /* vivid violet */
-  --vt-secondary: #1da388; /* teal (site’s brand) */
-  --vt-accent: #ff4d6d; /* pink/red accent */
-  --vt-bg-1: #0e0e12; /* deep charcoal */
-  --vt-bg-2: #11131a; /* slightly lighter */
-  --vt-light: #f8f9fb;
-  --vt-muted: #8b90a0;
+  /* Primary Brand Colors */
+  --primary-teal: #00d4aa;
+  --primary-teal-dark: #00b894;
+  --primary-teal-light: #17e3b8;
+  
+  /* Accent Colors */
+  --accent-coral: #ff6b6b;
+  --accent-purple: #6c5ce7;
+  --accent-orange: #ff9f43;
+  --accent-blue: #0abde3;
+  
+  /* Gradient Backgrounds */
+  --gradient-ocean: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-sunset: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-forest: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+  --gradient-sky: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-cool: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  
+  /* Neutral Colors */
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f5;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #6c757d;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  
+  /* Dark Theme Colors */
+  --dark-bg-1: #1a1d29;
+  --dark-bg-2: #252939;
+  --dark-bg-3: #2f3447;
+  
+  /* Light Theme Colors */
+  --light-bg-1: #ffffff;
+  --light-bg-2: #fafbfc;
+  --light-bg-3: #f5f7fa;
+  
+  /* Overlay Colors */
+  --overlay-dark: rgba(0, 0, 0, 0.7);
+  --overlay-light: rgba(255, 255, 255, 0.9);
+  --overlay-gradient: linear-gradient(135deg, rgba(0, 212, 170, 0.9) 0%, rgba(0, 184, 148, 0.8) 100%);
+  
+  /* Shadow Styles */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.20);
+  --shadow-colored: 0 8px 32px rgba(0, 212, 170, 0.3);
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
 }
 
-/* Keep .hero untouched */
+/* Hero Section - Keep enhanced but modernize */
+.hero {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
 
-/* Featured tours: dark gradient on image-like backgrounds */
+/* Featured Tours - Modern gradient overlay */
 .featured-tours {
-  background: linear-gradient(135deg, rgba(17, 19, 26, 0.92), rgba(14, 14, 18, 0.85));
+  background: var(--gradient-cool);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Ways to travel: light surface */
+.featured-tours::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Ways to Travel - Clean white with subtle pattern */
 .ways-to-travel {
-  background: var(--vt-light);
+  background: var(--light-bg-1);
+  position: relative;
 }
-.ways-to-travel h2 { color: #111; }
 
-/* Daily tours lives inside ways-to-travel container styles already */
-
-/* Indochina: soft light surface */
-.indochina-packages {
-  background: linear-gradient(180deg, #ffffff 0%, #f4f6fb 100%);
+.ways-to-travel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(0, 212, 170, 0.03) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(108, 92, 231, 0.03) 0%, transparent 50%);
+  pointer-events: none;
 }
-.indochina-right h2 { color: #0f1220; }
 
-/* Top packages: tinted dark for contrast */
-.top-vietnam-packages {
-  background: linear-gradient(135deg, #0f1120, #15182a);
+/* Left Spotlight Sections - Alternating gradients */
+.left-spotlight-section {
+  background: var(--gradient-ocean);
+  position: relative;
 }
-.top-vietnam-packages .section-header h2,
-.top-vietnam-packages .browse-all { color: #ffffff; }
-.top-vietnam-packages .divider { background: linear-gradient(90deg, var(--vt-primary), transparent); }
 
-/* Tours we love: light to keep rhythm */
-.tours-we-love { background: #f6f7fb; }
+.left-spotlight-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
 
-/* About Compass: white surface */
-.about-compass { background: #ffffff; }
-.about-left h3 { color: #0f1220; }
-.about-left p { color: #475069; }
+/* No Spotlight Sections - Soft colored backgrounds */
+.no-spotlight-section {
+  background: linear-gradient(180deg, var(--light-bg-2) 0%, var(--light-bg-3) 100%);
+  position: relative;
+}
 
-/* Contact Us: subtle paper */
-.contact-us { background: #f4f6fb; }
-.contact-us-card h4 { color: #0f1220; }
-.contact-us-card p { color: #58607a; }
+.no-spotlight-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 107, 107, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
 
-/* Footer ending palette */
+/* Right Spotlight Sections - Vibrant gradients */
+.right-spotlight-section {
+  background: var(--gradient-warm);
+  position: relative;
+}
+
+.right-spotlight-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(-45deg, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* About Compass - Clean professional */
+.about-compass {
+  background: var(--light-bg-1);
+  position: relative;
+}
+
+.about-compass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 170, 0.02) 100%);
+  pointer-events: none;
+}
+
+/* Contact Us - Soft gradient */
+.contact-us {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+}
+
+/* Footer - Dark modern gradient */
 .footer-ending {
-  background: linear-gradient(180deg, #0f1120, #0b0c14);
+  background: linear-gradient(180deg, var(--dark-bg-1) 0%, var(--dark-bg-2) 100%);
+  position: relative;
 }
-.footer-links-col h4 { color: var(--vt-secondary); }
-.footer-links-col a:hover { color: var(--vt-primary); }
-.footer-legal a:hover { color: var(--vt-primary); }
 
-/* Accent elements */
-.spotlight-badge { background: rgba(106, 92, 255, 0.18); }
+.footer-ending::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--primary-teal) 50%, transparent 100%);
+}
+
+/* Enhanced Card Styles */
+.tour-card,
+.daily-tour-card,
+.product-card,
+.travel-item,
+.contact-us-card {
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tour-card:hover,
+.daily-tour-card:hover,
+.product-card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-12px) scale(1.02);
+}
+
+.travel-item:hover,
+.contact-us-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px);
+}
+
+/* Accent Elements - Modern styling */
+.spotlight-badge {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
 .book-btn,
 .read-more-btn,
 .view-tours-btn,
-.book-now-btn { background: var(--vt-secondary); }
+.book-now-btn {
+  background: var(--gradient-forest);
+  box-shadow: var(--shadow-colored);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.book-btn::before,
+.read-more-btn::before,
+.view-tours-btn::before,
+.book-now-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.book-btn:hover::before,
+.read-more-btn:hover::before,
+.view-tours-btn:hover::before,
+.book-now-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
 .book-btn:hover,
 .read-more-btn:hover,
 .view-tours-btn:hover,
-.book-now-btn:hover { background: #00b894; }
+.book-now-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(0, 212, 170, 0.4);
+}
 
+/* Divider Enhancement */
+.divider {
+  background: var(--gradient-forest);
+  height: 3px;
+  box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
+}
+
+/* Section Headers */
+.section-header h2 {
+  position: relative;
+  display: inline-block;
+}
+
+.section-header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--gradient-forest);
+  border-radius: var(--radius-full);
+}
+
+/* Browse All Links */
+.browse-all {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.browse-all::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-teal);
+  transition: width 0.3s ease;
+}
+
+.browse-all:hover::after {
+  width: 100%;
+}
 
