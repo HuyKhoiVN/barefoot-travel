@@ -532,7 +532,7 @@
     }
 
     // ============================================
-    // TYPING EFFECT FOR HERO
+    // TYPING EFFECT FOR HERO (Character by character)
     // ============================================
     
     function initTypingEffect() {
@@ -542,30 +542,48 @@
             const originalHTML = $heroTitle.html();
             const lines = originalHTML.split('<br>');
             
-            if (lines.length === 2) {
-                // Two lines with typing effect
-                $heroTitle.html(`
-                    <span class="typing-line-1">${lines[0]}</span><br>
-                    <span class="typing-line-2">${lines[1]}</span>
-                `);
+            if (lines.length >= 2) {
+                const line1 = lines[0].trim();
+                const line2 = lines[1].trim();
                 
-                // Remove caret after animation completes
-                setTimeout(() => {
-                    $('.typing-line-1').css('border-right', 'none');
-                }, 2000);
+                // Clear and setup
+                $heroTitle.html('<span class="typed-line-1"></span><br><span class="typed-line-2"></span>');
                 
-                setTimeout(() => {
-                    $('.typing-line-2').addClass('finished');
-                }, 4100);
+                const $line1 = $heroTitle.find('.typed-line-1');
+                const $line2 = $heroTitle.find('.typed-line-2');
+                
+                // Type line 1
+                typeText($line1, line1, 50, () => {
+                    // After line 1 completes, type line 2
+                    setTimeout(() => {
+                        typeText($line2, line2, 50);
+                    }, 300);
+                });
             } else {
-                // Single line with typing effect
-                $heroTitle.addClass('typing-effect');
-                
-                setTimeout(() => {
-                    $heroTitle.removeClass('typing-effect').addClass('typing-effect no-caret');
-                }, 3500);
+                // Single line
+                const text = $heroTitle.text().trim();
+                $heroTitle.html('<span class="typed-text"></span>');
+                const $typed = $heroTitle.find('.typed-text');
+                typeText($typed, text, 50);
             }
         }
+    }
+    
+    // Character-by-character typing function
+    function typeText($element, text, speed, callback) {
+        let index = 0;
+        
+        function type() {
+            if (index < text.length) {
+                $element.text($element.text() + text.charAt(index));
+                index++;
+                setTimeout(type, speed);
+            } else if (callback) {
+                callback();
+            }
+        }
+        
+        type();
     }
 
     // ============================================
