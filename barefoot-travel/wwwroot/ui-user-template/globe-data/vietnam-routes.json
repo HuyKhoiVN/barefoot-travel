@@ -1,0 +1,53 @@
+﻿{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "from": "Ha Noi",
+        "to": "Da Nang",
+        "color": "#00d2ff",
+        "stroke_width": 2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [105.8342, 21.0278],
+          [108.2022, 16.0544]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "from": "Da Nang",
+        "to": "TP Ho Chi Minh",
+        "color": "#00d2ff",
+        "stroke_width": 2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [108.2022, 16.0544],
+          [106.6297, 10.8231]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "from": "Ha Noi",
+        "to": "TP Ho Chi Minh",
+        "color": "#00d2ff",
+        "stroke_width": 2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [105.8342, 21.0278],
+          [106.6297, 10.8231]
+        ]
+      }
+    }
+  ]
+}

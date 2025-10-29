@@ -1,0 +1,688 @@
+/* ============================================
+   3D GLOBE HERO SECTION STYLES
+   ============================================ */
+
+.hero-globe-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 700px;
+    overflow: hidden;
+    margin-top: 80px; /* Ensure header doesn't overlap */
+}
+
+/* Hero Background Image (Old design) */
+.hero-globe-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('./images/home_background.jpg') center/cover no-repeat;
+    z-index: 0;
+}
+
+/* Hero Overlay (Dark overlay on background) - Cover entire section */
+.hero-globe-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2; /* Above globe to cover entire section */
+    pointer-events: none; /* Allow interaction with content below */
+}
+
+/* Globe Container - Right Side, proper spacing from edge */
+.globe-container {
+    position: absolute;
+    top: 50%;
+    right: 6%; /* 6% spacing from right edge */
+    width: 700px; /* Optimized size with controlled zoom */
+    height: 700px; /* Square container for balanced display */
+    transform: translateY(-50%);
+    z-index: 1;
+    overflow: hidden !important; /* Contain globe within frame */
+    pointer-events: none; /* Allow clicks to pass through */
+    border: none !important; /* No border */
+    box-shadow: none !important; /* No shadow */
+    background: transparent !important; /* Transparent background */
+}
+
+/* Globe Gradient Overlay - Cover background image */
+.globe-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: calc(100% + 150px);
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(10, 14, 39, 0.1) 0%, 
+        rgba(10, 14, 39, 0.4) 30%,
+        rgba(10, 14, 39, 0.7) 70%, 
+        rgba(15, 20, 32, 0.9) 100%
+    );
+    z-index: -1;
+    pointer-events: none;
+}
+
+#globe-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    cursor: grab;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: auto; /* Enable interaction with globe */
+    border: none !important; /* No border */
+    outline: none !important; /* No outline */
+    box-shadow: none !important; /* No shadow */
+}
+
+#globe-canvas:active {
+    cursor: grabbing;
+}
+
+/* Ensure canvas child elements have no border */
+#globe-canvas canvas {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Hero Content Overlay - Left Side with margin */
+.hero-globe-content {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 6%; /* Left margin */
+    max-width: 50%; /* Balanced spacing with globe closer */
+    padding-right: 2%; /* Add right padding for spacing */
+}
+
+/* Text Content */
+.hero-globe-text {
+    max-width: 700px; /* Increased from 600px */
+    color: #ffffff;
+    text-align: left;
+}
+
+.hero-globe-text h1 {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    color: #ffffff;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    white-space: normal; /* Allow normal wrapping */
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards 0.3s;
+}
+
+/* Character by character animation - DISABLED for layout stability */
+.hero-globe-text h1 .char {
+    display: inline;
+    opacity: 1;
+    transform: none;
+}
+
+.hero-globe-text h1 br {
+    display: block !important;
+    content: "" !important;
+    margin: 0 !important;
+    height: 0;
+    line-height: 0;
+}
+
+@keyframes charFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-globe-text h1 .highlight {
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline; /* Keep inline for text flow */
+}
+
+.hero-globe-text h1 .highlight .char {
+    background: inherit;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-globe-text p {
+    font-size: 20px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 32px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards 1s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Feature Badges */
+.globe-feature-badges {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.globe-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-30px);
+    animation: slideInLeft 0.6s ease forwards;
+}
+
+.globe-badge:nth-child(1) { animation-delay: 0.3s; }
+.globe-badge:nth-child(2) { animation-delay: 0.5s; }
+.globe-badge:nth-child(3) { animation-delay: 0.7s; }
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.globe-badge:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.globe-badge i {
+    font-size: 16px;
+    color: #00d2ff;
+}
+
+/* CTA Buttons Wrapper */
+.globe-cta-wrapper {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards 1.5s;
+}
+
+/* Search Container with Expandable Input */
+.globe-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+}
+
+.search-input-wrapper {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.globe-search-container.expanded .search-input-wrapper {
+    width: 300px;
+    opacity: 1;
+    margin-left: -50px; /* Slide under button */
+}
+
+.globe-search-container.expanded #searchToggleBtn {
+    border-radius: 50px 0 0 50px;
+    position: relative;
+    z-index: 2;
+}
+
+#globeSearchInput {
+    flex: 1;
+    padding: 16px 20px 16px 70px; /* Space for button overlap */
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#globeSearchInput:focus {
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.search-submit-btn {
+    position: absolute;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.search-submit-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 210, 255, 0.4);
+}
+
+.globe-btn {
+    padding: 16px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.globe-btn-primary {
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 210, 255, 0.3);
+}
+
+.globe-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 210, 255, 0.4);
+}
+
+.globe-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.globe-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+}
+
+/* Cities Info Panel - Below content on left */
+.cities-info-panel {
+    position: relative;
+    z-index: 3;
+    max-width: 600px;
+    margin-top: 30px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.city-info-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    flex: 0 0 calc(33.333% - 12px);
+    min-width: 160px;
+    opacity: 0;
+    transform: scale(0.8);
+    animation: scaleIn 0.5s ease forwards;
+}
+
+.city-info-card:nth-child(1) { animation-delay: 1.8s; }
+.city-info-card:nth-child(2) { animation-delay: 2s; }
+.city-info-card:nth-child(3) { animation-delay: 2.2s; }
+
+@keyframes scaleIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.city-info-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+}
+
+.city-info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.city-info-card .city-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.city-info-card.hanoi .city-icon {
+    background: #ff4757;
+    box-shadow: 0 0 10px #ff4757;
+}
+
+.city-info-card.danang .city-icon {
+    background: #ffa502;
+    box-shadow: 0 0 10px #ffa502;
+}
+
+.city-info-card.hcmc .city-icon {
+    background: #ff6348;
+    box-shadow: 0 0 10px #ff6348;
+}
+
+.city-info-card .city-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.city-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.city-stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.city-stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #00d2ff;
+    margin-top: 4px;
+}
+
+/* Number counting animation */
+.city-stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #00d2ff;
+    margin-top: 4px;
+}
+
+.count-up {
+    display: inline-block;
+}
+
+/* Loading State */
+.globe-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    color: #ffffff;
+}
+
+.globe-loading .spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #00d2ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.globe-loading p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 1600px) {
+    .globe-container {
+        width: 650px;
+        height: 650px;
+        right: 5%;
+    }
+}
+
+@media (max-width: 1440px) {
+    .globe-container {
+        width: 600px;
+        height: 600px;
+        right: 5%;
+    }
+    
+    .hero-globe-content {
+        max-width: 52%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .hero-globe-content {
+        margin-left: 5%;
+        max-width: 55%;
+    }
+    
+    .hero-globe-text {
+        max-width: 650px;
+    }
+    
+    .hero-globe-text h1 {
+        font-size: 52px;
+    }
+    
+    .globe-container {
+        width: 550px;
+        height: 550px;
+        right: 4%;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-globe-section {
+        height: auto;
+        min-height: 650px;
+        margin-top: 70px;
+    }
+    
+    .globe-container {
+        width: 350px;
+        height: 350px;
+        opacity: 0.35;
+        top: 50%;
+        right: 2%;
+    }
+    
+    .globe-container::before {
+        background: linear-gradient(90deg, 
+            rgba(10, 14, 39, 0.2) 0%, 
+            rgba(10, 14, 39, 0.6) 100%
+        );
+    }
+    
+    .hero-globe-content {
+        align-items: flex-start;
+        margin-left: 5%;
+        max-width: 60%;
+        padding: 40px 0;
+    }
+    
+    .hero-globe-text {
+        text-align: left;
+        max-width: 100%;
+    }
+    
+    .hero-globe-text h1 {
+        font-size: 42px;
+    }
+    
+    .cities-info-panel {
+        max-width: 100%;
+    }
+    
+    .city-info-card {
+        flex: 0 0 calc(50% - 8px);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-globe-content {
+        margin-left: 5%;
+        max-width: 90%;
+    }
+    
+    .hero-globe-text h1 {
+        font-size: 36px;
+    }
+    
+    .hero-globe-text p {
+        font-size: 16px;
+    }
+    
+    .globe-btn {
+        padding: 14px 32px;
+        font-size: 14px;
+    }
+    
+    .globe-container {
+        width: 250px;
+        height: 250px;
+        opacity: 0.25;
+        right: -20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-globe-section {
+        margin-top: 60px;
+    }
+    
+    .globe-container {
+        width: 200px;
+        height: 200px;
+        opacity: 0.2;
+        right: -30px;
+        top: 45%;
+    }
+    
+    .hero-globe-content {
+        margin-left: 5%;
+        max-width: 85%;
+        padding: 40px 0;
+    }
+    
+    .hero-globe-text h1 {
+        font-size: 28px;
+    }
+    
+    .globe-feature-badges {
+        gap: 8px;
+    }
+    
+    .globe-badge {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    
+    .globe-cta-wrapper {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .globe-search-container {
+        width: 100%;
+    }
+    
+    .globe-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 24px;
+    }
+    
+    .globe-search-container.expanded .search-input-wrapper {
+        width: calc(100% - 50px);
+        margin-left: -50px;
+    }
+    
+    #globeSearchInput {
+        font-size: 14px;
+        padding: 12px 20px 12px 60px;
+    }
+    
+    .cities-info-panel {
+        margin-top: 24px;
+        gap: 10px;
+    }
+    
+    .city-info-card {
+        flex: 0 0 100%;
+        padding: 12px 16px;
+    }
+    
+    .city-info-card h3 {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .city-stat-label {
+        font-size: 10px;
+    }
+    
+    .city-stat-value {
+        font-size: 14px;
+    }
+}
+

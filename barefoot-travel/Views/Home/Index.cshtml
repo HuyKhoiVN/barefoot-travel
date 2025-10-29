@@ -17,6 +17,8 @@
     <link href="~/ui-user-template/assets/fontawesome/css/all.min.css?v=1.4" rel="stylesheet">
     <link href="~/ui-user-template/assets/font/css2.css?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="~/ui-user-template/assets/bootstrap/css/bootstrap.min.css?v=1.4" rel="stylesheet">
+    <!-- Globe 3D Styles -->
+    <link href="~/ui-user-template/globe-hero.css?v=1.2" rel="stylesheet">
     <style>
         /* Horizontal scrollable tour grid styles */
         .tour-grid-container {
@@ -258,45 +260,114 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-background"></div>
-        <div class="hero-overlay"></div>
-        <div class="bare-container">
-            <div class="hero-content">
-                <div class="hero-badges">
-                    <div class="badge">
-                        <i class="fas fa-check-circle"></i>
-                        <span>250+ trips throughout Vietnam</span>
+    <!-- Hero Section with 3D Globe -->
+    <section class="hero-globe-section">
+        <!-- Globe Container -->
+        <div class="globe-container">
+            <div id="globe-canvas"></div>
+        </div>
+        
+        <!-- Loading State -->
+        <div class="globe-loading">
+            <div class="spinner"></div>
+            <p>Loading 3D Globe...</p>
+        </div>
+        
+        <!-- Hero Content Overlay -->
+        <div class="hero-globe-content">
+            <div class="hero-globe-text">
+                    <!-- Feature Badges -->
+                    <div class="globe-feature-badges">
+                        <div class="globe-badge">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>250+ Tours</span>
+                        </div>
+                        <div class="globe-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Trusted & Safe</span>
+                        </div>
+                        <div class="globe-badge">
+                            <i class="fas fa-headset"></i>
+                            <span>24/7 Support</span>
+                        </div>
                     </div>
-                    <div class="badge">
-                        <i class="fas fa-headset"></i>
-                        <span>24/7 support</span>
+                    
+                    <!-- Main Heading -->
+                    <h1>
+                        Explore Vietnam's<br>
+                        <span class="highlight">Most Beautiful Destinations</span>
+                    </h1>
+                    
+                    <!-- Description -->
+                    <p>
+                        Discover breathtaking boat trips across Vietnam. 
+                        From Ha Long Bay to Mekong Delta, we connect you 
+                        to the most stunning waterways in Southeast Asia.
+                    </p>
+                    
+                    <!-- CTA Buttons with Expandable Search -->
+                    <div class="globe-cta-wrapper">
+                        <div class="globe-search-container" id="globeSearchContainer">
+                            <button class="globe-btn globe-btn-primary" id="searchToggleBtn">
+                                <i class="fas fa-search"></i>
+                                <span>Find Your Tour</span>
+                            </button>
+                            <div class="search-input-wrapper" id="searchInputWrapper">
+                                <input type="text" id="globeSearchInput" placeholder="Where do you want to go?" />
+                                <button class="search-submit-btn">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="globe-btn globe-btn-secondary" id="exploreTourBtn">
+                            <i class="fas fa-compass"></i>
+                            <span>Explore Tours</span>
+                        </button>
                     </div>
-                    <div class="badge">
-                        <i class="fas fa-heart"></i>
-                        <span>Local Experts</span>
+                    
+                    <!-- Cities Info Panel -->
+                    <div class="cities-info-panel">
+                        <div class="city-info-card hanoi" onclick="focusGlobeCity('hanoi')">
+                            <h3>
+                                <span class="city-icon"></span>
+                                Hà Nội
+                            </h3>
+                            <div class="city-stats">
+                                <div class="city-stat">
+                                    <span class="city-stat-label">Tours</span>
+                                    <span class="city-stat-value">85+</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="city-info-card danang" onclick="focusGlobeCity('da nang')">
+                            <h3>
+                                <span class="city-icon"></span>
+                                Đà Nẵng
+                            </h3>
+                            <div class="city-stats">
+                                <div class="city-stat">
+                                    <span class="city-stat-label">Tours</span>
+                                    <span class="city-stat-value">62+</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="city-info-card hcmc" onclick="focusGlobeCity('ho chi minh city')">
+                            <h3>
+                                <span class="city-icon"></span>
+                                TP.HCM
+                            </h3>
+                            <div class="city-stats">
+                                <div class="city-stat">
+                                    <span class="city-stat-label">Tours</span>
+                                    <span class="city-stat-value">103+</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="badge">
-                        <i class="fas fa-star"></i>
-                        <span>Competitive pricing</span>
-                    </div>
-                </div>
-
-                <div class="hero-text">
-                    <h1 class="responsive-text-xl">Book your favorite<br>boat trip</h1>
-                    <p class="responsive-text-md">Book instantly. More than <strong>250+ tours</strong> across Vietnam</p>
-                </div>
-
-                <div class="search-form">
-                    <input type="text" placeholder="Where do you want to go?">
-                    <button type="submit">
-                        <i class="fas fa-search"></i>
-                        <span class="show-mobile">Search</span>
-                    </button>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- About Compass Section -->
@@ -1154,6 +1225,14 @@
             });
         }
     </script>
+
+    <!-- Globe 3D Libraries (Offline) -->
+    <script src="~/ui-user-template/libs/three/three.min.js"></script>
+    <script src="~/ui-user-template/libs/topojson/topojson-client.min.js"></script>
+    <script src="~/ui-user-template/libs/globe-gl/globe.gl.min.js"></script>
+
+    <!-- Globe Hero Logic -->
+    <script src="~/ui-user-template/globe-hero.js?v=1.2"></script>
 </body>
 
 </html>
