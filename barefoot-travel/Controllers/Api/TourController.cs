@@ -24,7 +24,7 @@ namespace barefoot_travel.Controllers.Api
         #region Tour CRUD Operations
 
         /// <summary>
-        /// Get a specific tour by ID
+        /// Get a specific tour by ID (requires authentication)
         /// </summary>
         /// <param name="id">Tour ID</param>
         /// <returns>Tour details with related data</returns>
@@ -33,6 +33,41 @@ namespace barefoot_travel.Controllers.Api
         {
             _logger.LogInformation("Getting tour with ID: {TourId}", id);
             return await _tourService.GetTourByIdAsync(id);
+        }
+
+        /// <summary>
+        /// Get a specific tour by ID (public access - no authentication required)
+        /// </summary>
+        /// <param name="id">Tour ID</param>
+        /// <returns>Tour details with related data</returns>
+        [HttpGet("public/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTourPublic(int id)
+        {
+            _logger.LogInformation("Getting public tour with ID: {TourId}", id);
+            try
+            {
+                var result = await _tourService.GetTourByIdAsync(id);
+                
+                if (!result.Success)
+                {
+                    return NotFound(result);
+                }
+                
+                // Only return tours that are active and public
+                var tour = result.Data as dynamic;
+                if (tour != null && tour.Active == false)
+                {
+                    return NotFound(new ApiResponse(false, "Tour not found or not available"));
+                }
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting public tour with ID: {TourId}", id);
+                return BadRequest(new ApiResponse(false, "Failed to get tour details"));
+            }
         }
 
         /// <summary>
@@ -47,7 +82,7 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
-        /// Get tours by category ID for homepage preview
+        /// Get tours by category ID for homepage preview (no pagination)
         /// </summary>
         /// <param name="categoryId">Category ID</param>
         /// <param name="maxItems">Maximum items to return (default: 20)</param>
@@ -64,6 +99,43 @@ namespace barefoot_travel.Controllers.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting tours by category");
+                return BadRequest(new ApiResponse(false, "Failed to get tours"));
+            }
+        }
+
+        /// <summary>
+        /// Get paginated tours by category ID (includes child categories)
+        /// </summary>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="page">Page number (default: 1)</param>
+        /// <param name="pageSize">Items per page (default: 15)</param>
+        /// <param name="sortBy">Sort field (title, pricePerPerson)</param>
+        /// <param name="sortOrder">Sort direction (asc, desc)</param>
+        /// <param name="search">Search by tour name</param>
+        /// <returns>Paginated list of tours from category and child categories</returns>
+        [HttpGet("by-category/{categoryId}/paged")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetToursByCategoryPaged(
+            int categoryId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
+            [FromQuery] string? sortBy = "title",
+            [FromQuery] string sortOrder = "asc",
+            [FromQuery] string? search = null)
+        {
+            try
+            {
+                _logger.LogInformation("Getting paged tours for category ID: {CategoryId}, Page: {Page}, PageSize: {PageSize}", 
+                    categoryId, page, pageSize);
+                
+                var result = await _tourService.GetToursByCategoryPagedAsync(
+                    categoryId, page, pageSize, sortBy, sortOrder, search);
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting paged tours by category");
                 return BadRequest(new ApiResponse(false, "Failed to get tours"));
             }
         }

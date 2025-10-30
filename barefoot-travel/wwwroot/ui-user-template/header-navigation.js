@@ -118,7 +118,7 @@
                         // Has children - create nested dropdown
                         const $parentItem = $(`
                             <div class="dropdown-item-parent">
-                                <a href="/tours?category=${cat.id}" 
+                                <a href="/tours/${cat.id}" 
                                    data-category-id="${cat.id}"
                                    class="parent-link">
                                     ${sanitizeHtml(cat.categoryName)}
@@ -132,7 +132,7 @@
                         cat.children.forEach(child => {
                             if (child.active) {
                                 const $childLink = $(`
-                                    <a href="/tours?category=${child.id}" 
+                                    <a href="/tours/${child.id}" 
                                        data-category-id="${child.id}"
                                        class="sub-category">
                                         ${sanitizeHtml(child.categoryName)}
@@ -146,7 +146,7 @@
                     } else {
                         // No children - direct link
                         const $link = $(`
-                            <a href="/tours?category=${cat.id}" 
+                            <a href="/tours/${cat.id}" 
                                data-category-id="${cat.id}"
                                class="simple-link">
                                 ${sanitizeHtml(cat.categoryName)}
@@ -259,6 +259,8 @@
         div.textContent = text;
         return div.innerHTML;
     }
+
+    // Removed categoryNameToSlug function - no longer needed with ID-based routing
 
     // ============================================
     // MOBILE MENU TOGGLE

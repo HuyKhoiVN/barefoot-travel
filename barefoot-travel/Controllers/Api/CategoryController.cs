@@ -208,5 +208,27 @@ namespace barefoot_travel.Controllers.Api
             var result = await _categoryService.GetChildrenAsync(id);
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
+        /// <summary>
+        /// Get category by slug/name (case-insensitive)
+        /// </summary>
+        [HttpGet("by-name/{categoryName}")]
+        public async Task<IActionResult> GetCategoryByName(string categoryName)
+        {
+            // Convert slug format (e.g., 'ha-long') to search format
+            var searchName = categoryName.Replace("-", " ");
+            var result = await _categoryService.GetCategoryByNameAsync(searchName);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+        /// <summary>
+        /// Get child categories in tree structure
+        /// </summary>
+        [HttpGet("{parentId}/children-tree")]
+        public async Task<IActionResult> GetChildrenTree(int parentId)
+        {
+            var result = await _categoryService.GetChildrenTreeAsync(parentId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
     }
 }

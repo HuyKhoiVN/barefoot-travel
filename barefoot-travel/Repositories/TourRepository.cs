@@ -284,7 +284,7 @@ namespace barefoot_travel.Repositories
             var totalItems = await sortedQuery.CountAsync();
             var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-            // Execute paginated query with projection to DTO including images
+            // Execute paginated query with projection to DTO including images and categories
             var items = await sortedQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -315,6 +315,17 @@ namespace barefoot_travel.Repositories
                             UpdatedTime = ti.UpdatedTime,
                             UpdatedBy = ti.UpdatedBy,
                             Active = ti.Active
+                        })
+                        .ToList(),
+                    Categories = _context.TourCategories
+                        .Where(tc => tc.TourId == t.Id && tc.Active)
+                        .Join(_context.Categories, tc => tc.CategoryId, c => c.Id, (tc, c) => c)
+                        .Where(c => c.Active)
+                        .Select(c => new CategoryDto
+                        {
+                            Id = c.Id,
+                            CategoryName = c.CategoryName,
+                            Type = c.Type
                         })
                         .ToList()
                 })

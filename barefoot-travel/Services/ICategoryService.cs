@@ -20,5 +20,7 @@ namespace barefoot_travel.Services
         Task<ApiResponse> GetCategoryTreeAsync();
         Task<PagedResult<CategoryDto>> GetTreePagedAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? categoryName = null, string? type = null, List<int>? categoryIds = null, bool? active = null);
         Task<ApiResponse> GetChildrenAsync(int parentId);
+        Task<ApiResponse> GetCategoryByNameAsync(string categoryName);
+        Task<ApiResponse> GetChildrenTreeAsync(int parentId);
     }
 }

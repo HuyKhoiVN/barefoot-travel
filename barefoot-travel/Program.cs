@@ -214,6 +214,12 @@ app.UseAuthorization();
 // Custom JWT Middleware
 app.UseMiddleware<JwtMiddleware>();
 
+// Custom route for tours by category using ID (must be before default route)
+app.MapControllerRoute(
+    name: "toursByCategory",
+    pattern: "tours/{categoryId:int}",
+    defaults: new { controller = "Tours", action = "Index" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

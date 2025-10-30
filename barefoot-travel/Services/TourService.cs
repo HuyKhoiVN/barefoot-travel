@@ -93,6 +93,55 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<PagedResult<TourDto>> GetToursByCategoryPagedAsync(int categoryId, int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", string? search = null)
+        {
+            try
+            {
+                // Get all child category IDs recursively
+                var categoryRepository = _context.Set<Category>();
+                var childCategoryIds = await GetDescendantCategoryIdsRecursive(categoryId);
+                
+                // Include the parent category itself
+                childCategoryIds.Add(categoryId);
+                
+                // Get tours that belong to this category or any of its children
+                return await _tourRepository.GetToursPagedWithBasicInfoAsync(
+                    page, 
+                    pageSize, 
+                    sortBy, 
+                    sortOrder, 
+                    childCategoryIds, 
+                    search, 
+                    true); // Only active tours for public view
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving paged tours by category: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Recursively get all descendant category IDs
+        /// </summary>
+        private async Task<List<int>> GetDescendantCategoryIdsRecursive(int parentId)
+        {
+            var descendantIds = new List<int>();
+            
+            var directChildren = await _context.Categories
+                .Where(c => c.ParentId == parentId && c.Active)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            foreach (var childId in directChildren)
+            {
+                descendantIds.Add(childId);
+                var grandChildren = await GetDescendantCategoryIdsRecursive(childId);
+                descendantIds.AddRange(grandChildren);
+            }
+
+            return descendantIds;
+        }
+
         public async Task<ApiResponse> CreateTourAsync(CreateTourDto dto, string adminUsername)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();

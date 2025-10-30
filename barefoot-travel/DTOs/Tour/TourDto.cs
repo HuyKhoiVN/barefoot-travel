@@ -16,12 +16,12 @@ namespace barefoot_travel.DTOs.Tour
         public string? UpdatedBy { get; set; }
         public bool Active { get; set; }
         public List<TourImageDto> Images { get; set; } = new List<TourImageDto>();
+        public List<CategoryDto> Categories { get; set; } = new List<CategoryDto>();
     }
 
     public class TourDetailDto : TourDto
     {
-        public List<TourImageDto> Images { get; set; } = new List<TourImageDto>();
-        public List<CategoryDto> Categories { get; set; } = new List<CategoryDto>();
+        // Images and Categories inherited from TourDto
         public List<TourPriceDto> Prices { get; set; } = new List<TourPriceDto>();
         public List<PolicyDto> Policies { get; set; } = new List<PolicyDto>();
     }

@@ -1,0 +1,125 @@
+@{
+    var categoryId = ViewData["CategoryId"] != null ? Convert.ToInt32(ViewData["CategoryId"]) : 0;
+    ViewData["Title"] = "Tours";
+    Layout = "_UserLayout";
+}
+
+@section HeadScripts {
+    <!-- CRITICAL: Define CATEGORY_ID before any other scripts -->
+    <script>
+        window.CATEGORY_ID = @categoryId;
+        console.log('🔍 EARLY DEBUG - Category ID defined:', window.CATEGORY_ID);
+        console.log('🔍 EARLY DEBUG - Type:', typeof window.CATEGORY_ID);
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/user/home.css?v=1.4">
+    <link rel="stylesheet" href="~/css/user/category-tours.css?v=1.1">
+    <!-- Advanced animations from Home page -->
+    <link rel="stylesheet" href="~/ui-user-template/advanced-animations.css?v=1.4">
+}
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section">
+        <div class="bare-container">
+            <nav class="breadcrumb-nav">
+                <a href="/">Home</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="categoryBreadcrumb">Loading...</span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Category Banner -->
+    <section class="category-banner">
+        <div class="bare-container">
+            <div class="category-banner-simple">
+                <h1 id="categoryTitle">Loading...</h1>
+                <span class="tour-count-text"> - <span id="tourCount">0</span> Tours</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="category-tours-section">
+        <div class="bare-container">
+            <div class="category-tours-layout">
+                <!-- Left Sidebar: Category Tree -->
+                <aside class="category-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Categories</h3>
+                    </div>
+                    <div class="category-tree" id="categoryTree">
+                        <div class="tree-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading categories...</span>
+                        </div>
+                    </div>
+                    <button class="reset-filters-btn" id="resetFiltersBtn" style="display: none;">
+                        <i class="fas fa-redo"></i>
+                        Reset Filters
+                    </button>
+                </aside>
+
+                <!-- Right Content: Tours Grid -->
+                <main class="tours-content">
+                    <!-- Filters and Search -->
+                    <div class="tours-toolbar">
+                        <div class="search-filter">
+                            <div class="search-input-group">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="tourSearch" placeholder="Search tours by name...">
+                            </div>
+                        </div>
+                        
+                        <div class="sort-filter">
+                            <label for="sortSelect">
+                                <i class="fas fa-sort"></i>
+                                Sort by:
+                            </label>
+                            <select id="sortSelect">
+                                <option value="title_asc">Name (A-Z)</option>
+                                <option value="title_desc">Name (Z-A)</option>
+                                <option value="pricePerPerson_asc">Price (Low to High)</option>
+                                <option value="pricePerPerson_desc">Price (High to Low)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Results Info -->
+                    <div class="results-info">
+                        <p id="resultsCount">Showing 0 tours</p>
+                    </div>
+
+                    <!-- Tours Grid -->
+                    <div class="tours-grid" id="toursGrid">
+                        <!-- Tours will be loaded here -->
+                        <div class="grid-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading tours...</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container" id="paginationContainer">
+                        <!-- Pagination will be loaded here -->
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+@section Scripts {
+    <!-- Modern Effects & Animations (from Home page) -->
+    <script src="~/ui-user-template/modern-effects.js?v=1.3"></script>
+    
+    <!-- Category ID already defined in HeadScripts section -->
+    <script>
+        console.log('🔍 VERIFY - window.CATEGORY_ID before loading category-tours.js:', window.CATEGORY_ID);
+        console.log('🔍 VERIFY - Type:', typeof window.CATEGORY_ID);
+    </script>
+    
+    <script src="~/js/category-tours.js?v=1.8"></script>
+}
+

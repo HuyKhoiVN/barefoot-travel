@@ -310,6 +310,56 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<ApiResponse> GetCategoryByNameAsync(string categoryName)
+        {
+            try
+            {
+                var allCategories = await _categoryRepository.GetAllAsync();
+                var category = allCategories.FirstOrDefault(c => 
+                    c.CategoryName.Equals(categoryName, StringComparison.OrdinalIgnoreCase) && c.Active);
+                
+                if (category == null)
+                {
+                    return new ApiResponse(false, "Category not found");
+                }
+
+                var categoryDto = await MapToCategoryDto(category);
+                
+                // Get total tours for this category
+                categoryDto.TotalTours = await _tourRepository.GetTourCountByCategoryAsync(category.Id);
+                
+                return new ApiResponse(true, "Category retrieved successfully", categoryDto);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving category: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse> GetChildrenTreeAsync(int parentId)
+        {
+            try
+            {
+                var children = await _categoryRepository.GetChildrenAsync(parentId);
+                var categoryDtos = await MapToCategoryDtos(children);
+                
+                // Get total tours for each category
+                foreach (var categoryDto in categoryDtos)
+                {
+                    categoryDto.TotalTours = await _tourRepository.GetTourCountByCategoryAsync(categoryDto.Id);
+                }
+                
+                // Build tree structure
+                var categoryTree = BuildCategoryTree(categoryDtos, parentId);
+                
+                return new ApiResponse(true, "Category children tree retrieved successfully", categoryTree);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving category children tree: {ex.Message}");
+            }
+        }
+
         private async Task<CategoryDto> MapToCategoryDto(Category category)
         {
             string? parentName = null;

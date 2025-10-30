@@ -1,22 +1,11 @@
 ﻿@{
     ViewData["Title"] = "Home";
-    Layout = null;
+    Layout = "_UserLayout";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compass Travel - Book Your Favorite Boat Trip</title>
-    <link href="~/ui-user-template/style.css?v=1.4" rel="stylesheet">
-    <link rel="stylesheet" href="~/ui-user-template/responsive.css?v=1.4">
+@section Styles {
     <link rel="stylesheet" href="~/ui-user-template/sections-theme.css?v=1.4">
     <link rel="stylesheet" href="~/ui-user-template/advanced-animations.css?v=1.4">
-    <link href="~/ui-user-template/assets/fontawesome/css/all.min.css?v=1.4" rel="stylesheet">
-    <link href="~/ui-user-template/assets/font/css2.css?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="~/ui-user-template/assets/bootstrap/css/bootstrap.min.css?v=1.4" rel="stylesheet">
     <!-- Globe 3D Styles -->
     <link href="~/ui-user-template/globe-hero.css?v=1.2" rel="stylesheet">
     <style>
@@ -123,142 +112,8 @@
                 right: -5px;
             }
         }
-
-        /* Currency Selector Dropdown Styles */
-        .currency-selector {
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .currency-selector #currentCurrencyDisplay {
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .currency-dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 10px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            min-width: 150px;
-            z-index: 1000;
-            overflow: hidden;
-            animation: fadeInDown 0.2s ease;
-        }
-
-        @@keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .currency-option {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            width: 100%;
-            text-align: left;
-            background: white;
-            border: none;
-            border-bottom: 1px solid #f0f0f0;
-            color: #333;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .currency-option:last-child {
-            border-bottom: none;
-        }
-
-        .currency-option:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .currency-option:focus {
-            outline: none;
-        }
-
-        .currency-option .currency-symbol {
-            font-size: 18px;
-            font-weight: 600;
-            margin-right: 10px;
-            min-width: 24px;
-        }
-
-        .currency-option .currency-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-        }
-
-        .currency-selector:hover .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-
-        .currency-selector .fa-chevron-down {
-            transition: transform 0.2s ease;
-            font-size: 10px;
-            margin-left: 4px;
-        }
     </style>
-</head>
-
-<body>
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="bare-container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <i class="fas fa-compass"></i>
-                    <span>compass travel</span>
-                </div>
-
-                <nav class="main-nav" id="mainNav">
-                    <!-- Categories will be loaded dynamically from API -->
-                    <div class="nav-loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="search-box hide-mobile">
-                        <input type="text" placeholder="Search tours..." title="Press Enter to search">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="currency-selector dropdown" id="currencySelector">
-                        <span id="currentCurrencyDisplay">₫</span>
-                        <i class="fas fa-chevron-down"></i>
-                        <div class="currency-dropdown-menu">
-                            <button type="button" class="currency-option" data-currency="VND">
-                                <span class="currency-symbol">₫</span>
-                                <span class="currency-name">VND</span>
-                            </button>
-                            <button type="button" class="currency-option" data-currency="USD">
-                                <span class="currency-symbol">$</span>
-                                <span class="currency-name">USD</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+}
 
     <!-- Hero Section with 3D Globe -->
     <section class="hero-globe-section">
@@ -374,7 +229,7 @@
     <section class="about-compass animate-on-scroll responsive-padding">
         <div class="bare-container">
             <div class="section-header">
-                <h2 class="responsive-text-lg">About Compass Travel</h2>
+                <h2 class="responsive-text-lg">About Barefoot Atlas Travel</h2>
                 <a href="#" class="browse-all">
                     <i class="fas fa-arrow-right"></i>
                     <span>Learn more</span>
@@ -485,109 +340,9 @@
         <!-- Sections will be dynamically loaded here based on homepage config -->
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-background"></div>
-        <div class="footer-overlay"></div>
-        <div class="footer-ending">
-            <div class="bare-container">
-                <div class="footer-links-grid">
-                    <div class="footer-links-col">
-                        <h4>Follow Us</h4>
-                        <div class="social-links">
-                            <a href="#" class="social-link facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-link instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-link youtube"><i class="fab fa-youtube"></i></a>
-                            <a href="#" class="social-link tripadvisor"><i class="fab fa-tripadvisor"></i></a>
-                            <a href="#" class="social-link whatsapp"><i class="fab fa-whatsapp"></i></a>
-                        </div>
-                    </div>
-                    <div class="footer-links-col" data-type="destinations">
-                        <h4>Destinations</h4>
-                        <ul>
-                            <!-- Will be populated by footer-enhanced.js (max 5) -->
-                            <li><a href="#">Loading...</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-links-col" data-type="tour-types">
-                        <h4>Tour Types</h4>
-                        <ul>
-                            <!-- Will be populated by footer-enhanced.js (max 5) -->
-                            <li><a href="#">Loading...</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-links-col footer-contact-col">
-                        <h4>Contact Us</h4>
-                        <div class="contact-grid">
-                            <div class="contact-col">
-                                <div class="contact-item-footer">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>123 Nguyen Hue St, District 1<br>Ho Chi Minh City, Vietnam</span>
-                                </div>
-                                <div class="contact-item-footer">
-                                    <i class="fas fa-phone-alt"></i>
-                                    <span>+84 28 3822 8888</span>
-                                </div>
-                            </div>
-                            <div class="contact-col">
-                                <div class="contact-item-footer">
-                                    <i class="fas fa-envelope"></i>
-                                    <span>info@compasstravel.vn</span>
-                                </div>
-                                <div class="contact-item-footer">
-                                    <i class="fas fa-clock"></i>
-                                    <span>Mon - Fri: 8AM - 6PM</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <div class="footer-bottom-left">
-                        <div class="footer-logo">
-                            <i class="fas fa-compass"></i>
-                            <span>compass travel</span>
-                        </div>
-                        <p class="copyright">
-                            © 2025 Compass Travel Vietnam. All rights reserved.
-                            <span class="license">License No: 01-1234/2024-TCDL-GP LHQT</span>
-                        </p>
-                        <div class="footer-legal">
-                            <a href="#">Privacy Policy</a>
-                            <span class="separator">•</span>
-                            <a href="#">Terms of Service</a>
-                            <span class="separator">•</span>
-                            <a href="#">Cookie Policy</a>
-                            <span class="separator">•</span>
-                            <a href="#">Sitemap</a>
-                        </div>
-                    </div>
-
-                    <div class="footer-bottom-right">
-                        <div class="payment-icons">
-                            <i class="fab fa-cc-visa"></i>
-                            <i class="fab fa-cc-mastercard"></i>
-                            <i class="fab fa-cc-paypal"></i>
-                            <i class="fab fa-cc-amex"></i>
-                        </div>
-                        
-                        <div class="back-to-top" id="backToTop">
-                            <i class="fas fa-chevron-up"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="~/ui-user-template/assets/jquery-3.6.0.min.js"></script>
-    <script src="~/ui-user-template/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/ui-user-template/responsive-script.js"></script>
+@section Scripts {
     <script src="~/ui-user-template/script.js"></script>
     <script src="~/ui-user-template/modern-effects.js?v=1.3"></script>
-    <script src="~/ui-user-template/header-navigation.js?v=1.2"></script>
-    <script src="~/ui-user-template/footer-enhanced.js?v=1.2"></script>
-    <script src="~/js/currency-converter.js"></script>
     
     <script>
         $(document).ready(function() {
@@ -832,7 +587,7 @@
                 const tourCount = category.totalTours || 0;
                 
                 container.append(`
-                    <div class="travel-item">
+                    <div class="travel-item" data-category-id="${category.id}" style="cursor: pointer;">
                         <div class="travel-image">
                             <img src="${imageUrl}" alt="${category.categoryName}">
                         </div>
@@ -842,6 +597,12 @@
                         </div>
                     </div>
                 `);
+            });
+
+            // Add click handlers to navigate to category page
+            $('.travel-item').on('click', function() {
+                const categoryId = $(this).data('category-id');
+                window.location.href = `/tours/${categoryId}`;
             });
 
             // Load daily tours data
@@ -861,8 +622,9 @@
 
             tours.forEach(function(tour) {
                 const cardClass = tour.cardClass || '';
-                container.append(`
-                    <div class="daily-tour-card ${cardClass}">
+                
+                const card = $(`
+                    <div class="daily-tour-card ${cardClass}" data-category-id="${tour.categoryId}" style="cursor: pointer;">
                         <div class="daily-card-background" style="background-image: url('${tour.imageUrl}');"></div>
                         <div class="daily-card-overlay"></div>
                         <div class="daily-card-content">
@@ -873,6 +635,15 @@
                         </div>
                     </div>
                 `);
+                
+                // Add click handler
+                card.on('click', function(e) {
+                    e.preventDefault();
+                    const categoryId = $(this).data('category-id');
+                    window.location.href = `/tours/${categoryId}`;
+                });
+                
+                container.append(card);
             });
         }
 
@@ -1224,6 +995,8 @@
                 $('.currency-dropdown-menu').hide();
             });
         }
+        
+        // Removed categoryNameToSlug function - no longer needed with ID-based routing
     </script>
 
     <!-- Globe 3D Libraries (Offline) -->
@@ -1233,6 +1006,4 @@
 
     <!-- Globe Hero Logic -->
     <script src="~/ui-user-template/globe-hero.js?v=1.2"></script>
-</body>
-
-</html>
+}
