@@ -822,11 +822,12 @@ section {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .product-card:hover .main-image {
-  transform: scale(1.05);
+  opacity: 0;
+  transform: scale(1.1);
 }
 
 .gallery-image {
@@ -837,11 +838,12 @@ section {
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .product-card:hover .gallery-image {
   opacity: 1;
+  transform: scale(1.05);
 }
 
 .wishlist-btn {

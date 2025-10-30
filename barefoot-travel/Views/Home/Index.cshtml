@@ -587,7 +587,7 @@
                 const tourCount = category.totalTours || 0;
                 
                 container.append(`
-                    <div class="travel-item" data-category-id="${category.id}" style="cursor: pointer;">
+                    <div class="travel-item" data-category-id="${category.categoryId}" style="cursor: pointer;">
                         <div class="travel-image">
                             <img src="${imageUrl}" alt="${category.categoryName}">
                         </div>
@@ -661,13 +661,14 @@
             
             tours.forEach(function(tour) {
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
                 
                 html += `
                     <div class="product-card">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
-                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
                             <div class="wishlist-btn">
                                 <i class="fas fa-heart"></i>
                             </div>
@@ -747,6 +748,7 @@
             
             tours.forEach(function(tour) {
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
                 const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
                 
@@ -754,7 +756,7 @@
                     <div class="product-card">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
-                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
                             <div class="wishlist-btn">
                                 <i class="fas fa-heart"></i>
                             </div>
@@ -860,6 +862,7 @@
             
             tours.forEach(function(tour) {
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
+                const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
                 const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
                 
@@ -867,7 +870,7 @@
                     <div class="product-card">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
-                            <img src="${imageUrl}" alt="Gallery Image" class="gallery-image">
+                            <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
                             <div class="wishlist-btn">
                                 <i class="fas fa-heart"></i>
                             </div>
