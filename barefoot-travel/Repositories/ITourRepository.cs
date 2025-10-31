@@ -24,7 +24,7 @@ namespace barefoot_travel.Repositories
         Task<TourDetailDto?> GetTourDetailByIdAsync(int id);
         Task<TourDetailDto?> GetTourDetailBySlugAsync(string slug);
         Task<List<TourDto>> GetToursWithBasicInfoAsync();
-        Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null);
+        Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null, string? status = null);
         Task<List<TourDto>> GetToursByCategoryAsync(int categoryId);
 
         // Optimized bulk operations

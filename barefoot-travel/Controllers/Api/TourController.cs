@@ -42,32 +42,10 @@ namespace barefoot_travel.Controllers.Api
         /// <returns>Tour details with related data</returns>
         [HttpGet("public/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTourPublic(int id)
+        public async Task<ApiResponse> GetTourPublic(int id)
         {
-            _logger.LogInformation("Getting public tour with ID: {TourId}", id);
-            try
-            {
-                var result = await _tourService.GetTourByIdAsync(id);
-                
-                if (!result.Success)
-                {
-                    return NotFound(result);
-                }
-                
-                // Only return tours that are active and public
-                var tour = result.Data as dynamic;
-                if (tour != null && tour.Active == false)
-                {
-                    return NotFound(new ApiResponse(false, "Tour not found or not available"));
-                }
-                
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting public tour with ID: {TourId}", id);
-                return BadRequest(new ApiResponse(false, "Failed to get tour details"));
-            }
+            _logger.LogInformation("Getting tour with ID: {TourId}", id);
+            return await _tourService.GetTourByIdAsync(id);
         }
 
         /// <summary>
@@ -105,7 +83,7 @@ namespace barefoot_travel.Controllers.Api
                     return NotFound(result);
                 }
                 
-                // Only return active tours
+                // Only return active tours with public status (status filter already applied in repository)
                 var tour = result.Data as dynamic;
                 if (tour != null && tour.Active == false)
                 {

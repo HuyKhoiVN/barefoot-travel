@@ -130,7 +130,8 @@ namespace barefoot_travel.Services
                     sortOrder, 
                     childCategoryIds, 
                     search, 
-                    true); // Only active tours for public view
+                    true, // Only active tours for public view
+                    Common.TourStatusConstant.Public); // Only public status tours
             }
             catch (Exception ex)
             {

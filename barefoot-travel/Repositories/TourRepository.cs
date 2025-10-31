@@ -195,7 +195,7 @@ namespace barefoot_travel.Repositories
                                       Policies = (from tpol in _context.TourPolicies
                                                   join p in _context.Policies on tpol.PolicyId equals p.Id
                                                   where tpol.TourId == t.Id && tpol.Active && p.Active
-                                                  select new { p.Id, p.PolicyType }).ToList()
+                                                  select new { p.Id, p.PolicyType, p.Content }).ToList()
                                   }).FirstOrDefaultAsync();
 
             if (tourData == null) return null;
@@ -243,7 +243,8 @@ namespace barefoot_travel.Repositories
                 Policies = tourData.Policies.Select(policy => new PolicyDto
                 {
                     Id = policy.Id,
-                    PolicyType = policy.PolicyType
+                    PolicyType = policy.PolicyType,
+                    Content = policy.Content
                 }).ToList()
             };
         }
@@ -255,7 +256,7 @@ namespace barefoot_travel.Repositories
 
             // Single optimized query with all joins performed on server
             var tourData = await (from t in _context.Tours
-                                  where t.Slug != null && t.Slug == slug.ToLower() && t.Active
+                                  where t.Slug != null && t.Slug == slug.ToLower() && t.Active && t.Status == Common.TourStatusConstant.Public
                                   select new
                                   {
                                       Tour = t,
@@ -350,7 +351,7 @@ namespace barefoot_travel.Repositories
                           }).ToListAsync();
         }
 
-        public async Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null)
+        public async Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null, string? status = null)
         {
             // Build base query with optimized filtering
             var baseQuery = _context.Tours.AsQueryable();
@@ -363,6 +364,12 @@ namespace barefoot_travel.Repositories
             else
             {
                 baseQuery = baseQuery.Where(t => t.Active);
+            }
+
+            // Apply status filter if provided
+            if (!string.IsNullOrEmpty(status))
+            {
+                baseQuery = baseQuery.Where(t => t.Status == status);
             }
 
             // Apply search filter by title
@@ -763,7 +770,7 @@ namespace barefoot_travel.Repositories
         {
             var tours = await (from t in _context.Tours
                                join tc in _context.TourCategories on t.Id equals tc.TourId
-                               where tc.CategoryId == categoryId && t.Active && tc.Active
+                               where tc.CategoryId == categoryId && t.Active && tc.Active && t.Status == Common.TourStatusConstant.Public
                                orderby t.CreatedTime descending
                                select new
                                {
@@ -796,7 +803,7 @@ namespace barefoot_travel.Repositories
                 return new List<HomepageTourDto>();
 
             var rawTours = await (from t in _context.Tours
-                                  where tourIds.Contains(t.Id) && t.Active
+                                  where tourIds.Contains(t.Id) && t.Active && t.Status == Common.TourStatusConstant.Public
                                   select new
                                   {
                                       Tour = t,

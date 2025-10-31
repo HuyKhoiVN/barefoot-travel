@@ -61,6 +61,7 @@ namespace barefoot_travel.DTOs.Tour
     {
         public int Id { get; set; }
         public string PolicyType { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
     }
 
     public class TourStatusDto
