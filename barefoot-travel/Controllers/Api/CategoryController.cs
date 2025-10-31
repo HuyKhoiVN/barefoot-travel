@@ -222,6 +222,22 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
+        /// Get category by slug (SEO-friendly)
+        /// </summary>
+        /// <param name="slug">Category slug (e.g., "ha-long-bay")</param>
+        [HttpGet("by-slug/{slug}")]
+        public async Task<IActionResult> GetCategoryBySlug(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                return BadRequest(new ApiResponse(false, "Slug parameter is required"));
+            }
+
+            var result = await _categoryService.GetCategoryBySlugAsync(slug);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+        /// <summary>
         /// Get child categories in tree structure
         /// </summary>
         [HttpGet("{parentId}/children-tree")]

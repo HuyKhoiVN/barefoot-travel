@@ -27,11 +27,17 @@
             });
 
             if (treeResponse.success && treeResponse.data) {
+                console.log('📍 Header Categories loaded:', treeResponse.data.length);
+                console.log('📍 First category:', treeResponse.data[0]);
+                
                 categoriesCache.tree = treeResponse.data;
                 
                 // Separate categories by type
                 categoriesCache.homeCategories = filterCategoriesByType(treeResponse.data, 'HOME-CATEGORY');
                 categoriesCache.tourCategories = filterCategoriesByType(treeResponse.data, 'TOURS');
+                
+                console.log('📍 Home categories:', categoriesCache.homeCategories.length);
+                console.log('📍 Tour categories:', categoriesCache.tourCategories.length);
                 
                 // Build navigation menu
                 buildNavigationMenu();
@@ -113,14 +119,20 @@
         if (categories && categories.length > 0) {
             categories.forEach(cat => {
                 if (cat.active) {
+                    console.log('📍 Building nav for:', cat.categoryName, '- slug:', cat.slug);
+                    
                     // Parent category
                     if (cat.children && cat.children.length > 0) {
                         // Has children - create nested dropdown
+                        // Only navigate if has slug, otherwise just show submenu
+                        const parentUrl = cat.slug ? `/categories/${cat.slug}` : '#';
+                        console.log('   Parent URL:', parentUrl);
                         const $parentItem = $(`
                             <div class="dropdown-item-parent">
-                                <a href="/tours/${cat.id}" 
+                                <a href="${parentUrl}" 
                                    data-category-id="${cat.id}"
-                                   class="parent-link">
+                                   data-category-slug="${cat.slug || ''}"
+                                   class="parent-link ${!cat.slug ? 'no-slug' : ''}">
                                     ${sanitizeHtml(cat.categoryName)}
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
@@ -131,27 +143,50 @@
                         const $submenu = $parentItem.find('.dropdown-submenu');
                         cat.children.forEach(child => {
                             if (child.active) {
+                                // Only create link if child has slug
+                                const childUrl = child.slug ? `/categories/${child.slug}` : '#';
                                 const $childLink = $(`
-                                    <a href="/tours/${child.id}" 
+                                    <a href="${childUrl}" 
                                        data-category-id="${child.id}"
-                                       class="sub-category">
+                                       data-category-slug="${child.slug || ''}"
+                                       class="sub-category ${!child.slug ? 'no-slug' : ''}">
                                         ${sanitizeHtml(child.categoryName)}
                                     </a>
                                 `);
+                                
+                                // Add click handler to prevent navigation if no slug
+                                if (!child.slug) {
+                                    $childLink.on('click', function(e) {
+                                        e.preventDefault();
+                                        console.warn('⚠️ Category has no slug:', child.categoryName);
+                                    });
+                                }
+                                
                                 $submenu.append($childLink);
                             }
                         });
                         
                         $dropdown.append($parentItem);
                     } else {
-                        // No children - direct link
+                        // No children - direct link (only if has slug)
+                        const linkUrl = cat.slug ? `/categories/${cat.slug}` : '#';
                         const $link = $(`
-                            <a href="/tours/${cat.id}" 
+                            <a href="${linkUrl}" 
                                data-category-id="${cat.id}"
-                               class="simple-link">
+                               data-category-slug="${cat.slug || ''}"
+                               class="simple-link ${!cat.slug ? 'no-slug' : ''}">
                                 ${sanitizeHtml(cat.categoryName)}
                             </a>
                         `);
+                        
+                        // Prevent navigation if no slug
+                        if (!cat.slug) {
+                            $link.on('click', function(e) {
+                                e.preventDefault();
+                                console.warn('⚠️ Category has no slug:', cat.categoryName);
+                            });
+                        }
+                        
                         $dropdown.append($link);
                     }
                 }
@@ -260,7 +295,12 @@
         return div.innerHTML;
     }
 
-    // Removed categoryNameToSlug function - no longer needed with ID-based routing
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Slug generation is now handled by backend
+    // Frontend uses slug from API response
 
     // ============================================
     // MOBILE MENU TOGGLE

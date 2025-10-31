@@ -136,6 +136,39 @@ namespace barefoot_travel.Repositories
             return await query.AnyAsync();
         }
 
+        public async Task<Tour?> GetBySlugAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return null;
+
+            return await _context.Tours
+                .Where(t => t.Slug != null && t.Slug == slug.ToLower() && t.Active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> SlugExistsAsync(string slug, int? excludeId = null)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return false;
+
+            var query = _context.Tours.Where(t => t.Slug != null && t.Slug == slug.ToLower());
+            
+            if (excludeId.HasValue)
+            {
+                query = query.Where(t => t.Id != excludeId.Value);
+            }
+            
+            return await query.AnyAsync();
+        }
+
+        public async Task<List<string>> GetAllSlugsAsync()
+        {
+            return await _context.Tours
+                .Where(t => t.Slug != null)
+                .Select(t => t.Slug!)
+                .ToListAsync();
+        }
+
         #endregion
 
         #region Tour with Related Data - DTO methods with joins
@@ -172,6 +205,7 @@ namespace barefoot_travel.Repositories
             {
                 Id = tourData.Tour.Id,
                 Title = tourData.Tour.Title,
+                Slug = tourData.Tour.Slug,
                 Description = tourData.Tour.Description,
                 MapLink = tourData.Tour.MapLink,
                 PricePerPerson = tourData.Tour.PricePerPerson,
@@ -195,6 +229,85 @@ namespace barefoot_travel.Repositories
                 {
                     Id = cat.Id,
                     CategoryName = cat.CategoryName,
+                    Type = cat.Type
+                }).ToList(),
+                Prices = tourData.Prices.Select(price => new TourPriceDto
+                {
+                    Id = price.Id,
+                    TourId = price.TourId,
+                    PriceTypeId = price.PriceTypeId,
+                    PriceTypeName = price.PriceTypeName,
+                    Price = price.Price,
+                    CreatedTime = price.CreatedTime
+                }).ToList(),
+                Policies = tourData.Policies.Select(policy => new PolicyDto
+                {
+                    Id = policy.Id,
+                    PolicyType = policy.PolicyType
+                }).ToList()
+            };
+        }
+
+        public async Task<TourDetailDto?> GetTourDetailBySlugAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return null;
+
+            // Single optimized query with all joins performed on server
+            var tourData = await (from t in _context.Tours
+                                  where t.Slug != null && t.Slug == slug.ToLower() && t.Active
+                                  select new
+                                  {
+                                      Tour = t,
+                                      Images = (from ti in _context.TourImages
+                                                where ti.TourId == t.Id && ti.Active
+                                                select new { ti.Id, ti.TourId, ti.ImageUrl, ti.IsBanner, ti.CreatedTime }).ToList(),
+                                      Categories = (from tc in _context.TourCategories
+                                                    join c in _context.Categories on tc.CategoryId equals c.Id
+                                                    where tc.TourId == t.Id && tc.Active && c.Active
+                                                    select new { c.Id, c.CategoryName, c.Slug, c.Type }).ToList(),
+                                      Prices = (from tp in _context.TourPrices
+                                                join pt in _context.PriceTypes on tp.PriceTypeId equals pt.Id
+                                                where tp.TourId == t.Id && tp.Active && pt.Active
+                                                select new { tp.Id, tp.TourId, tp.PriceTypeId, pt.PriceTypeName, tp.Price, tp.CreatedTime }).ToList(),
+                                      Policies = (from tpol in _context.TourPolicies
+                                                  join p in _context.Policies on tpol.PolicyId equals p.Id
+                                                  where tpol.TourId == t.Id && tpol.Active && p.Active
+                                                  select new { p.Id, p.PolicyType }).ToList()
+                                  }).FirstOrDefaultAsync();
+
+            if (tourData == null) return null;
+
+            // Map to DTO after server-side data retrieval
+            return new TourDetailDto
+            {
+                Id = tourData.Tour.Id,
+                Title = tourData.Tour.Title,
+                Slug = tourData.Tour.Slug,
+                Description = tourData.Tour.Description,
+                MapLink = tourData.Tour.MapLink,
+                PricePerPerson = tourData.Tour.PricePerPerson,
+                MaxPeople = tourData.Tour.MaxPeople,
+                Duration = tourData.Tour.Duration,
+                StartTime = tourData.Tour.StartTime,
+                ReturnTime = tourData.Tour.ReturnTime,
+                CreatedTime = tourData.Tour.CreatedTime,
+                UpdatedTime = tourData.Tour.UpdatedTime,
+                UpdatedBy = tourData.Tour.UpdatedBy,
+                Active = tourData.Tour.Active,
+                Images = tourData.Images.Select(img => new TourImageDto
+                {
+                    Id = img.Id,
+                    TourId = img.TourId,
+                    ImageUrl = img.ImageUrl,
+                    IsBanner = img.IsBanner,
+                    CreatedTime = img.CreatedTime
+                }).ToList(),
+                Categories = tourData.Categories.Select(cat => new CategoryDto
+                {
+                    Id = cat.Id,
+                    CategoryName = cat.CategoryName,
+                    Slug = cat.Slug,
                     Type = cat.Type
                 }).ToList(),
                 Prices = tourData.Prices.Select(price => new TourPriceDto

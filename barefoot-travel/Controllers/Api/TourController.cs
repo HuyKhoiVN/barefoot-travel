@@ -82,6 +82,46 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
+        /// Get tour by slug (public access - SEO-friendly)
+        /// </summary>
+        /// <param name="slug">Tour slug (e.g., "ha-long-bay-2-day-cruise")</param>
+        [HttpGet("by-slug/{slug}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTourBySlug(string slug)
+        {
+            _logger.LogInformation("Getting tour by slug: {Slug}", slug);
+            
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                return BadRequest(new ApiResponse(false, "Slug parameter is required"));
+            }
+
+            try
+            {
+                var result = await _tourService.GetTourBySlugAsync(slug);
+                
+                if (!result.Success)
+                {
+                    return NotFound(result);
+                }
+                
+                // Only return active tours
+                var tour = result.Data as dynamic;
+                if (tour != null && tour.Active == false)
+                {
+                    return NotFound(new ApiResponse(false, "Tour not found or not available"));
+                }
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting tour by slug: {Slug}", slug);
+                return BadRequest(new ApiResponse(false, "Failed to get tour details"));
+            }
+        }
+
+        /// <summary>
         /// Get tours by category ID for homepage preview (no pagination)
         /// </summary>
         /// <param name="categoryId">Category ID</param>

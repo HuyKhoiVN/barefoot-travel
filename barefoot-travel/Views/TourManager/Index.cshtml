@@ -102,8 +102,25 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label">Slug (SEO URL)</label>
+                                <input type="text" class="form-control" id="createTourSlug" placeholder="Auto-generate from title">
+                                <div class="form-text">
+                                    <small class="text-muted">Leave empty to auto-generate. Example: "ha-long-2-day-cruise"</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label">Duration <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="createDuration" placeholder="e.g., 3 days 2 nights" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Price Per Person <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="createPricePerPerson" step="0.01" min="0" required>
                             </div>
                         </div>
                     </div>
@@ -300,8 +317,25 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label">Slug (SEO URL)</label>
+                                <input type="text" class="form-control" id="editTourSlug">
+                                <div class="form-text">
+                                    <small class="text-muted">Leave empty to auto-update from title</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label">Duration <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="editDuration" placeholder="e.g., 3 days 2 nights" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Price Per Person <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editPricePerPerson" step="0.01" min="0" required>
                             </div>
                         </div>
                     </div>
@@ -2024,6 +2058,7 @@ $(document).ready(function() {
 
         const tourData = {
             title: $('#createTitle').val(),
+            slug: $('#createTourSlug').val().trim() || null,
             description: $('#createDescription').val(),
             mapLink: $('#createMapLink').val() || null,
             pricePerPerson: parseFloat($('#createPricePerPerson').val()),
@@ -2078,6 +2113,7 @@ $(document).ready(function() {
 
         const tourData = {
             title: $('#editTitle').val(),
+            slug: $('#editTourSlug').val().trim() || null,
             description: $('#editDescription').val(),
             mapLink: $('#editMapLink').val() || null,
             pricePerPerson: parseFloat($('#editPricePerPerson').val()),
@@ -2236,6 +2272,7 @@ $(document).ready(function() {
     function populateEditForm(tour) {
         $('#editTourId').val(tour.id);
         $('#editTitle').val(tour.title);
+        $('#editTourSlug').val(tour.slug || '');
         $('#editDescription').val(tour.description || '');
         $('#editDescriptionPreview').html(tour.description || '<p class="text-muted mb-0">Click "Edit Description" to add tour description...</p>');
         $('#editMapLink').val(tour.mapLink || '');
@@ -2301,6 +2338,53 @@ $(document).ready(function() {
             timeout = setTimeout(later, wait);
         };
     }
+
+    // Slug Auto-Preview
+    function generateSlugPreview(text) {
+        if (!text) return '';
+        return text.toLowerCase()
+            .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+            .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
+            .replace(/[ìíịỉĩ]/g, 'i')
+            .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
+            .replace(/[ùúụủũưừứựửữ]/g, 'u')
+            .replace(/[ỳýỵỷỹ]/g, 'y')
+            .replace(/[đ]/g, 'd')
+            .replace(/ - /g, '-')
+            .replace(/ \/ /g, '-')
+            .replace(/ & /g, '-')
+            .replace(/ \+ /g, '-')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    // Auto-preview for Create form
+    $('#createTitle').on('input', function() {
+        const slugField = $('#createTourSlug');
+        if (slugField.val() === '') {
+            const title = $(this).val();
+            const preview = generateSlugPreview(title);
+            slugField.attr('placeholder', preview ? 'Auto: ' + preview : 'Auto-generate from title');
+        }
+    });
+
+    // Auto-preview for Edit form
+    $('#editTitle').on('input', function() {
+        const slugField = $('#editTourSlug');
+        if (slugField.val() === '') {
+            const title = $(this).val();
+            const preview = generateSlugPreview(title);
+            slugField.attr('placeholder', preview ? 'Auto: ' + preview : 'Auto-generate from title');
+        }
+    });
+
+    // Clear placeholder when user starts typing in slug field
+    $('#createTourSlug, #editTourSlug').on('input', function() {
+        if ($(this).val()) {
+            $(this).attr('placeholder', '');
+        }
+    });
 
             // formatCurrency is now provided globally by currency-converter.js
 });

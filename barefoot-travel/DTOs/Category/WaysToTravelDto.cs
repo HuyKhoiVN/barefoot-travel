@@ -4,6 +4,7 @@ namespace barefoot_travel.DTOs.Category
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
         public int TotalTours { get; set; }
         public string ImageUrl1 { get; set; } = string.Empty;
         public string? ImageUrl2 { get; set; }

@@ -171,6 +171,39 @@ namespace barefoot_travel.Repositories
                 .AnyAsync();
         }
 
+        public async Task<Category?> GetBySlugAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return null;
+
+            return await _context.Categories
+                .Where(c => c.Slug != null && c.Slug == slug.ToLower() && c.Active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> SlugExistsAsync(string slug, int? excludeId = null)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return false;
+
+            var query = _context.Categories.Where(c => c.Slug != null && c.Slug == slug.ToLower());
+            
+            if (excludeId.HasValue)
+            {
+                query = query.Where(c => c.Id != excludeId.Value);
+            }
+            
+            return await query.AnyAsync();
+        }
+
+        public async Task<List<string>> GetAllSlugsAsync()
+        {
+            return await _context.Categories
+                .Where(c => c.Slug != null)
+                .Select(c => c.Slug!)
+                .ToListAsync();
+        }
+
         public async Task<List<Category>> GetByTypeAsync(string type)
         {
             return await _context.Categories

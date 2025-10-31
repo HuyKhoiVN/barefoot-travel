@@ -16,6 +16,9 @@ namespace barefoot_travel.Repositories
         Task<bool> ExistsAsync(int id);
         Task<bool> NameExistsAsync(string categoryName, int? excludeId = null);
         Task<bool> HasChildrenAsync(int id);
+        Task<Category?> GetBySlugAsync(string slug);
+        Task<bool> SlugExistsAsync(string slug, int? excludeId = null);
+        Task<List<string>> GetAllSlugsAsync();
         Task<List<Category>> GetByTypeAsync(string type);
         Task<List<Category>> GetByParentIdAsync(int? parentId);
         Task<bool> UpdateStatusAsync(int id, bool active, string updatedBy);

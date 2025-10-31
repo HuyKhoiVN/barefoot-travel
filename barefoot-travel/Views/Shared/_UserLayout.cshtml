@@ -16,6 +16,18 @@
     @RenderSection("Styles", required: false)
     
     <style>
+        /* Navigation - Disabled links for categories without slug */
+        .nav-item a.no-slug {
+            opacity: 0.5;
+            cursor: not-allowed;
+            color: #999 !important;
+        }
+        
+        .nav-item a.no-slug:hover {
+            background-color: #f8f9fa !important;
+            color: #999 !important;
+        }
+
         /* Currency Selector Dropdown Styles */
         .currency-selector {
             position: relative;

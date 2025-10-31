@@ -39,6 +39,7 @@ namespace barefoot_travel.DTOs.Category
         public int CategoryId { get; set; }
         public string Badge { get; set; } = string.Empty; // daily-card-category (e.g., "DAILY TOURS")
         public string CategoryName { get; set; } = string.Empty; // h3 title
+        public string Slug { get; set; } = string.Empty; // Category slug for navigation
         public string Description { get; set; } = string.Empty; // p description
         public string ImageUrl { get; set; } = string.Empty;
         public int DisplayOrder { get; set; }

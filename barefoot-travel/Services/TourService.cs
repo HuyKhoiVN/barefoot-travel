@@ -55,6 +55,24 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<ApiResponse> GetTourBySlugAsync(string slug)
+        {
+            try
+            {
+                var tourDetail = await _tourRepository.GetTourDetailBySlugAsync(slug);
+                if (tourDetail == null)
+                {
+                    return new ApiResponse(false, "Tour not found");
+                }
+
+                return new ApiResponse(true, "Tour retrieved successfully", tourDetail);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving tour: {ex.Message}");
+            }
+        }
+
         public async Task<ApiResponse> GetAllToursAsync()
         {
             try
@@ -153,8 +171,31 @@ namespace barefoot_travel.Services
                     return new ApiResponse(false, "Tour title already exists");
                 }
 
+                // Generate slug if not provided
+                var slug = string.IsNullOrWhiteSpace(dto.Slug) 
+                    ? SlugGenerator.GenerateSlug(dto.Title) 
+                    : SlugGenerator.GenerateSlug(dto.Slug);
+
+                // Only set slug if generation was successful
+                if (!string.IsNullOrWhiteSpace(slug))
+                {
+                    // Validate slug format
+                    if (!SlugGenerator.IsValidSlug(slug))
+                    {
+                        return new ApiResponse(false, "Invalid slug format");
+                    }
+
+                    // Ensure slug is unique
+                    if (await _tourRepository.SlugExistsAsync(slug))
+                    {
+                        var existingSlugs = await _tourRepository.GetAllSlugsAsync();
+                        slug = SlugGenerator.EnsureUnique(slug, existingSlugs);
+                    }
+                }
+
                 // Create tour
                 var tour = MapToTour(dto, adminUsername);
+                tour.Slug = string.IsNullOrWhiteSpace(slug) ? null : slug;
                 var createdTour = await _tourRepository.CreateAsync(tour);
 
                 // Create related data within transaction
@@ -187,6 +228,43 @@ namespace barefoot_travel.Services
                 if (await _tourRepository.TitleExistsAsync(dto.Title, id))
                 {
                     return new ApiResponse(false, "Tour title already exists");
+                }
+
+                // Handle slug update
+                if (!string.IsNullOrWhiteSpace(dto.Slug))
+                {
+                    var newSlug = SlugGenerator.GenerateSlug(dto.Slug);
+                    
+                    // Only update if slug generation was successful
+                    if (!string.IsNullOrWhiteSpace(newSlug))
+                    {
+                        // Validate slug format
+                        if (!SlugGenerator.IsValidSlug(newSlug))
+                        {
+                            await transaction.RollbackAsync();
+                            return new ApiResponse(false, "Invalid slug format");
+                        }
+                        
+                        // Check if slug changed and new slug is unique
+                        if (newSlug != tour.Slug && 
+                            await _tourRepository.SlugExistsAsync(newSlug, id))
+                        {
+                            await transaction.RollbackAsync();
+                            return new ApiResponse(false, "Slug already exists");
+                        }
+                        
+                        tour.Slug = newSlug;
+                    }
+                }
+                else if (dto.Title != tour.Title)
+                {
+                    // Auto-update slug if title changed but slug not provided
+                    var newSlug = SlugGenerator.GenerateSlug(dto.Title);
+                    if (!string.IsNullOrWhiteSpace(newSlug) && 
+                        !await _tourRepository.SlugExistsAsync(newSlug, id))
+                    {
+                        tour.Slug = newSlug;
+                    }
                 }
 
                 // Update tour basic info

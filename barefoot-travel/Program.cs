@@ -214,7 +214,18 @@ app.UseAuthorization();
 // Custom JWT Middleware
 app.UseMiddleware<JwtMiddleware>();
 
-// Custom route for tours by category using ID (must be before default route)
+// Slug-based category tours route (NEW - PRIORITY)
+// Example: /categories/ha-long-bay
+app.MapControllerRoute(
+    name: "categoriesBySlug",
+    pattern: "categories/{slug}",
+    defaults: new { controller = "Categories", action = "Index" },
+    constraints: new { 
+        slug = @"^[a-z0-9-]+$"  // Only lowercase, numbers, hyphens
+    });
+
+// OLD: Keep for backward compatibility (ID-based)
+// Example: /tours/123
 app.MapControllerRoute(
     name: "toursByCategory",
     pattern: "tours/{categoryId:int}",

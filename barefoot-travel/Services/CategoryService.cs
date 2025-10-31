@@ -88,7 +88,30 @@ namespace barefoot_travel.Services
                     return new ApiResponse(false, "Parent category not found");
                 }
 
+                // Generate slug if not provided
+                var slug = string.IsNullOrWhiteSpace(dto.Slug) 
+                    ? SlugGenerator.GenerateSlug(dto.CategoryName) 
+                    : SlugGenerator.GenerateSlug(dto.Slug);
+
+                // Only set slug if generation was successful
+                if (!string.IsNullOrWhiteSpace(slug))
+                {
+                    // Validate slug format
+                    if (!SlugGenerator.IsValidSlug(slug))
+                    {
+                        return new ApiResponse(false, "Invalid slug format");
+                    }
+
+                    // Ensure slug is unique
+                    if (await _categoryRepository.SlugExistsAsync(slug))
+                    {
+                        var existingSlugs = await _categoryRepository.GetAllSlugsAsync();
+                        slug = SlugGenerator.EnsureUnique(slug, existingSlugs);
+                    }
+                }
+
                 var category = MapToCategory(dto, adminUsername);
+                category.Slug = string.IsNullOrWhiteSpace(slug) ? null : slug;
                 var createdCategory = await _categoryRepository.CreateAsync(category);
                 var categoryDto = await MapToCategoryDto(createdCategory);
 
@@ -128,9 +151,44 @@ namespace barefoot_travel.Services
                     return new ApiResponse(false, "Category cannot be its own parent");
                 }
 
+                // Handle slug update
+                if (!string.IsNullOrWhiteSpace(dto.Slug))
+                {
+                    var newSlug = SlugGenerator.GenerateSlug(dto.Slug);
+                    
+                    // Only update if slug generation was successful
+                    if (!string.IsNullOrWhiteSpace(newSlug))
+                    {
+                        // Validate slug format
+                        if (!SlugGenerator.IsValidSlug(newSlug))
+                        {
+                            return new ApiResponse(false, "Invalid slug format");
+                        }
+                        
+                        // Check if slug changed and new slug is unique
+                        if (newSlug != category.Slug && 
+                            await _categoryRepository.SlugExistsAsync(newSlug, id))
+                        {
+                            return new ApiResponse(false, "Slug already exists");
+                        }
+                        
+                        category.Slug = newSlug;
+                    }
+                }
+                else if (dto.CategoryName != category.CategoryName)
+                {
+                    // Auto-update slug if name changed but slug not provided
+                    var newSlug = SlugGenerator.GenerateSlug(dto.CategoryName);
+                    if (!string.IsNullOrWhiteSpace(newSlug) && 
+                        !await _categoryRepository.SlugExistsAsync(newSlug, id))
+                    {
+                        category.Slug = newSlug;
+                    }
+                }
+
                 MapToCategoryForUpdate(category, dto, adminUsername);
                 await _categoryRepository.UpdateAsync(category);
-                var categoryDto = MapToCategoryDto(category);
+                var categoryDto = await MapToCategoryDto(category);
 
                 return new ApiResponse(true, "Category updated successfully", categoryDto);
             }
@@ -336,6 +394,29 @@ namespace barefoot_travel.Services
             }
         }
 
+        public async Task<ApiResponse> GetCategoryBySlugAsync(string slug)
+        {
+            try
+            {
+                var category = await _categoryRepository.GetBySlugAsync(slug);
+                if (category == null)
+                {
+                    return new ApiResponse(false, "Category not found");
+                }
+
+                var categoryDto = await MapToCategoryDto(category);
+                
+                // Get total tours for this category
+                categoryDto.TotalTours = await _tourRepository.GetTourCountByCategoryAsync(category.Id);
+                
+                return new ApiResponse(true, "Category retrieved successfully", categoryDto);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error retrieving category: {ex.Message}");
+            }
+        }
+
         public async Task<ApiResponse> GetChildrenTreeAsync(int parentId)
         {
             try
@@ -375,6 +456,7 @@ namespace barefoot_travel.Services
                 ParentId = category.ParentId,
                 ParentName = parentName,
                 CategoryName = category.CategoryName,
+                Slug = category.Slug ?? "",
                 Enable = category.Enable,
                 Type = category.Type,
                 Priority = category.Priority,
@@ -431,6 +513,7 @@ namespace barefoot_travel.Services
                     ParentId = category.ParentId,
                     ParentName = parentName,
                     CategoryName = category.CategoryName,
+                    Slug = category.Slug ?? "",
                     Enable = category.Enable,
                     Type = category.Type,
                     Priority = category.Priority,
@@ -454,6 +537,7 @@ namespace barefoot_travel.Services
                     Id = c.Id,
                     ParentId = c.ParentId,
                     CategoryName = c.CategoryName,
+                    Slug = c.Slug,
                     Enable = c.Enable,
                     Type = c.Type,
                     Priority = c.Priority,

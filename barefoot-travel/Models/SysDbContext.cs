@@ -152,6 +152,10 @@ public partial class SysDbContext : DbContext
 
             entity.HasIndex(e => new { e.HomepageTitle, e.Active, e.HomepageOrder }, "IX_Category_HomepageDisplay");
 
+            entity.HasIndex(e => e.Slug, "IX_Category_Slug")
+                .IsUnique()
+                .HasFilter("([Slug] IS NOT NULL)");
+
             entity.HasIndex(e => new { e.ShowInWaysToTravel, e.WaysToTravelOrder }, "IX_Category_WaysToTravel");
 
             entity.Property(e => e.Active).HasDefaultValue(true);
@@ -167,6 +171,7 @@ public partial class SysDbContext : DbContext
             entity.Property(e => e.HomepageTitle).HasMaxLength(200);
             entity.Property(e => e.ShowInDailyTours).HasDefaultValue(false);
             entity.Property(e => e.ShowInWaysToTravel).HasDefaultValue(false);
+            entity.Property(e => e.Slug).HasMaxLength(200);
             entity.Property(e => e.Type).HasMaxLength(50);
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
             entity.Property(e => e.UpdatedTime).HasColumnType("datetime");
@@ -417,6 +422,10 @@ public partial class SysDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tours__3214EC075316BC9A");
 
+            entity.HasIndex(e => e.Slug, "IX_Tour_Slug")
+                .IsUnique()
+                .HasFilter("([Slug] IS NOT NULL)");
+
             entity.HasIndex(e => e.Status, "IX_Tour_Status").HasFilter("([Active]=(1))");
 
             entity.HasIndex(e => new { e.Status, e.Active }, "IX_Tour_Status_Active");
@@ -430,6 +439,7 @@ public partial class SysDbContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(false);
             entity.Property(e => e.PricePerPerson).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Slug).HasMaxLength(300);
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasDefaultValue("draft");

@@ -187,6 +187,7 @@ namespace barefoot_travel.Services
                     {
                         CategoryId = category.Id,
                         CategoryName = category.CategoryName,
+                        Slug = category.Slug ?? "",
                         TotalTours = totalTours,
                         ImageUrl1 = category.WaysToTravelImage1,
                         ImageUrl2 = category.WaysToTravelImage2,

@@ -33,6 +33,8 @@ public partial class Tour
 
     public string Status { get; set; } = null!;
 
+    public string? Slug { get; set; }
+
     public virtual ICollection<HomePageFeaturedTour> HomePageFeaturedTours { get; set; } = new List<HomePageFeaturedTour>();
 
     public virtual ICollection<HomePageSectionTour> HomePageSectionTours { get; set; } = new List<HomePageSectionTour>();

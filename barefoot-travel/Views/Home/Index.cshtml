@@ -412,7 +412,9 @@
                 type: 'GET',
                 success: function(response) {
                     console.log('Ways to Travel response:', response);
+                    console.log('Categories data:', response.data?.categories);
                     if (response.success && response.data) {
+                        console.log('First category:', response.data.categories[0]);
                         renderWaysToTravelSection(response.data.categories);
                     }
                 },
@@ -585,9 +587,18 @@
             sortedCategories.forEach(function(category) {
                 const imageUrl = category.imageUrl1 || '/ui-user-template/images/home_background.jpg';
                 const tourCount = category.totalTours || 0;
+                const categorySlug = category.slug || '';
+                
+                console.log('📊 Rendering category:', category.categoryName);
+                console.log('   - categoryId:', category.categoryId);
+                console.log('   - slug:', category.slug);
+                console.log('   - final categorySlug:', categorySlug);
                 
                 container.append(`
-                    <div class="travel-item" data-category-id="${category.categoryId}" style="cursor: pointer;">
+                    <div class="travel-item" 
+                         data-category-id="${category.categoryId}" 
+                         data-category-slug="${categorySlug}" 
+                         style="cursor: pointer;">
                         <div class="travel-image">
                             <img src="${imageUrl}" alt="${category.categoryName}">
                         </div>
@@ -599,10 +610,15 @@
                 `);
             });
 
-            // Add click handlers to navigate to category page
+            // Add click handlers to navigate to category page using SLUG ONLY
             $('.travel-item').on('click', function() {
-                const categoryId = $(this).data('category-id');
-                window.location.href = `/tours/${categoryId}`;
+                const categorySlug = $(this).data('category-slug');
+                if (categorySlug) {
+                    window.location.href = `/categories/${categorySlug}`;
+                } else {
+                    // No slug available - stay on page, show message
+                    console.warn('⚠️ Category has no slug, cannot navigate');
+                }
             });
 
             // Load daily tours data
@@ -622,9 +638,18 @@
 
             tours.forEach(function(tour) {
                 const cardClass = tour.cardClass || '';
+                const categorySlug = tour.slug || '';
+                
+                console.log('📊 Rendering daily tour:', tour.categoryName);
+                console.log('   - categoryId:', tour.categoryId);
+                console.log('   - slug:', tour.slug);
+                console.log('   - final categorySlug:', categorySlug);
                 
                 const card = $(`
-                    <div class="daily-tour-card ${cardClass}" data-category-id="${tour.categoryId}" style="cursor: pointer;">
+                    <div class="daily-tour-card ${cardClass}" 
+                         data-category-id="${tour.categoryId}" 
+                         data-category-slug="${categorySlug}" 
+                         style="cursor: pointer;">
                         <div class="daily-card-background" style="background-image: url('${tour.imageUrl}');"></div>
                         <div class="daily-card-overlay"></div>
                         <div class="daily-card-content">
@@ -636,11 +661,16 @@
                     </div>
                 `);
                 
-                // Add click handler
+                // Add click handler using SLUG ONLY
                 card.on('click', function(e) {
                     e.preventDefault();
-                    const categoryId = $(this).data('category-id');
-                    window.location.href = `/tours/${categoryId}`;
+                    const categorySlug = $(this).data('category-slug');
+                    if (categorySlug) {
+                        window.location.href = `/categories/${categorySlug}`;
+                    } else {
+                        // No slug - stay on page
+                        console.warn('⚠️ Daily tour category has no slug, cannot navigate');
+                    }
                 });
                 
                 container.append(card);

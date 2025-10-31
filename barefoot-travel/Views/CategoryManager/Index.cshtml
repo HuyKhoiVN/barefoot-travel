@@ -133,6 +133,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label">Slug (SEO URL)</label>
+                                <input type="text" class="form-control" id="createCategorySlug" placeholder="Auto-generate from name">
+                                <div class="form-text">
+                                    <small class="text-muted">Leave empty to auto-generate. Example: "ha-long-bay"</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label">Type <span class="text-danger">*</span></label>
                                 <select class="form-select" id="createType" required>
                                     <option value="">Select Type</option>
@@ -140,8 +151,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Priority</label>
@@ -149,6 +158,8 @@
                                 <div class="form-text">Higher number = higher priority (0 = default)</div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Status</label>
@@ -213,11 +224,29 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label">Slug (SEO URL)</label>
+                                <input type="text" class="form-control" id="editCategorySlug">
+                                <div class="form-text">
+                                    <small class="text-muted">Leave empty to auto-update from name</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label">Type <span class="text-danger">*</span></label>
                                 <select class="form-select" id="editType" required>
                                     <option value="">Select Type</option>
                                     <!-- Types will be loaded from API -->
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <input type="number" class="form-control" id="editPriority" min="0" value="0">
+                                <div class="form-text">Higher number = higher priority (0 = default)</div>
                             </div>
                         </div>
                     </div>
@@ -1732,6 +1761,7 @@ $(document).ready(function() {
 
         const categoryData = {
             categoryName: $('#createCategoryName').val(),
+            slug: $('#createCategorySlug').val().trim() || null,
             type: $('#createType').val(),
             parentId: $('#createParentCategoryId').val() || null,
             enable: $('#createEnable').is(':checked'),
@@ -1783,6 +1813,7 @@ $(document).ready(function() {
 
         const categoryData = {
             categoryName: $('#editCategoryName').val(),
+            slug: $('#editCategorySlug').val().trim() || null,
             type: $('#editType').val(),
             parentId: $('#editParentCategoryId').val() || null,
             enable: $('#editEnable').is(':checked'),
@@ -1954,6 +1985,7 @@ $(document).ready(function() {
     function populateEditForm(category) {
         $('#editCategoryId').val(category.id);
         $('#editCategoryName').val(category.categoryName);
+        $('#editCategorySlug').val(category.slug || '');
         $('#editType').val(category.type || '');
         $('#editPriority').val(category.priority || 0);
         
@@ -1994,6 +2026,53 @@ $(document).ready(function() {
         const date = new Date(dateString);
         return date.toLocaleDateString('vi-VN');
     }
+
+    // Slug Auto-Preview
+    function generateSlugPreview(text) {
+        if (!text) return '';
+        return text.toLowerCase()
+            .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+            .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
+            .replace(/[ìíịỉĩ]/g, 'i')
+            .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
+            .replace(/[ùúụủũưừứựửữ]/g, 'u')
+            .replace(/[ỳýỵỷỹ]/g, 'y')
+            .replace(/[đ]/g, 'd')
+            .replace(/ - /g, '-')
+            .replace(/ \/ /g, '-')
+            .replace(/ & /g, '-')
+            .replace(/ \+ /g, '-')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    // Auto-preview for Create form
+    $('#createCategoryName').on('input', function() {
+        const slugField = $('#createCategorySlug');
+        if (slugField.val() === '') {
+            const name = $(this).val();
+            const preview = generateSlugPreview(name);
+            slugField.attr('placeholder', preview ? 'Auto: ' + preview : 'Auto-generate from name');
+        }
+    });
+
+    // Auto-preview for Edit form
+    $('#editCategoryName').on('input', function() {
+        const slugField = $('#editCategorySlug');
+        if (slugField.val() === '') {
+            const name = $(this).val();
+            const preview = generateSlugPreview(name);
+            slugField.attr('placeholder', preview ? 'Auto: ' + preview : 'Auto-generate from name');
+        }
+    });
+
+    // Clear placeholder when user starts typing in slug field
+    $('#createCategorySlug, #editCategorySlug').on('input', function() {
+        if ($(this).val()) {
+            $(this).attr('placeholder', '');
+        }
+    });
 });
 </script>
 }

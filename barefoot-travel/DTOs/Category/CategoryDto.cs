@@ -8,6 +8,7 @@ namespace barefoot_travel.DTOs.Category
         public int? ParentId { get; set; }
         public string? ParentName { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
         public bool Enable { get; set; }
         public string Type { get; set; } = string.Empty;
         public int Priority { get; set; }
@@ -25,6 +26,9 @@ namespace barefoot_travel.DTOs.Category
         [StringLength(100, ErrorMessage = "Category name cannot exceed 100 characters")]
         public string CategoryName { get; set; } = string.Empty;
 
+        [StringLength(200, ErrorMessage = "Slug cannot exceed 200 characters")]
+        public string? Slug { get; set; }
+
         public int? ParentId { get; set; }
 
         public bool Enable { get; set; } = true;
@@ -41,6 +45,9 @@ namespace barefoot_travel.DTOs.Category
         [Required(ErrorMessage = "Category name is required")]
         [StringLength(100, ErrorMessage = "Category name cannot exceed 100 characters")]
         public string CategoryName { get; set; } = string.Empty;
+
+        [StringLength(200, ErrorMessage = "Slug cannot exceed 200 characters")]
+        public string? Slug { get; set; }
 
         public int? ParentId { get; set; }
 
@@ -65,6 +72,7 @@ namespace barefoot_travel.DTOs.Category
         public int Id { get; set; }
         public int? ParentId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
         public bool Enable { get; set; }
         public string Type { get; set; } = string.Empty;
         public int Priority { get; set; }

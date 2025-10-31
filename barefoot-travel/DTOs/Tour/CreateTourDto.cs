@@ -8,6 +8,9 @@ namespace barefoot_travel.DTOs.Tour
         [StringLength(255, ErrorMessage = "Title cannot exceed 255 characters")]
         public string Title { get; set; } = string.Empty;
 
+        [StringLength(300, ErrorMessage = "Slug cannot exceed 300 characters")]
+        public string? Slug { get; set; }
+
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; } = string.Empty;
 

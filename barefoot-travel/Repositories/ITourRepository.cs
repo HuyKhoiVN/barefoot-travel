@@ -16,9 +16,13 @@ namespace barefoot_travel.Repositories
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<bool> TitleExistsAsync(string title, int? excludeId = null);
+        Task<Tour?> GetBySlugAsync(string slug);
+        Task<bool> SlugExistsAsync(string slug, int? excludeId = null);
+        Task<List<string>> GetAllSlugsAsync();
 
         // Tour with related data - DTO methods with joins
         Task<TourDetailDto?> GetTourDetailByIdAsync(int id);
+        Task<TourDetailDto?> GetTourDetailBySlugAsync(string slug);
         Task<List<TourDto>> GetToursWithBasicInfoAsync();
         Task<PagedResult<TourDto>> GetToursPagedWithBasicInfoAsync(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc", List<int>? categoryIds = null, string? search = null, bool? active = null);
         Task<List<TourDto>> GetToursByCategoryAsync(int categoryId);

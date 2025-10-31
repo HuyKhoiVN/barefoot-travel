@@ -189,12 +189,20 @@
         
         // Add checkbox change handlers
         $('.category-checkbox').on('change', function() {
-            const categoryId = $(this).data('category-id');
+            const categorySlug = $(this).data('category-slug');
+            const categoryName = $(this).closest('.category-tree-label').find('.category-tree-name').text();
             const isChecked = $(this).is(':checked');
             
             if (isChecked) {
-                // Navigate to category page using ID
-                window.location.href = `/tours/${categoryId}`;
+                // Navigate ONLY if category has slug
+                if (categorySlug) {
+                    window.location.href = `/categories/${categorySlug}`;
+                } else {
+                    // No slug - uncheck and stay on page
+                    $(this).prop('checked', false);
+                    console.warn('⚠️ Category has no slug, cannot navigate:', categoryName);
+                    alert('This category is not yet configured with a URL. Please contact admin.');
+                }
             }
         });
         
@@ -211,11 +219,13 @@
     function renderCategoryTreeItem(category) {
         const isActive = category.id === state.currentCategoryId;
         const tourCount = category.totalTours || 0;
+        const categorySlug = category.slug || '';
         
         let html = '<li class="category-tree-item">';
         html += `<label class="category-tree-label">`;
         html += `<input type="checkbox" class="category-checkbox" 
                     data-category-id="${category.id}"
+                    data-category-slug="${categorySlug}"
                     ${isActive ? 'checked' : ''}>`;
         html += `<div class="category-name-wrapper">`;
         html += `<span class="category-tree-name">${escapeHtml(category.categoryName)}</span>`;

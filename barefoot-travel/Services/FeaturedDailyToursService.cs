@@ -142,6 +142,7 @@ namespace barefoot_travel.Services
                 CategoryId = c.Id,
                 Badge = c.DailyTourBadge ?? string.Empty,
                 CategoryName = c.CategoryName,
+                Slug = c.Slug ?? "",
                 Description = c.DailyTourDescription ?? string.Empty,
                 ImageUrl = c.DailyTourImageUrl ?? string.Empty,
                 DisplayOrder = c.DailyTourOrder ?? 0,

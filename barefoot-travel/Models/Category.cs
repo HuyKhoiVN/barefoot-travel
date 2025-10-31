@@ -11,6 +11,7 @@ public partial class Category
 
     public string CategoryName { get; set; } = null!;
 
+
     public bool Enable { get; set; }
 
     public string Type { get; set; } = null!;
@@ -50,6 +51,8 @@ public partial class Category
     public bool? ShowInDailyTours { get; set; }
 
     public string? DailyTourCardClass { get; set; }
+
+    public string? Slug { get; set; }
 
     public virtual ICollection<HomePageSectionCategory> HomePageSectionCategories { get; set; } = new List<HomePageSectionCategory>();
 
