@@ -1,124 +1,315 @@
 @{
-    var categoryId = ViewData["CategoryId"] != null ? Convert.ToInt32(ViewData["CategoryId"]) : 0;
-    ViewData["Title"] = "Tours";
+    var tourSlug = ViewData["TourSlug"]?.ToString() ?? "";
+    ViewData["Title"] = ViewData["Title"]?.ToString() ?? "Tour Details";
     Layout = "_UserLayout";
 }
 
 @section HeadScripts {
-    <!-- CRITICAL: Define CATEGORY_ID before any other scripts -->
     <script>
-        window.CATEGORY_ID = @categoryId;
-        console.log('🔍 EARLY DEBUG - Category ID defined:', window.CATEGORY_ID);
-        console.log('🔍 EARLY DEBUG - Type:', typeof window.CATEGORY_ID);
+        window.TOUR_SLUG = '@tourSlug';
     </script>
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/user/category-tours.css?v=1.2">
-    <!-- Advanced animations from Home page -->
+    <link rel="stylesheet" href="~/css/user/tour-details.css?v=1.0">
     <link rel="stylesheet" href="~/ui-user-template/advanced-animations.css?v=1.4">
+    <!-- Flatpickr Datepicker -->
+    <link rel="stylesheet" href="~/lib/flatpickr.min.css">
 }
 
-    <!-- Breadcrumb -->
-    <section class="breadcrumb-section">
-        <div class="bare-container">
-            <nav class="breadcrumb-nav">
-                <a href="/">Home</a>
-                <i class="fas fa-chevron-right"></i>
-                <span id="categoryBreadcrumb">Loading...</span>
-            </nav>
-        </div>
-    </section>
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+    <div class="bare-container">
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a>
+            <i class="fas fa-chevron-right"></i>
+            <span id="tourBreadcrumb">Loading...</span>
+        </nav>
+    </div>
+</section>
 
-    <!-- Category Banner -->
-    <section class="category-banner">
-        <div class="bare-container">
-            <div class="category-banner-simple">
-                <h1 id="categoryTitle">Loading...</h1>
-                <span class="tour-count-text"> - <span id="tourCount">0</span> Tours</span>
+<!-- Main Content -->
+<section class="tour-details-section">
+    <div class="bare-container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading tour details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-state" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Tour Not Found</h3>
+            <p>The tour you're looking for doesn't exist or is no longer available.</p>
+            <a href="/" class="btn-back-home">Back to Home</a>
+        </div>
+
+        <!-- Tour Details Layout -->
+        <div id="tourDetailsLayout" class="row" style="display: none;">
+            <!-- Tour Information (col-9) -->
+            <div class="col-lg-9 col-md-8 col-12">
+                <div class="tour-info-section">
+                    <!-- Category Navigation -->
+                    <div id="categoryNavigation" class="category-navigation">
+                        <!-- Categories will be loaded here -->
+                    </div>
+
+                    <!-- Tour Title -->
+                    <h1 id="tourTitle" class="tour-title">Loading...</h1>
+
+                    <!-- Tour Meta Information -->
+                    <div id="tourMeta" class="tour-meta">
+                        <!-- Meta info will be loaded here -->
+                    </div>
+
+                    <!-- Tour Categories Row -->
+                    <div id="tourCategoriesRow" class="tour-categories-row">
+                        <!-- Categories list will be loaded here -->
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Tour Images Grid -->
+                    <div id="tourImagesGrid" class="tour-images-grid">
+                        <!-- Images will be loaded here -->
+                    </div>
+
+                    <!-- Tour Description -->
+                    <div id="tourDescription" class="tour-description">
+                        <!-- Description will be loaded here -->
+                    </div>
+
+                    <!-- Tour Policies -->
+                    <div id="tourPolicies" class="tour-policies">
+                        <!-- Policies will be loaded here -->
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Main Content -->
-    <section class="category-tours-section">
-        <div class="bare-container">
-            <div class="category-tours-layout">
-                <!-- Left Sidebar: Category Tree -->
-                <aside class="category-sidebar">
-                    <div class="sidebar-header">
-                        <h3>Categories</h3>
+            <!-- Booking Form (col-3) -->
+            <aside class="col-lg-3 col-md-4 col-12">
+                <div class="booking-form-section">
+                <div class="booking-form-widget">
+                    <div class="booking-price-display" id="bookingPriceDisplay">
+                        <span class="price-label">From</span>
+                        <span class="price-amount" id="priceAmount">$0</span>
+                        <span class="price-per">per person</span>
                     </div>
-                    <div class="category-tree" id="categoryTree">
-                        <div class="tree-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Loading categories...</span>
-                        </div>
-                    </div>
-                    <button class="reset-filters-btn" id="resetFiltersBtn" style="display: none;">
-                        <i class="fas fa-redo"></i>
-                        Reset Filters
-                    </button>
-                </aside>
 
-                <!-- Right Content: Tours Grid -->
-                <main class="tours-content">
-                    <!-- Filters and Search -->
-                    <div class="tours-toolbar">
-                        <div class="search-filter">
-                            <div class="search-input-group">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="tourSearch" placeholder="Search tours by name...">
+                    <div class="divider"></div>
+
+                    <div class="booking-form-content">
+                        <!-- Tour Schedule Info -->
+                        <div class="schedule-info">
+                            <div class="schedule-row">
+                                <div class="schedule-item">
+                                    <i data-lucide="clock" class="lucide-icon"></i>
+                                    <div class="schedule-details">
+                                        <label>Start Time</label>
+                                        <span id="startTime">--:--</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item">
+                                    <i data-lucide="clock" class="lucide-icon"></i>
+                                    <div class="schedule-details">
+                                        <label>Return Time</label>
+                                        <span id="returnTime">--:--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="schedule-item full-width">
+                                <div class="duration-label-row">
+                                    <i data-lucide="calendar-days" class="lucide-icon"></i>
+                                    <label>Duration</label>
+                                </div>
+                                <div class="duration-input-row">
+                                        <input type="text" id="duration" class="form-control" value="--" readonly style="background-color:#f4f4f4; font-weight: 600">
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="sort-filter">
-                            <label for="sortSelect">
-                                <i class="fas fa-sort"></i>
-                                Sort by:
-                            </label>
-                            <select id="sortSelect">
-                                <option value="title_asc">Name (A-Z)</option>
-                                <option value="title_desc">Name (Z-A)</option>
-                                <option value="pricePerPerson_asc">Price (Low to High)</option>
-                                <option value="pricePerPerson_desc">Price (High to Low)</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Results Info -->
-                    <div class="results-info">
-                        <p id="resultsCount">Showing 0 tours</p>
-                    </div>
+                        <!-- Booking Form -->
+                        <form id="bookingForm" class="booking-form">
+                            <div class="form-group">
+                                <label for="bookingDate">
+                                    <i data-lucide="calendar" class="lucide-icon"></i>
+                                    Booking Date
+                                </label>
+                                <input type="text" id="bookingDate" class="form-control" placeholder="Select date..." required readonly>
+                            </div>
 
-                    <!-- Tours Grid -->
-                    <div class="tours-grid" id="toursGrid">
-                        <!-- Tours will be loaded here -->
-                        <div class="grid-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading tours...</p>
-                        </div>
-                    </div>
+                            <div class="form-group">
+                                <label for="numberOfPeople">
+                                    <i data-lucide="users" class="lucide-icon"></i>
+                                    Number of Guests
+                                </label>
+                                <input type="number" id="numberOfPeople" class="form-control" min="1" max="100" value="1" required>
+                            </div>
 
-                    <!-- Pagination -->
-                    <div class="pagination-container" id="paginationContainer">
-                        <!-- Pagination will be loaded here -->
+                            <button type="submit" class="btn-request-booking">
+                                <i data-lucide="send" class="lucide-icon"></i>
+                                Request Booking
+                            </button>
+                        </form>
                     </div>
-                </main>
-            </div>
+                </div>
+                </div>
+            </aside>
         </div>
-    </section>
+    </div>
+</section>
+
+<!-- Booking Modal -->
+<div id="bookingModal" class="booking-modal" style="display: none;">
+    <div class="booking-modal-overlay"></div>
+    <div class="booking-modal-content">
+        <button class="booking-modal-close" id="closeBookingModal">&times;</button>
+        
+        <h2 class="booking-modal-title">Book Your Tour</h2>
+        
+        <form id="publicBookingForm" class="public-booking-form">
+            <!-- Tour Information (Read-only) -->
+            <div class="booking-section">
+                <h3 class="section-title">Tour Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Tour Name</label>
+                        <div class="info-value" id="modalTourName">--</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Price Per Person</label>
+                        <div class="info-value" id="modalPricePerPerson">$0</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Start Time</label>
+                        <div class="info-value" id="modalStartTime">--:--</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Return Time</label>
+                        <div class="info-value" id="modalReturnTime">--:--</div>
+                    </div>
+                    <div class="info-item full-width">
+                        <label>Duration</label>
+                        <div class="info-value" id="modalDuration">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Details (Editable) -->
+            <div class="booking-section">
+                <h3 class="section-title">Booking Details</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalBookingDate">Booking Date <span class="required">*</span></label>
+                        <input type="text" id="modalBookingDate" class="form-input" placeholder="Select date..." required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalNumberOfGuests">Number of Guests <span class="required">*</span></label>
+                        <input type="number" id="modalNumberOfGuests" class="form-input" min="1" max="100" value="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="booking-section">
+                <h3 class="section-title">Contact Information</h3>
+                <div class="form-group">
+                    <label for="modalCustomerName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="modalCustomerName" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalEmail">Email <span class="required">*</span></label>
+                        <input type="email" id="modalEmail" class="form-input" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalPhone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="modalPhone" class="form-input" placeholder="+84 xxx xxx xxx" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modalNote">Additional Notes (Optional)</label>
+                    <textarea id="modalNote" class="form-textarea" rows="3" placeholder="Any special requests or requirements..."></textarea>
+                </div>
+            </div>
+
+            <!-- Total Price -->
+            <div class="booking-total">
+                <div class="total-label">Estimated Total</div>
+                <div class="total-amount" id="modalTotalPrice">$0</div>
+            </div>
+
+            <!-- Information Note -->
+            <div class="booking-info-note">
+                <em>Your booking request will be processed within 24 hours. Confirmation details will be sent to your email.</em>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="booking-actions">
+                <button type="button" class="btn-cancel" id="cancelBooking">Cancel</button>
+                <button type="submit" class="btn-confirm-booking">Confirm Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
-    <!-- Modern Effects & Animations (from Home page) -->
+    <!-- Lucide Icons -->
+    <script src="~/lib/lucide.min.js"></script>
+    <!-- Flatpickr Datepicker -->
+    <script src="~/lib/flatpickr.min.js"></script>
+    <!-- Toast Notifications -->
+    <script src="~/js/toast.js"></script>
     <script src="~/ui-user-template/modern-effects.js?v=1.3"></script>
-    
-    <!-- Category ID already defined in HeadScripts section -->
+    <script src="~/js/tour-details.js?v=1.0"></script>
     <script>
-        console.log('🔍 VERIFY - window.CATEGORY_ID before loading category-tours.js:', window.CATEGORY_ID);
-        console.log('🔍 VERIFY - Type:', typeof window.CATEGORY_ID);
+        // Store flatpickr instances
+        let mainDatePicker, modalDatePicker;
+        
+        // Initialize Flatpickr for all date inputs with English locale
+        $(document).ready(function() {
+            // Get tomorrow's date
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // Initialize Flatpickr for main booking form
+            mainDatePicker = flatpickr('#bookingDate', {
+                locale: 'en',
+                dateFormat: 'Y-m-d',
+                minDate: tomorrow,
+                altInput: true,
+                altFormat: 'M j, Y', // Example: Nov 2, 2025
+                disableMobile: false,
+                allowInput: false,
+                clickOpens: true,
+                onChange: function(selectedDates, dateStr, instance) {
+                    // Sync with modal if needed
+                    if (modalDatePicker && dateStr) {
+                        modalDatePicker.setDate(dateStr, false);
+                    }
+                }
+            });
+            
+            // Initialize Flatpickr for modal
+            modalDatePicker = flatpickr('#modalBookingDate', {
+                locale: 'en',
+                dateFormat: 'Y-m-d',
+                minDate: tomorrow,
+                altInput: true,
+                altFormat: 'M j, Y', // Example: Nov 2, 2025
+                disableMobile: false,
+                allowInput: false,
+                clickOpens: true,
+                onChange: function(selectedDates, dateStr, instance) {
+                    // No need to sync back to main form
+                }
+            });
+        });
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
-    
-    <script src="~/js/category-tours.js?v=1.8"></script>
 }
-

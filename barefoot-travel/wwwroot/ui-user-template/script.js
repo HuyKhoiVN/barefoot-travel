@@ -1252,31 +1252,9 @@ function renderCombinedSections(data) {
 // =====================
 // Data loading (AJAX)
 // =====================
-
-function loadSectionsData() {
-  return $.ajax({
-    url: "./data/sections.json",
-    method: "GET",
-    dataType: "json",
-    cache: false,
-  })
-}
-
-// Kick off rendering when DOM ready
-$(() => {
-  loadSectionsData()
-    .done((data) => {
-      try {
-        if (data.featuredTours) renderFeaturedTours(data.featuredTours)
-        if (data.waysToTravel) renderWaysToTravel(data.waysToTravel)
-        if (data.dailyTours) renderDailyTours(data.dailyTours)
-        if (data.combinedSections) renderCombinedSections(data.combinedSections)
-      } catch (e) {
-        console.warn("Render error", e)
-      }
-    })
-    .fail((xhr, status) => {
-      console.error("Failed loading sections.json", status)
-      showNotification("Failed to load content. Please try again later.", "info")
-    })
-})
+// NOTE: sections.json loading removed - using API data instead
+// Home page now loads data dynamically from backend APIs:
+// - Featured Tours: via loadFeaturedTours() in Views/Home/Index.cshtml
+// - Daily Tours: via loadDailyTours() 
+// - Ways to Travel: via loadWaysToTravel()
+// - Combined Sections: via loadHomepageData()

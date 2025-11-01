@@ -25,6 +25,10 @@ namespace barefoot_travel.Services
         {
             var tours = await _featuredTourRepository.GetAllFeaturedToursAsync();
 
+            // Get tour slugs
+            var tourIds = tours.Select(t => t.TourId).ToList();
+            var tourSlugs = await _tourRepository.GetByIdsWithSlugAsync(tourIds);
+
             var toursDto = tours.Select(t => new FeaturedTourDto
             {
                 Id = t.Id,
@@ -34,7 +38,8 @@ namespace barefoot_travel.Services
                 ImageUrl = t.ImageUrl ?? string.Empty,
                 DisplayOrder = t.DisplayOrder,
                 TourId = t.TourId,
-                CardClass = t.CardClass
+                CardClass = t.CardClass,
+                Slug = tourSlugs.FirstOrDefault(ts => ts.Id == t.TourId)?.Slug ?? string.Empty
             }).ToList();
 
             return new FeaturedToursConfigDto

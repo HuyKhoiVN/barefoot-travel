@@ -106,7 +106,6 @@
                     if (response.data.refreshToken) {
                       localStorage.setItem('refresh_token', response.data.refreshToken);
                     }
-                    console.log('Token refreshed successfully');
                     processQueue(null, response.data.accessToken);
                   } else {
                     // Refresh failed, redirect to login
@@ -174,7 +173,6 @@
           return;
         }
       } catch (error) {
-        console.warn('Error parsing token:', error);
         // If we can't parse the token, try to verify it with the server
       }
 
@@ -222,7 +220,6 @@
             if (response.data.refreshToken) {
               localStorage.setItem('refresh_token', response.data.refreshToken);
             }
-            console.log('Token refreshed successfully');
           } else {
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('refresh_token');

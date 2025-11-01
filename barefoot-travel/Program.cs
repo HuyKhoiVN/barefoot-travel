@@ -143,6 +143,7 @@ builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSelectedTourRep
 builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionRepository, barefoot_travel.Repositories.HomePageSectionRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionCategoryRepository, barefoot_travel.Repositories.HomePageSectionCategoryRepository>();
 builder.Services.AddScoped<barefoot_travel.Repositories.IHomePageSectionTourRepository, barefoot_travel.Repositories.HomePageSectionTourRepository>();
+builder.Services.AddScoped<barefoot_travel.Repositories.IDashboardRepository, barefoot_travel.Repositories.DashboardRepository>();
 
 // Service Registration
 builder.Services.AddScoped<barefoot_travel.Services.IAuthService, barefoot_travel.Services.AuthService>();
@@ -158,6 +159,7 @@ builder.Services.AddScoped<barefoot_travel.Services.IFileUploadService, barefoot
 builder.Services.AddScoped<barefoot_travel.Services.IHomePageService, barefoot_travel.Services.HomePageService>();
 builder.Services.AddScoped<barefoot_travel.Services.IHomePageSectionService, barefoot_travel.Services.HomePageSectionService>();
 builder.Services.AddScoped<barefoot_travel.Services.IFeaturedDailyToursService, barefoot_travel.Services.FeaturedDailyToursService>();
+builder.Services.AddScoped<barefoot_travel.Services.IDashboardService, barefoot_travel.Services.DashboardService>();
 
 // HTML Sanitizer for XSS protection
 //builder.Services.AddHtmlSanitizer();
@@ -224,12 +226,15 @@ app.MapControllerRoute(
         slug = @"^[a-z0-9-]+$"  // Only lowercase, numbers, hyphens
     });
 
-// OLD: Keep for backward compatibility (ID-based)
-// Example: /tours/123
+// Slug-based tour details route
+// Example: /tours/ha-long-bay-2-day-cruise
 app.MapControllerRoute(
-    name: "toursByCategory",
-    pattern: "tours/{categoryId:int}",
-    defaults: new { controller = "Tours", action = "Index" });
+    name: "toursBySlug",
+    pattern: "tours/{slug}",
+    defaults: new { controller = "Tours", action = "Index" },
+    constraints: new { 
+        slug = @"^[a-z0-9-]+$"  // Only lowercase, numbers, hyphens
+    });
 
 app.MapControllerRoute(
     name: "default",

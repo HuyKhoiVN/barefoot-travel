@@ -11,6 +11,7 @@ namespace barefoot_travel.DTOs.Category
         public int DisplayOrder { get; set; }
         public int TourId { get; set; }
         public string? CardClass { get; set; }
+        public string Slug { get; set; } = string.Empty; // Tour slug for navigation
     }
 
     // DTO for Featured Tours config response

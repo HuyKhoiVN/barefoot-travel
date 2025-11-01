@@ -56,6 +56,7 @@ namespace barefoot_travel.DTOs
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
         public decimal PricePerPerson { get; set; }
         public string Duration { get; set; } = string.Empty;
         public string? BannerImageUrl { get; set; }

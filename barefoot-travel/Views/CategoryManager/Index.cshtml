@@ -1270,7 +1270,6 @@ $(document).ready(function() {
                 if (Array.isArray(categories)) {
                     // Build tree structure for create modal
                     const createHtml = buildCategoryRadioButtons(categories, 'create');
-                            console.log(createHtml);
                     createParentCategory.append(createHtml);
                     
                     // Build tree structure for edit modal
@@ -1392,8 +1391,6 @@ $(document).ready(function() {
 
     // Toggle parent category children visibility
     function toggleParentCategoryChildren(categoryId, prefix, icon) {
-        console.log('toggleParentCategoryChildren called:', { categoryId, prefix, icon: icon.text() });
-        
         const currentItem = icon.closest('.category-item');
         const currentLevel = parseInt(currentItem.data('level'));
         
@@ -1435,19 +1432,14 @@ $(document).ready(function() {
 
     // Show direct children of a parent category
     function showParentCategoryDirectChildren(categoryId, prefix, currentLevel) {
-        console.log('showParentCategoryDirectChildren called:', { categoryId, prefix, currentLevel });
-        
         const container = $(`#${prefix}ParentCategory`);
         const allItems = container.find(`.category-item[data-prefix="${prefix}"]`);
-        
-        console.log('Found items:', allItems.length);
         
         allItems.each(function() {
             const itemLevel = parseInt($(this).data('level'));
             if (itemLevel === currentLevel + 1) {
                 // Check if this is a direct child
                 if (isParentCategoryDirectChildOf($(this), categoryId, prefix, currentLevel)) {
-                    console.log('Showing child:', $(this).find('label').text());
                     $(this).removeClass('collapsed');
                 }
             }

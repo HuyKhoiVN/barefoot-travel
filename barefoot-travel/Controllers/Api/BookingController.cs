@@ -285,5 +285,41 @@ namespace barefoot_travel.Controllers.Api
                 return new ApiResponse(false, $"Error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Create a public booking (no authentication required)
+        /// </summary>
+        /// <param name="dto">Public booking creation data</param>
+        /// <returns>Created booking details</returns>
+        [HttpPost("public")]
+        [AllowAnonymous]
+        public async Task<ApiResponse> CreatePublicBooking([FromBody] CreatePublicBookingDto dto)
+        {
+            _logger.LogInformation("Creating public booking for tour ID: {TourId}, Customer: {CustomerName}", dto.TourId, dto.NameCustomer);
+
+            try
+            {
+                // Map public DTO to internal DTO
+                var createBookingDto = new CreateBookingDto
+                {
+                    TourId = dto.TourId,
+                    StartDate = dto.StartDate,
+                    People = dto.People,
+                    PhoneNumber = dto.PhoneNumber,
+                    NameCustomer = dto.NameCustomer,
+                    Email = dto.Email,
+                    Note = dto.Note,
+                    PaymentStatus = "Pending", // Default to Pending
+                    UserId = null // Guest booking
+                };
+
+                return await _bookingService.CreateBookingAsync(createBookingDto, "Guest");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating public booking for tour ID: {TourId}", dto.TourId);
+                return new ApiResponse(false, $"Error: {ex.Message}");
+            }
+        }
     }
 }

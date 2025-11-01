@@ -12,24 +12,25 @@ namespace barefoot_travel.Controllers
         }
 
         /// <summary>
-        /// Display tours for a specific category
-        /// Route: /tours/{categoryId}
+        /// Display tour details page
+        /// Route: /tours/{slug}
         /// </summary>
-        /// <param name="categoryId">Category ID</param>
-        public IActionResult Index(int categoryId)
+        /// <param name="slug">Tour slug</param>
+        public IActionResult Index(string slug)
         {
-            _logger.LogInformation("⚡ ToursController.Index called with categoryId: {CategoryId}", categoryId);
+            _logger.LogInformation("⚡ ToursController.Index called with slug: {Slug}", slug);
             
-            if (categoryId <= 0)
+            if (string.IsNullOrWhiteSpace(slug))
             {
-                _logger.LogWarning("❌ categoryId is invalid, redirecting to Home");
+                _logger.LogWarning("❌ slug is invalid, redirecting to Home");
                 return RedirectToAction("Index", "Home");
             }
             
-            _logger.LogInformation("✅ Setting ViewData[CategoryId] = {CategoryId}", categoryId);
-            ViewData["CategoryId"] = categoryId;
+            _logger.LogInformation("✅ Setting ViewData[TourSlug] = {Slug}", slug);
+            ViewData["TourSlug"] = slug;
+            ViewData["Title"] = "Tour Details";
             
-            _logger.LogInformation("✅ Returning view for category ID: {CategoryId}", categoryId);
+            _logger.LogInformation("✅ Returning view for tour slug: {Slug}", slug);
             return View();
         }
     }

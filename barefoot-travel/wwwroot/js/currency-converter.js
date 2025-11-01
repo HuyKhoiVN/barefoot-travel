@@ -59,7 +59,6 @@ const CurrencyConverter = (function() {
      */
     function setCurrency(currency) {
         if (currency !== 'VND' && currency !== 'USD') {
-            console.error('Invalid currency. Must be VND or USD');
             return;
         }
         

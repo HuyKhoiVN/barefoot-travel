@@ -19,6 +19,7 @@ namespace barefoot_travel.Repositories
         Task<Tour?> GetBySlugAsync(string slug);
         Task<bool> SlugExistsAsync(string slug, int? excludeId = null);
         Task<List<string>> GetAllSlugsAsync();
+        Task<List<Tour>> GetByIdsWithSlugAsync(List<int> tourIds);
 
         // Tour with related data - DTO methods with joins
         Task<TourDetailDto?> GetTourDetailByIdAsync(int id);

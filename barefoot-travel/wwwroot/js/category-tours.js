@@ -22,9 +22,6 @@
 
     // Initialize on document ready
     $(document).ready(function() {
-        console.log('📄 Document ready - Starting initialization');
-        console.log('🔍 window.CATEGORY_ID at document.ready:', window.CATEGORY_ID);
-        
         initializePage();
         initEventListeners();
         initCurrencySelector();
@@ -34,20 +31,12 @@
      * Initialize page
      */
     function initializePage() {
-        // Get category ID from window
-        console.log('🔍 DEBUG - window.CATEGORY_ID:', window.CATEGORY_ID);
-        console.log('🔍 DEBUG - typeof:', typeof window.CATEGORY_ID);
-        
         const categoryId = window.CATEGORY_ID;
         
         if (!categoryId || categoryId <= 0) {
-            console.error('❌ ERROR - Category ID not provided or invalid');
-            console.error('   window.CATEGORY_ID value:', window.CATEGORY_ID);
             showError('Category not found');
             return;
         }
-
-        console.log('✅ Initializing page for category ID:', categoryId);
         
         // Load category data by ID
         loadCategoryDataById(categoryId);
@@ -104,8 +93,6 @@
                     state.currentCategory = response.data;
                     state.currentCategoryId = response.data.id;
                     
-                    console.log('✅ Category loaded:', response.data);
-                    
                     // Update page elements
                     updateCategoryInfo(response.data);
                     
@@ -115,12 +102,10 @@
                     // Load tours
                     loadTours();
                 } else {
-                    console.error('❌ Category not found in response');
                     showError('Category not found');
                 }
             },
             error: function(xhr) {
-                console.error('❌ Error loading category:', xhr);
                 if (xhr.status === 404) {
                     showError('Category not found');
                 } else {
@@ -157,7 +142,6 @@
                 }
             },
             error: function(xhr) {
-                console.error('Error loading child categories:', xhr);
                 renderEmptyTree();
             }
         });
@@ -200,8 +184,6 @@
                 } else {
                     // No slug - uncheck and stay on page
                     $(this).prop('checked', false);
-                    console.warn('⚠️ Category has no slug, cannot navigate:', categoryName);
-                    alert('This category is not yet configured with a URL. Please contact admin.');
                 }
             }
         });
@@ -279,7 +261,6 @@
      */
     function loadTours() {
         if (!state.currentCategoryId) {
-            console.error('❌ Cannot load tours: currentCategoryId is null');
             return;
         }
         
@@ -301,17 +282,11 @@
         // Use new API endpoint that handles category hierarchy
         const apiUrl = `/api/Tour/by-category/${state.currentCategoryId}/paged`;
         
-        console.log('🔍 Loading tours from API:', apiUrl);
-        console.log('🔍 Params:', params);
-        
         $.ajax({
             url: apiUrl,
             type: 'GET',
             data: params,
             success: function(response) {
-                console.log('✅ Tours API response:', response);
-                console.log('   Sample tour images:', response.items && response.items[0] ? response.items[0].images : 'No items');
-                
                 if (response && response.items) {
                     state.totalPages = response.totalPages;
                     state.totalTours = response.totalItems;
@@ -332,7 +307,6 @@
                 }
             },
             error: function(xhr) {
-                console.error('❌ Error loading tours:', xhr);
                 showToursError();
             }
         });
@@ -431,8 +405,9 @@
             : (state.currentCategory ? state.currentCategory.categoryName : '');
         
         // Create card with exact structure from Home page
+        const tourSlug = tour.slug || '';
         const card = $(`
-            <div class="product-card" data-tour-id="${tour.id}">
+            <div class="product-card" data-tour-id="${tour.id}" data-tour-slug="${escapeHtml(tourSlug)}">
                 <div class="product-image-wrapper">
                     <img src="${mainImage}" alt="${escapeHtml(tour.title)}" class="main-image" loading="lazy">
                     <img src="${galleryImage}" alt="Gallery Image" class="gallery-image" loading="lazy">
@@ -445,12 +420,12 @@
                         <a href="#" onclick="return false;">${escapeHtml(categoryName)}</a>
                     </p>
                     <h3 class="product-title">
-                        <a href="#" data-tour-id="${tour.id}">${escapeHtml(tour.title)}</a>
+                        <a href="${tourSlug ? '/tours/' + tourSlug : '#'}" data-tour-id="${tour.id}">${escapeHtml(tour.title)}</a>
                     </h3>
                     <div class="product-price">
                         <span class="amount">${price}</span>
                     </div>
-                    <a href="#" class="read-more-btn" data-tour-id="${tour.id}">Read more</a>
+                    <a href="${tourSlug ? '/tours/' + tourSlug : '#'}" class="read-more-btn" data-tour-id="${tour.id}">Read more</a>
                 </div>
             </div>
         `);
@@ -480,45 +455,27 @@
         
         // Add click handlers for title and read more button
         card.find('.product-title a, .read-more-btn').on('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const tourId = $(this).data('tour-id');
-            viewTourDetails(tourId);
+            const slug = $(this).closest('.product-card').data('tour-slug');
+            if (slug) {
+                window.location.href = `/tours/${slug}`;
+            } else {
+                e.preventDefault();
+                console.warn('Tour slug not available');
+            }
         });
         
         // Card click handler - entire card is clickable
         card.on('click', function(e) {
             // Don't trigger if clicking wishlist button or links
             if (!$(e.target).closest('.wishlist-btn, a').length) {
-                viewTourDetails(tour.id);
+                const slug = $(this).data('tour-slug');
+                if (slug) {
+                    window.location.href = `/tours/${slug}`;
+                }
             }
         });
         
         return card;
-    }
-
-    /**
-     * View tour details
-     */
-    function viewTourDetails(tourId) {
-        $.ajax({
-            url: `/api/Tour/public/${tourId}`,
-            type: 'GET',
-            success: function(response) {
-                if (response.success && response.data) {
-                    const tour = response.data;
-                    console.log('Tour details:', tour);
-                    // TODO: Navigate to tour detail page or show modal
-                    alert(`Tour: ${tour.title}\nPrice: ${formatPrice(tour.pricePerPerson)}`);
-                } else {
-                    alert('Tour not found');
-                }
-            },
-            error: function(xhr) {
-                console.error('Error loading tour details:', xhr);
-                alert('Failed to load tour details');
-            }
-        });
     }
 
     /**

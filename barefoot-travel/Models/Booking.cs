@@ -36,4 +36,8 @@ public partial class Booking
     public string? UpdatedBy { get; set; }
 
     public bool Active { get; set; }
+
+    // Navigation properties
+    public virtual Tour Tour { get; set; } = null!;
+    public virtual BookingStatus BookingStatus { get; set; } = null!;
 }

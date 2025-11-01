@@ -1079,8 +1079,10 @@ function renderDailyTours(data) {
 function buildProductCard(t) {
   const imgMain = (t.ImageUrl && t.ImageUrl[0]) || ""
   const imgAlt = (t.ImageUrl && t.ImageUrl[1]) || imgMain
+  const tourSlug = t.Slug || t.slug || ""
+  const tourHref = tourSlug ? `/tours/${tourSlug}` : "#"
   const $card = $(`
-    <div class="product-card anim-reveal anim-hover-zoom">
+    <div class="product-card anim-reveal anim-hover-zoom" data-tour-slug="${tourSlug}">
       <div class="product-image-wrapper">
         <img class="main-image" alt="" />
         <img class="gallery-image" alt="" />
@@ -1088,9 +1090,9 @@ function buildProductCard(t) {
       </div>
       <div class="product-content">
         <p class="product-categories"></p>
-        <h3 class="product-title"><a href="#"></a></h3>
+        <h3 class="product-title"><a href="${tourHref}"></a></h3>
         <div class="product-price"><span class="currency">$</span><span class="amount"></span></div>
-        <a href="#" class="read-more-btn">Read more</a>
+        <a href="${tourHref}" class="read-more-btn">Read more</a>
       </div>
     </div>`)
   setSafeImgSrc($card.find(".main-image"), imgMain)
@@ -1109,6 +1111,14 @@ function buildProductCard(t) {
   })
   $card.find(".product-title a").text(t.TourName || "")
   $card.find(".amount").text(t.Price || "")
+  
+  // Make entire card clickable
+  $card.on("click", function(e) {
+    if (!$(e.target).closest(".wishlist-btn, a").length && tourSlug) {
+      window.location.href = `/tours/${tourSlug}`
+    }
+  })
+  
   return $card
 }
 
@@ -1272,11 +1282,10 @@ $(() => {
         if (data.dailyTours) renderDailyTours(data.dailyTours)
         if (data.combinedSections) renderCombinedSections(data.combinedSections)
       } catch (e) {
-        console.warn("Render error", e)
+        // Render error
       }
     })
     .fail((xhr, status) => {
-      console.error("Failed loading sections.json", status)
       showNotification("Failed to load content. Please try again later.", "info")
     })
 })

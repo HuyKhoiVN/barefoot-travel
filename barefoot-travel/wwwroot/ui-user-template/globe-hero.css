@@ -248,7 +248,7 @@
     display: flex;
     align-items: center;
     gap: 0;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to allow dropdown to show */
 }
 
 .search-input-wrapper {
@@ -350,7 +350,7 @@
 /* Cities Info Panel - Below content on left */
 .cities-info-panel {
     position: relative;
-    z-index: 3;
+    z-index: -1;
     max-width: 600px;
     margin-top: 30px;
     display: flex;

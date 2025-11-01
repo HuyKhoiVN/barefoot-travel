@@ -667,8 +667,6 @@
                     endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 6, 0);
                 }
                 
-                console.log(`Loading ${currentViewMode} month(s) data for ${targetDate.getFullYear()}-${targetDate.getMonth() + 1}`);
-                console.log(`Start: ${startOfMonth.toISOString()}, End: ${endOfMonth.toISOString()}`);
                 
                 loadCalendarForMonth(startOfMonth, endOfMonth);
             }
@@ -695,9 +693,7 @@
                     },
                     success: function(response) {
                         hideLoading();
-                        console.log('API Response:', response);
                         if (response.success) {
-                            console.log('Calendar Data:', response.data);
                             displayCalendar(response.data);
                         } else {
                             showToast('Error loading calendar: ' + response.message, 'danger');
@@ -711,14 +707,12 @@
             }
             
             function displayCalendar(data) {
-                console.log('Displaying calendar with data:', data);
                 calendarData = data;
                 
                 const container = $('#calendarSlider');
                 container.empty();
                 
                 if (!data.months || data.months.length === 0) {
-                    console.log('No months data available');
                     container.html('<div class="alert alert-info">No calendar data available</div>');
                     return;
                 }
@@ -743,24 +737,19 @@
                 const currentYear = today.getFullYear();
                 const currentMonth = today.getMonth() + 1; // JavaScript months are 0-based
                 
-                console.log('Looking for current month:', currentMonth, 'year:', currentYear);
                 
                 let month = data.months.find(m => m.year === currentYear && m.month === currentMonth);
                 
                 if (!month) {
-                    console.log('Current month not found, using first available month');
                     // Fallback to first month if current month not found
                     month = data.months[0];
                 }
                 
-                console.log('Displaying month:', month);
                 
                 if (month) {
                     const monthHtml = createMonthHtml(month, 'current');
                     container.append(monthHtml);
-                    console.log('Month HTML created and appended');
                 } else {
-                    console.log('No month data found');
                     container.html('<div class="alert alert-info">No month data available</div>');
                 }
             }
@@ -772,12 +761,10 @@
                 // Add mode class
                 container.removeClass('mode-3 mode-6').addClass(`mode-${currentViewMode}`);
                 
-                console.log(`Displaying ${data.months.length} months in grid mode`);
                 
                 data.months.forEach((month, index) => {
                     const monthHtml = createMonthHtml(month, 'grid');
                     container.append(monthHtml);
-                    console.log(`Month ${index + 1} HTML created: ${month.monthName}`);
                 });
             }
             
@@ -829,7 +816,6 @@
             }
             
             function createMonthHtml(month, type = 'current') {
-                console.log('Creating month HTML for:', month);
                 const showWeekends = true; // Always show weekends since we removed the switch
                 const today = new Date();
                 
@@ -840,10 +826,6 @@
                 // Get last day of month
                 const lastDay = new Date(month.year, month.month, 0);
                 const daysInMonth = lastDay.getDate();
-                
-                console.log(`Month: ${month.month}, Year: ${month.year}, Days in month: ${daysInMonth}, Start day: ${startDay}`);
-                console.log('Month days data:', month.days);
-                console.log(`Total cells needed: ${startDay + daysInMonth} (${startDay} empty + ${daysInMonth} days)`);
                 
                 let html = `
                     <div class="calendar-month ${type}">
@@ -864,7 +846,6 @@
                 for (let i = 0; i < startDay; i++) {
                     html += '<div class="calendar-day other-month"></div>';
                 }
-                console.log(`Added ${startDay} empty cells`);
                 
                 let daysAdded = 0;
                 // Add days of the month
@@ -877,11 +858,6 @@
                                apiDate.getMonth() === month.month - 1 && 
                                apiDate.getFullYear() === month.year;
                     }) : null;
-                    
-                    // Debug logging for first few days
-                    if (day <= 5) {
-                        console.log(`Day ${day}: date=${date.toDateString()}, dayData=`, dayData);
-                    }
                     
                     let dayClass = 'calendar-day';
                     if (date.toDateString() === today.toDateString()) {
@@ -923,8 +899,6 @@
                     daysAdded++;
                 }
                 
-                console.log(`Added ${daysAdded} days out of ${daysInMonth} total days`);
-                
                 html += `
                         </div>
                     </div>
@@ -946,15 +920,12 @@
             
             // Global functions for onclick handlers
             window.showDayDetails = function(date) {
-                console.log('Showing day details for:', date);
                 $('#selectedDate').text(formatDateForDisplay(date));
                 
                 // Convert date string to Date object for API call
                 const selectedDate = new Date(date);
                 const startDateStr = formatDateForApi(selectedDate);
                 const endDateStr = formatDateForApi(selectedDate);
-                
-                console.log('API call with startDate:', startDateStr, 'endDate:', endDateStr);
                 
                 $.ajax({
                     url: '/api/admin/booking/calendar',
@@ -967,7 +938,6 @@
                         'Authorization': 'Bearer ' + getAuthToken()
                     },
                     success: function(response) {
-                        console.log('Day details API response:', response);
                         if (response.success && response.data.months.length > 0) {
                             const month = response.data.months[0];
                             // Find the specific day data
@@ -977,14 +947,11 @@
                             });
                             
                             if (dayData && dayData.bookings.length > 0) {
-                                console.log('Found day data with bookings:', dayData.bookings.length);
                                 displayDayBookings(dayData.bookings);
                             } else {
-                                console.log('No bookings found for this date');
                                 $('#dayBookingsList').html('<p class="text-muted text-center">No bookings for this date.</p>');
                             }
                         } else {
-                            console.log('No months data in response');
                             $('#dayBookingsList').html('<p class="text-muted text-center">No bookings for this date.</p>');
                         }
                     },
@@ -1164,7 +1131,6 @@
             function setupViewModeHandlers() {
                 $('input[name="viewMode"]').on('change', function() {
                     currentViewMode = parseInt($(this).val());
-                    console.log('View mode changed to:', currentViewMode);
                     loadCalendarForCurrentViewMode();
                 });
             }
@@ -1187,7 +1153,6 @@
                     endDate = new Date(today.getFullYear(), today.getMonth() + 6, 0);
                 }
                 
-                console.log(`Loading ${currentViewMode} month(s) from ${startDate.toISOString()} to ${endDate.toISOString()}`);
                 loadCalendarForMonth(startDate, endDate);
             }
             

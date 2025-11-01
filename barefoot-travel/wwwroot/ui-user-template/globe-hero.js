@@ -122,8 +122,6 @@ class GlobeHero {
             setTimeout(() => {
                 this.showLoading(false);
             }, 1000);
-            
-            console.log('✅ Globe initialized successfully');
         } catch (error) {
             console.error('❌ Error initializing globe:', error);
             this.showError('Failed to load 3D Globe. Please refresh the page.');
@@ -533,6 +531,17 @@ function setupSearchToggle() {
     // Close search when clicking outside
     document.addEventListener('click', (e) => {
         if (searchContainer && !searchContainer.contains(e.target)) {
+            // Don't close if clicking on search results dropdown
+            const searchDropdown = searchContainer.querySelector('.search-results-dropdown');
+            if (searchDropdown && searchDropdown.contains(e.target)) {
+                return;
+            }
+            
+            // Don't close if dropdown is visible and has results
+            if (searchDropdown && searchDropdown.style.display !== 'none') {
+                return;
+            }
+            
             searchContainer.classList.remove('expanded');
         }
     });
@@ -581,7 +590,6 @@ function setupExploreTours() {
 document.addEventListener('DOMContentLoaded', () => {
     // Check if globe container exists
     if (document.getElementById('globe-canvas')) {
-        console.log('🌍 Initializing 3D Globe...');
         window.globeHero = new GlobeHero('globe-canvas');
         
         // Expose city focus function for buttons

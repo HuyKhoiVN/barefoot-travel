@@ -107,7 +107,6 @@ async function fetchTours(status = '', page = 1, pageSize = 10, sortBy = 'create
         
         return await response.json();
     } catch (error) {
-        console.error('Error fetching tours:', error);
         showToast('Error loading tours', 'error');
         return null;
     }
@@ -135,7 +134,6 @@ async function changeTourStatus(tourId, newStatus, reason = '') {
             return false;
         }
     } catch (error) {
-        console.error('Error changing status:', error);
         showToast('Error changing status', 'error');
         return false;
     }
@@ -173,7 +171,6 @@ async function batchChangeStatus(newStatus) {
             showToast(result.message || 'Failed to change status', 'error');
         }
     } catch (error) {
-        console.error('Error in batch status change:', error);
         showToast('Error changing status', 'error');
     } finally {
         showLoading(false);
@@ -212,7 +209,6 @@ async function batchDelete() {
             showToast(result.message || 'Failed to delete tours', 'error');
         }
     } catch (error) {
-        console.error('Error in batch delete:', error);
         showToast('Error deleting tours', 'error');
     } finally {
         showLoading(false);
@@ -243,7 +239,6 @@ async function deleteTour(tourId) {
             showToast(result.message || 'Failed to delete tour', 'error');
         }
     } catch (error) {
-        console.error('Error deleting tour:', error);
         showToast('Error deleting tour', 'error');
     }
 }
@@ -292,7 +287,6 @@ async function viewTourDetail(tourId) {
             showToast('Failed to load tour details', 'error');
         }
     } catch (error) {
-        console.error('Error loading tour details:', error);
         showToast('Error loading tour details', 'error');
     }
 }
@@ -344,7 +338,6 @@ async function viewStatusHistory(tourId) {
             showToast('Failed to load status history', 'error');
         }
     } catch (error) {
-        console.error('Error loading status history:', error);
         showToast('Error loading status history', 'error');
     }
 }
@@ -782,7 +775,6 @@ window.showToast = function(message, type = 'info') {
     if (typeof originalShowToast === 'function') {
         return originalShowToast(message, toastType);
     } else {
-        console.log(`Toast: ${message} (${type})`);
         alert(message);
     }
 };

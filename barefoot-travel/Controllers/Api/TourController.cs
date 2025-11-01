@@ -159,6 +159,34 @@ namespace barefoot_travel.Controllers.Api
         }
 
         /// <summary>
+        /// Search tours by tour name or category name (for live search dropdown)
+        /// </summary>
+        /// <param name="q">Search query</param>
+        /// <param name="limit">Maximum results to return (default: 10)</param>
+        /// <returns>List of matching tours with basic info</returns>
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchTours([FromQuery] string q, [FromQuery] int limit = 10)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+                {
+                    return Ok(new ApiResponse(true, "Search query too short", new List<object>()));
+                }
+
+                _logger.LogInformation("Searching tours with query: {Query}", q);
+                var result = await _tourService.SearchToursAsync(q, limit);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching tours");
+                return BadRequest(new ApiResponse(false, "Failed to search tours"));
+            }
+        }
+
+        /// <summary>
         /// Get paginated list of tours with filtering and sorting
         /// </summary>
         /// <param name="page">Page number (default: 1)</param>

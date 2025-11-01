@@ -169,6 +169,20 @@ namespace barefoot_travel.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Tour>> GetByIdsWithSlugAsync(List<int> tourIds)
+        {
+            if (tourIds == null || !tourIds.Any())
+                return new List<Tour>();
+
+            return await (from t in _context.Tours
+                         where tourIds.Contains(t.Id) && t.Active
+                         select new Tour
+                         {
+                             Id = t.Id,
+                             Slug = t.Slug
+                         }).ToListAsync();
+        }
+
         #endregion
 
         #region Tour with Related Data - DTO methods with joins
@@ -240,11 +254,30 @@ namespace barefoot_travel.Repositories
                     Price = price.Price,
                     CreatedTime = price.CreatedTime
                 }).ToList(),
-                Policies = tourData.Policies.Select(policy => new PolicyDto
+                Policies = tourData.Policies.Select(policy =>
                 {
-                    Id = policy.Id,
-                    PolicyType = policy.PolicyType,
-                    Content = policy.Content
+                    var dto = new PolicyDto
+                    {
+                        Id = policy.Id,
+                        PolicyType = policy.PolicyType,
+                        Content = policy.Content
+                    };
+                    
+                    // Parse JSON content to List<string>
+                    if (!string.IsNullOrWhiteSpace(policy.Content))
+                    {
+                        try
+                        {
+                            dto.ContentItems = System.Text.Json.JsonSerializer.Deserialize<List<string>>(policy.Content) ?? new List<string>();
+                        }
+                        catch
+                        {
+                            // If parsing fails, keep empty list
+                            dto.ContentItems = new List<string>();
+                        }
+                    }
+                    
+                    return dto;
                 }).ToList()
             };
         }
@@ -274,7 +307,7 @@ namespace barefoot_travel.Repositories
                                       Policies = (from tpol in _context.TourPolicies
                                                   join p in _context.Policies on tpol.PolicyId equals p.Id
                                                   where tpol.TourId == t.Id && tpol.Active && p.Active
-                                                  select new { p.Id, p.PolicyType }).ToList()
+                                                  select new { p.Id, p.PolicyType, p.Content }).ToList()
                                   }).FirstOrDefaultAsync();
 
             if (tourData == null) return null;
@@ -320,10 +353,30 @@ namespace barefoot_travel.Repositories
                     Price = price.Price,
                     CreatedTime = price.CreatedTime
                 }).ToList(),
-                Policies = tourData.Policies.Select(policy => new PolicyDto
+                Policies = tourData.Policies.Select(policy =>
                 {
-                    Id = policy.Id,
-                    PolicyType = policy.PolicyType
+                    var dto = new PolicyDto
+                    {
+                        Id = policy.Id,
+                        PolicyType = policy.PolicyType,
+                        Content = policy.Content
+                    };
+                    
+                    // Parse JSON content to List<string>
+                    if (!string.IsNullOrWhiteSpace(policy.Content))
+                    {
+                        try
+                        {
+                            dto.ContentItems = System.Text.Json.JsonSerializer.Deserialize<List<string>>(policy.Content) ?? new List<string>();
+                        }
+                        catch
+                        {
+                            // If parsing fails, keep empty list
+                            dto.ContentItems = new List<string>();
+                        }
+                    }
+                    
+                    return dto;
                 }).ToList()
             };
         }
@@ -412,6 +465,7 @@ namespace barefoot_travel.Repositories
                 {
                     Id = t.Id,
                     Title = t.Title,
+                    Slug = t.Slug ?? "",
                     Description = t.Description,
                     MapLink = t.MapLink,
                     PricePerPerson = t.PricePerPerson,
@@ -790,6 +844,7 @@ namespace barefoot_travel.Repositories
             {
                 Id = t.Tour.Id,
                 Title = t.Tour.Title,
+                Slug = t.Tour.Slug ?? string.Empty,
                 PricePerPerson = t.Tour.PricePerPerson,
                 Duration = t.Tour.Duration,
                 BannerImageUrl = t.BannerImage,
@@ -834,6 +889,7 @@ namespace barefoot_travel.Repositories
                        {
                            Id = t.Tour.Id,
                            Title = t.Tour.Title,
+                           Slug = t.Tour.Slug ?? string.Empty,
                            PricePerPerson = t.Tour.PricePerPerson,
                            Duration = t.Tour.Duration,
                            BannerImageUrl = t.BannerImage,

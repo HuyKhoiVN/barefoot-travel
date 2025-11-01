@@ -624,8 +624,6 @@
             // initCustomCursor();
             // initParticles();
             // initLazyLoadingWithBlur();
-            
-            console.log('✨ Modern effects initialized successfully!');
         }, 500);
     });
 

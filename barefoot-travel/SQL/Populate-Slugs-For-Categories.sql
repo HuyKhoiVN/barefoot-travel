@@ -267,3 +267,4 @@ FROM Tour WHERE Slug IS NOT NULL;
 
 
 
+

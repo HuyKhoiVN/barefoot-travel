@@ -14,10 +14,15 @@ namespace barefoot_travel.Repositories
 
         public async Task<List<HomePageFeaturedTour>> GetAllFeaturedToursAsync()
         {
-            return await _context.HomePageFeaturedTours
-                .Where(x => x.Active)
-                .OrderBy(x => x.DisplayOrder)
-                .ToListAsync();
+            // Join with Tour table to ensure we get tour data
+            var result = await (from hft in _context.HomePageFeaturedTours
+                               join t in _context.Tours on hft.TourId equals t.Id
+                               where hft.Active && t.Active
+                               orderby hft.DisplayOrder
+                               select hft)
+                               .ToListAsync();
+            
+            return result;
         }
 
         public async Task<HomePageFeaturedTour?> GetFeaturedTourByIdAsync(int id)

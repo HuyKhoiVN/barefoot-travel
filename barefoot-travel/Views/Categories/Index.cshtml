@@ -10,10 +10,7 @@
     <!-- CRITICAL: Define both SLUG and ID before any other scripts -->
     <script>
         window.CATEGORY_SLUG = '@categorySlug';
-        window.CATEGORY_ID = @categoryId;
-        console.log('🔍 EARLY DEBUG - Category Slug:', window.CATEGORY_SLUG);
-        console.log('🔍 EARLY DEBUG - Category ID:', window.CATEGORY_ID);
-        console.log('🔍 EARLY DEBUG - Type:', typeof window.CATEGORY_ID);
+        window.CATEGORY_ID = @categoryId;    
     </script>
 }
 
@@ -119,13 +116,12 @@
     
     <!-- Category Slug and ID already defined in HeadScripts section -->
     <script>
-        console.log('🔍 VERIFY - window.CATEGORY_SLUG:', window.CATEGORY_SLUG);
-        console.log('🔍 VERIFY - window.CATEGORY_ID:', window.CATEGORY_ID);
-        console.log('🔍 VERIFY - Type:', typeof window.CATEGORY_ID);
+        
     </script>
     
     <script src="~/js/category-tours.js?v=1.9"></script>
 }
+
 
 
 

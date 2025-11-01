@@ -52,8 +52,7 @@ $(document).ready(() => {
     e.preventDefault();
     var searchTerm = $(".search-form input").val();
     if (searchTerm.trim() !== "") {
-      console.log("Searching for:", searchTerm);
-      alert("Search functionality would be implemented here!");
+      // Search functionality would be implemented here
     }
   });
 
@@ -68,8 +67,7 @@ $(document).ready(() => {
     if (e.which === 13) {
       var searchTerm = $(this).val();
       if (searchTerm.trim() !== "") {
-        console.log("Header search for:", searchTerm);
-        alert("Header search functionality would be implemented here!");
+        // Header search functionality would be implemented here
       }
     }
   });
@@ -86,12 +84,10 @@ $(document).ready(() => {
 
   // Language and currency selectors
   $(".language-selector").on("click", function () {
-    console.log("Language selector clicked");
     // Language selection logic would go here
   });
 
   $(".currency-selector").on("click", function () {
-    console.log("Currency selector clicked");
     // Currency selection logic would go here
   });
 
@@ -119,16 +115,14 @@ $(document).ready(() => {
   $(".book-btn").on("click", function (e) {
     e.preventDefault();
     var tourTitle = $(this).closest(".tour-card").find("h3").text();
-    console.log("Booking tour:", tourTitle);
-    alert("Booking functionality would be implemented here for: " + tourTitle);
+    // Booking functionality would be implemented here
   });
 
   // View tours button functionality
   $(".view-tours-btn").on("click", function (e) {
     e.preventDefault();
     var destination = $(this).closest(".daily-tour-card").find("h3").text();
-    console.log("Viewing tours for:", destination);
-    alert("View tours functionality would be implemented here for: " + destination);
+    // View tours functionality would be implemented here
   });
 
   // Product card interactions
@@ -147,17 +141,14 @@ $(document).ready(() => {
   $(".wishlist-btn").on("click", function (e) {
     e.preventDefault();
     var productTitle = $(this).closest(".product-card").find(".product-title a").text();
-    console.log("Added to wishlist:", productTitle);
     
     // Toggle wishlist state
     if ($(this).hasClass("active")) {
       $(this).removeClass("active");
       $(this).find("i").removeClass("fas").addClass("far");
-      alert("Removed from wishlist: " + productTitle);
     } else {
       $(this).addClass("active");
       $(this).find("i").removeClass("far").addClass("fas");
-      alert("Added to wishlist: " + productTitle);
     }
   });
 
@@ -165,15 +156,13 @@ $(document).ready(() => {
   $(".read-more-btn").on("click", function (e) {
     e.preventDefault();
     var productTitle = $(this).closest(".product-card").find(".product-title a").text();
-    console.log("Reading more about:", productTitle);
-    alert("Read more functionality would be implemented here for: " + productTitle);
+    // Read more functionality would be implemented here
   });
 
   // Travel item interactions
   $(".travel-item").on("click", function () {
     var travelType = $(this).find("h4").text();
-    console.log("Selected travel type:", travelType);
-    alert("Travel type selection would be implemented here for: " + travelType);
+    // Travel type selection would be implemented here
   });
 
   // Tab functionality for best sellers
@@ -182,11 +171,9 @@ $(document).ready(() => {
     $(this).addClass("active");
     
     var tabValue = $(this).text();
-    console.log("Selected tab:", tabValue);
     
     // Filter products based on tab selection
     // This would be implemented based on your data structure
-    alert("Tab functionality would filter products for: " + tabValue + " days");
   });
 
   // Back to top functionality
@@ -215,7 +202,6 @@ $(document).ready(() => {
   $(".social-link").on("click", function (e) {
     e.preventDefault();
     var platform = $(this).find("i").attr("class").split("-")[2];
-    console.log("Social media link clicked:", platform);
     // Social media functionality would be implemented here
   });
 
@@ -223,7 +209,6 @@ $(document).ready(() => {
   $(".footer-links-col a").on("click", function (e) {
     e.preventDefault();
     var linkText = $(this).text();
-    console.log("Footer link clicked:", linkText);
     // Footer link functionality would be implemented here
   });
 
@@ -249,7 +234,6 @@ $(document).ready(() => {
   function initMobileMenu() {
     if ($(window).width() <= 768) {
       // Mobile menu functionality would go here
-      console.log("Mobile menu initialized");
     }
   }
 
@@ -266,7 +250,6 @@ $(document).ready(() => {
 
   // Initialize page
   function initPage() {
-    console.log("Home page initialized");
     // Any additional initialization code would go here
   }
 

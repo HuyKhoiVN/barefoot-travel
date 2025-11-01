@@ -34,7 +34,7 @@
   </div>
   <div class="col-lg-4">
     <div class="card overflow-hidden">
-      <div class="card-body pb-0">
+      <div class="card-body pb-0 weekly-stats">
         <div class="d-flex align-items-start">
           <div>
             <h4 class="card-title">Weekly Stats</h4>
@@ -63,10 +63,10 @@
           </span>
           <div class="ms-3">
             <h5 class="mb-0 fw-bolder fs-4">Top Bookings</h5>
-            <span class="text-muted fs-3">Halong Bay Tour</span>
+            <span class="text-muted fs-3 top-bookings-name">Halong Bay Tour</span>
           </div>
           <div class="ms-auto">
-            <span class="badge bg-secondary-subtle text-muted">+25%</span>
+            <span class="badge bg-secondary-subtle text-muted top-bookings-change">+25%</span>
           </div>
         </div>
         <div class="py-3 d-flex align-items-center">
@@ -75,10 +75,10 @@
           </span>
           <div class="ms-3">
             <h5 class="mb-0 fw-bolder fs-4">Best Rated</h5>
-            <span class="text-muted fs-3">Sapa Trekking</span>
+            <span class="text-muted fs-3 best-rated-name">Sapa Trekking</span>
           </div>
           <div class="ms-auto">
-            <span class="badge bg-secondary-subtle text-muted">4.8★</span>
+            <span class="badge bg-secondary-subtle text-muted best-rated-rating">4.8★</span>
           </div>
         </div>
         <div class="py-3 d-flex align-items-center">
@@ -87,10 +87,10 @@
           </span>
           <div class="ms-3">
             <h5 class="mb-0 fw-bolder fs-4">Most Popular</h5>
-            <span class="text-muted fs-3">Hoi An Ancient Town</span>
+            <span class="text-muted fs-3 most-popular-name">Hoi An Ancient Town</span>
           </div>
           <div class="ms-auto">
-            <span class="badge bg-secondary-subtle text-muted">+45%</span>
+            <span class="badge bg-secondary-subtle text-muted most-popular-change">+45%</span>
           </div>
         </div>
         <div class="pt-3 mb-7 d-flex align-items-center">
@@ -99,10 +99,10 @@
           </span>
           <div class="ms-3">
             <h5 class="mb-0 fw-bolder fs-4">Revenue</h5>
-            <span class="text-muted fs-3">$12,500</span>
+            <span class="text-muted fs-3 revenue-amount">$12,500</span>
           </div>
           <div class="ms-auto">
-            <span class="badge bg-secondary-subtle text-muted">+18%</span>
+            <span class="badge bg-secondary-subtle text-muted revenue-change">+18%</span>
           </div>
         </div>
       </div>
@@ -129,7 +129,7 @@
         </div>
       </div>
       <div class="table-responsive mt-4">
-        <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+        <table class="table mb-0 text-nowrap varient-table align-middle fs-3 recent-bookings-table">
           <thead>
             <tr>
               <th scope="col" class="px-0 text-muted">
@@ -148,8 +148,7 @@
             <tr>
               <td class="px-0">
                 <div class="d-flex align-items-center">
-                  <img src="~/assets/images/profile/user-3.jpg" class="rounded-circle" width="40"
-                    alt="customer" />
+
                   <div class="ms-3">
                     <h6 class="mb-0 fw-bolder">John Smith</h6>
                     <span class="text-muted">john@email.com</span>
@@ -167,8 +166,7 @@
             <tr>
               <td class="px-0">
                 <div class="d-flex align-items-center">
-                  <img src="~/assets/images/profile/user-5.jpg" class="rounded-circle" width="40"
-                    alt="customer" />
+
                   <div class="ms-3">
                     <h6 class="mb-0 fw-bolder">
                       Sarah Johnson
@@ -188,8 +186,7 @@
             <tr>
               <td class="px-0">
                 <div class="d-flex align-items-center">
-                  <img src="~/assets/images/profile/user-6.jpg" class="rounded-circle" width="40"
-                    alt="customer" />
+
                   <div class="ms-3">
                     <h6 class="mb-0 fw-bolder">
                       Mike Wilson
@@ -213,124 +210,251 @@
   </div>
 </div>
 
-<div class="col-lg-6">
-  <!-- Card -->
-  <div class="card">
-    <div class="card-body">
-      <h4 class="card-title mb-0">Recent Comments</h4>
-    </div>
-    <div class="comment-widgets scrollable mb-2 common-widget" style="height: 465px" data-simplebar="">
-      <!-- Comment Row -->
-      <div class="d-flex flex-row comment-row border-bottom p-3 gap-3">
-        <div>
-          <span><img src="~/assets/images/profile/user-3.jpg" class="rounded-circle" alt="user"
-              width="50" /></span>
-        </div>
-        <div class="comment-text w-100">
-          <h6 class="fw-medium">John Smith</h6>
-          <p class="mb-1 fs-2 text-muted">
-            Amazing Halong Bay tour! The cruise was fantastic and the guide was very knowledgeable.
-          </p>
-          <div class="comment-footer mt-2">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-success-subtle text-success">5★</span>
-              <span class="action-icons">
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-edit fs-5"></i></a>
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-check fs-5"></i></a>
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-heart fs-5"></i></a>
-              </span>
-            </div>
-            <span class="text-muted ms-auto fw-normal fs-2 d-block mt-2 text-end">2 hours ago</span>
-          </div>
-        </div>
-      </div>
-      <!-- Comment Row -->
-      <div class="d-flex flex-row comment-row border-bottom active p-3 gap-3">
-        <div>
-          <span><img src="~/assets/images/profile/user-5.jpg" class="rounded-circle" alt="user"
-              width="50" /></span>
-        </div>
-        <div class="comment-text active w-100">
-          <h6 class="fw-medium">Sarah Johnson</h6>
-          <p class="mb-1 fs-2 text-muted">
-            The Sapa trekking experience was incredible. Highly recommend for nature lovers!
-          </p>
-          <div class="comment-footer mt-2">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-success-subtle text-success">5★</span>
-              <span class="action-icons active">
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-edit fs-5"></i></a>
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-circle-x fs-5"></i></a>
-                <a href="javascript:void(0)" class="ps-3"><i class="ti ti-heart text-danger fs-5"></i></a>
-              </span>
-            </div>
-            <span class="text-muted ms-auto fw-normal fs-2 text-end mt-2 d-block">4 hours ago</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+@section Scripts {
+<script>
+  $(document).ready(function() {
+    let chartInstance = null;
 
-<div class="col-lg-6">
-  <div class="card">
-    <div class="card-body">
-      <div class="d-flex align-items-center">
-        <h4 class="card-title mb-0">Quick Stats</h4>
-        <select class="form-select w-auto ms-auto">
-          <option selected="">Today</option>
-          <option value="1">This Week</option>
-        </select>
-      </div>
-      <div class="d-flex align-items-center flex-row mt-4">
-        <div class="p-2 display-5 text-primary">
-          <i class="ti ti-calendar-check"></i>
-          <span>24</span>
-        </div>
-        <div class="p-2">
-          <h3 class="mb-0">Bookings Today</h3>
-          <small>Total confirmed bookings</small>
-        </div>
-      </div>
-      <table class="table table-borderless">
-        <tbody>
+    // Load dashboard data
+    function loadDashboardData(filterPeriod = null) {
+      const url = filterPeriod 
+        ? `${baseUrl}api/dashboard/stats?filterPeriod=${filterPeriod}`
+        : `${baseUrl}api/dashboard/stats`;
+
+      $.ajax({
+        url: url,
+        type: 'GET',
+        success: function(response) {
+          if (response.success && response.data) {
+            updateMonthlyOverview(response.data.monthlyOverview);
+            updateWeeklyStats(response.data.weeklyStats);
+            updateRecentBookings(response.data.recentBookings);
+          } else {
+            console.error('Failed to load dashboard data:', response.message);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading dashboard data:', error);
+        }
+      });
+    }
+
+    // Update monthly overview chart
+    function updateMonthlyOverview(data) {
+      // Prepare chart data
+      const categories = [];
+      const thisMonthData = [];
+      const lastMonthData = [];
+
+      // Get all dates from both months
+      const allDates = new Set([
+        ...data.thisMonth.map(d => new Date(d.date).getDate()),
+        ...data.lastMonth.map(d => new Date(d.date).getDate())
+      ]);
+
+      // Sort dates
+      const sortedDates = Array.from(allDates).sort((a, b) => a - b);
+
+      // Build chart data
+      sortedDates.forEach(day => {
+        categories.push(day);
+
+        // Find data for this month
+        const thisMonthPoint = data.thisMonth.find(d => new Date(d.date).getDate() === day);
+        thisMonthData.push(thisMonthPoint ? thisMonthPoint.bookings : 0);
+
+        // Find data for last month
+        const lastMonthPoint = data.lastMonth.find(d => new Date(d.date).getDate() === day);
+        lastMonthData.push(lastMonthPoint ? lastMonthPoint.bookings : 0);
+      });
+
+      // Calculate max value for y-axis
+      const maxValue = Math.max(...thisMonthData, ...lastMonthData);
+      const yMax = Math.ceil(maxValue * 1.2);
+
+      // Create or update chart
+      const chartOptions = {
+        series: [
+          {
+            name: "This Month",
+            data: thisMonthData,
+          },
+          {
+            name: "Last Month",
+            data: lastMonthData,
+          },
+        ],
+        chart: {
+          type: "bar",
+          height: 275,
+          toolbar: {
+            show: false,
+          },
+          foreColor: "#adb0bb",
+          fontFamily: "inherit",
+          sparkline: {
+            enabled: false,
+          },
+        },
+        grid: {
+          show: false,
+          borderColor: "transparent",
+          padding: {
+            left: 0,
+            right: 0,
+            bottom: 0,
+          },
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: "25%",
+            endingShape: "rounded",
+            borderRadius: 5,
+          },
+        },
+        colors: ["var(--bs-primary)", "var(--bs-info)"],
+        dataLabels: {
+          enabled: false,
+        },
+        yaxis: {
+          show: true,
+          min: 0,
+          max: yMax > 0 ? yMax : 10,
+          tickAmount: 3,
+        },
+        stroke: {
+          show: true,
+          width: 5,
+          lineCap: "butt",
+          colors: ["transparent"],
+        },
+        xaxis: {
+          type: "category",
+          categories: categories,
+          axisBorder: {
+            show: false,
+          },
+        },
+        fill: {
+          opacity: 1,
+        },
+        tooltip: {
+          theme: "dark",
+        },
+        legend: {
+          show: false,
+        },
+      };
+
+      // Destroy existing chart if any
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      // Create new chart
+      chartInstance = new ApexCharts(
+        document.querySelector("#sales-overview"),
+        chartOptions
+      );
+      chartInstance.render();
+    }
+
+    // Update weekly stats
+    function updateWeeklyStats(data) {
+      // Update Top Bookings
+      if (data.topBookings) {
+        $('.weekly-stats .top-bookings-name').text(data.topBookings.tourName);
+        $('.weekly-stats .top-bookings-change').text(data.topBookings.changePercentage);
+      } else {
+        $('.weekly-stats .top-bookings-name').text('N/A');
+        $('.weekly-stats .top-bookings-change').text('0%');
+      }
+
+      // Update Best Rated (if available)
+      if (data.bestRated) {
+        $('.weekly-stats .best-rated-name').text(data.bestRated.tourName);
+        $('.weekly-stats .best-rated-rating').text(data.bestRated.rating.toFixed(1) + '★');
+      } else {
+        $('.weekly-stats .best-rated-name').text('N/A');
+        $('.weekly-stats .best-rated-rating').text('N/A');
+      }
+
+      // Update Most Popular
+      if (data.mostPopular) {
+        $('.weekly-stats .most-popular-name').text(data.mostPopular.tourName);
+        $('.weekly-stats .most-popular-change').text(data.mostPopular.changePercentage);
+      } else {
+        $('.weekly-stats .most-popular-name').text('N/A');
+        $('.weekly-stats .most-popular-change').text('0%');
+      }
+
+      // Update Revenue
+      if (data.revenue) {
+        $('.weekly-stats .revenue-amount').text(formatCurrency(data.revenue.totalRevenue));
+        $('.weekly-stats .revenue-change').text(data.revenue.changePercentage);
+      }
+    }
+
+    // Update recent bookings table
+    function updateRecentBookings(bookings) {
+      const tbody = $('.recent-bookings-table tbody');
+      tbody.empty();
+
+      if (bookings && bookings.length > 0) {
+        bookings.forEach(booking => {
+          const row = `
+            <tr>
+              <td class="px-0">
+                <div class="d-flex align-items-center">
+                  <div class="ms-3">
+                    <h6 class="mb-0 fw-bolder">${escapeHtml(booking.customerName)}</h6>
+                    <span class="text-muted">${escapeHtml(booking.email)}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-0">${escapeHtml(booking.tourName)}</td>
+              <td class="px-0">
+                <span class="badge ${booking.statusClass}">${escapeHtml(booking.status)}</span>
+              </td>
+              <td class="px-0 text-dark fw-medium text-end">
+                ${formatCurrency(booking.amount)}
+              </td>
+            </tr>
+          `;
+          tbody.append(row);
+        });
+      } else {
+        tbody.append(`
           <tr>
-            <td>Pending</td>
-            <td class="fw-medium">8 bookings</td>
+            <td colspan="4" class="text-center py-4 text-muted">
+              No bookings found
+            </td>
           </tr>
-          <tr>
-            <td>Confirmed</td>
-            <td class="fw-medium">16 bookings</td>
-          </tr>
-          <tr>
-            <td>Cancelled</td>
-            <td class="fw-medium">2 bookings</td>
-          </tr>
-          <tr>
-            <td>Revenue</td>
-            <td class="fw-medium">$4,250</td>
-          </tr>
-        </tbody>
-      </table>
-      <hr />
-      <ul class="list-unstyled row text-center city-weather-days mb-0">
-        <li class="col">
-          <i class="ti ti-calendar fs-4"></i><span>Mon</span>
-          <h3 class="mb-0 fs-6 lh-base">18</h3>
-        </li>
-        <li class="col">
-          <i class="ti ti-calendar fs-4"></i><span>Tue</span>
-          <h3 class="mb-0 fs-6 lh-base">22</h3>
-        </li>
-        <li class="col">
-          <i class="ti ti-calendar fs-4"></i><span>Wed</span>
-          <h3 class="mb-0 fs-6 lh-base">19</h3>
-        </li>
-        <li class="col">
-          <i class="ti ti-calendar fs-4"></i><span>Thu</span>
-          <h3 class="mb-0 fs-6 lh-base">24</h3>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
+        `);
+      }
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Filter change handler
+    $('.theme-select').on('change', function() {
+      const filterPeriod = $(this).val();
+      loadDashboardData(filterPeriod);
+    });
+
+    // Initial load
+    loadDashboardData();
+  });
+</script>
+}

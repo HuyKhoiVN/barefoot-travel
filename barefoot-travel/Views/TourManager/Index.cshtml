@@ -1237,41 +1237,53 @@ $(document).ready(function() {
             }, 100);
         }
         
-        // Clean up unused images
-        cleanupUnusedImages(htmlContent);
+        // ⚠️ DISABLED: Auto cleanup feature caused images to be deleted incorrectly
+        // BUG: cleanupUnusedImages() only checks current tour description but deletes ALL old images
+        // This causes images from other tours, categories, and homepage to be deleted unexpectedly
+        // Solution: Manual cleanup should be done carefully with database verification
+        // cleanupUnusedImages(htmlContent);
         
         $('#descriptionEditorModal').modal('hide');
         showAlert('Description saved successfully!', 'success');
     }
 
-    // Function to cleanup unused images (only from description, not tour images)
-    function cleanupUnusedImages(htmlContent) {
-        // Only cleanup if we have HTML content and it's from description editor
-        if (!htmlContent || !quillEditor) {
-            return;
-        }
-        
-        $.ajax({
-            url: baseUrl + 'api/fileupload/cleanup-unused-description-images',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: getAuthHeaders(),
-            data: JSON.stringify({
-                htmlContent: htmlContent,
-                folder: 'uploads'
-            }),
-            success: function(response) {
-                if (response.success && response.data.deletedCount > 0) {
-                    console.log(`Cleaned up ${response.data.deletedCount} unused description images`);
-                    // Don't show alert to user as this is background cleanup
-                }
-            },
-            error: function(xhr) {
-                if (handleAuthError(xhr)) return;
-                console.error('Error cleaning up unused description images:', xhr.responseText);
-            }
-        });
-    }
+    // ⚠️ DISABLED FUNCTION - DO NOT USE
+    // BUG DESCRIPTION:
+    // This function only checks images in the current tour description (htmlContent parameter)
+    // But it deletes ALL images in wwwroot/uploads that are:
+    //   1. Not in current tour description
+    //   2. Older than 1 hour
+    // PROBLEM: It does NOT check:
+    //   - Images from OTHER tours (TourImage table)
+    //   - Images from Categories (WaysToTravelImage1/2, DailyTourImageUrl)
+    //   - Images from other features
+    // RESULT: Deletes images that are still being used by other entities
+    // 
+    // function cleanupUnusedImages(htmlContent) {
+    //     if (!htmlContent || !quillEditor) {
+    //         return;
+    //     }
+    //     
+    //     $.ajax({
+    //         url: baseUrl + 'api/fileupload/cleanup-unused-description-images',
+    //         type: 'POST',
+    //         contentType: 'application/json',
+    //         headers: getAuthHeaders(),
+    //         data: JSON.stringify({
+    //             htmlContent: htmlContent,
+    //             folder: 'uploads'
+    //         }),
+    //         success: function(response) {
+    //             if (response.success && response.data.deletedCount > 0) {
+    //                 console.log(`Cleaned up ${response.data.deletedCount} unused description images`);
+    //             }
+    //         },
+    //         error: function(xhr) {
+    //             if (handleAuthError(xhr)) return;
+    //             console.error('Error cleaning up unused description images:', xhr.responseText);
+    //         }
+    //     });
+    // }
 
     // Function to manage tour images
     window.manageTourImages = function(tourId) {

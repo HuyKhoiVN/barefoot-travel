@@ -27,8 +27,6 @@
             });
 
             if (treeResponse.success && treeResponse.data) {
-                console.log('📍 Header Categories loaded:', treeResponse.data.length);
-                console.log('📍 First category:', treeResponse.data[0]);
                 
                 categoriesCache.tree = treeResponse.data;
                 
@@ -36,8 +34,6 @@
                 categoriesCache.homeCategories = filterCategoriesByType(treeResponse.data, 'HOME-CATEGORY');
                 categoriesCache.tourCategories = filterCategoriesByType(treeResponse.data, 'TOURS');
                 
-                console.log('📍 Home categories:', categoriesCache.homeCategories.length);
-                console.log('📍 Tour categories:', categoriesCache.tourCategories.length);
                 
                 // Build navigation menu
                 buildNavigationMenu();
@@ -119,14 +115,12 @@
         if (categories && categories.length > 0) {
             categories.forEach(cat => {
                 if (cat.active) {
-                    console.log('📍 Building nav for:', cat.categoryName, '- slug:', cat.slug);
                     
                     // Parent category
                     if (cat.children && cat.children.length > 0) {
                         // Has children - create nested dropdown
                         // Only navigate if has slug, otherwise just show submenu
                         const parentUrl = cat.slug ? `/categories/${cat.slug}` : '#';
-                        console.log('   Parent URL:', parentUrl);
                         const $parentItem = $(`
                             <div class="dropdown-item-parent">
                                 <a href="${parentUrl}" 
@@ -368,7 +362,6 @@
     
     $(document).ready(function() {
         initHeaderNavigation();
-        console.log('📍 Header navigation initialized with dynamic categories');
     });
 
     // Expose to global scope if needed

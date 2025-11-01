@@ -161,6 +161,60 @@ namespace barefoot_travel.Services
             return descendantIds;
         }
 
+        public async Task<ApiResponse> SearchToursAsync(string query, int limit = 10)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
+                {
+                    return new ApiResponse(true, "Search query too short", new List<object>());
+                }
+
+                // Search tours by title or category name (case-insensitive, fuzzy matching)
+                var results = await _context.Tours
+                    .Where(t => t.Active && 
+                                t.Status == Common.TourStatusConstant.Public &&
+                                (t.Title.Contains(query) || 
+                                 _context.TourCategories
+                                    .Any(tc => tc.TourId == t.Id && 
+                                               tc.Active &&
+                                               _context.Categories
+                                                   .Any(c => c.Id == tc.CategoryId && 
+                                                            c.Active && 
+                                                            c.CategoryName.Contains(query)))))
+                    .OrderBy(t => t.Title)
+                    .Take(limit)
+                    .Select(t => new
+                    {
+                        id = t.Id,
+                        title = t.Title,
+                        slug = t.Slug,
+                        price = t.PricePerPerson,
+                        imageUrl = _context.TourImages
+                            .Where(ti => ti.TourId == t.Id && ti.Active)
+                            .OrderByDescending(ti => ti.IsBanner)
+                            .ThenBy(ti => ti.Id)
+                            .Select(ti => ti.ImageUrl)
+                            .FirstOrDefault(),
+                        categories = _context.TourCategories
+                            .Where(tc => tc.TourId == t.Id && tc.Active)
+                            .Join(_context.Categories,
+                                tc => tc.CategoryId,
+                                c => c.Id,
+                                (tc, c) => c.CategoryName)
+                            .Take(2)
+                            .ToList()
+                    })
+                    .ToListAsync();
+
+                return new ApiResponse(true, "Search completed successfully", results);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(false, $"Error searching tours: {ex.Message}");
+            }
+        }
+
         public async Task<ApiResponse> CreateTourAsync(CreateTourDto dto, string adminUsername)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();

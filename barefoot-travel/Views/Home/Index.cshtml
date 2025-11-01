@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="~/ui-user-template/sections-theme.css?v=1.4">
     <link rel="stylesheet" href="~/ui-user-template/advanced-animations.css?v=1.4">
     <!-- Globe 3D Styles -->
-    <link href="~/ui-user-template/globe-hero.css?v=1.2" rel="stylesheet">
+    <link href="~/ui-user-template/globe-hero.css?v=1.5" rel="stylesheet">
     <style>
         /* Horizontal scrollable tour grid styles */
         .tour-grid-container {
@@ -351,6 +351,17 @@
             loadDailyTours();
             loadHomepageData();
             loadWaysToTravel();
+            
+            // Handle product card clicks (using event delegation for dynamically added cards)
+            $(document).on('click', '.product-card', function(e) {
+                // Don't trigger if clicking wishlist button or links (links will handle their own navigation)
+                if (!$(e.target).closest('.wishlist-btn, a').length) {
+                    const slug = $(this).data('tour-slug');
+                    if (slug) {
+                        window.location.href = `/tours/${slug}`;
+                    }
+                }
+            });
         });
 
         // Load all homepage data from API
@@ -359,14 +370,13 @@
                 url: '/api/HomePage/sections',
                 type: 'GET',
                 success: function(response) {
-                    console.log('Response received:', response);
                     if (response.success && response.data) {
                         // response.data is already the array of sections
                         renderHomepageSections(response.data);
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error loading homepage sections from API:', xhr);
+                    // Error handling
                 }
             });
         }
@@ -377,13 +387,12 @@
                 url: '/api/FeaturedDailyTours/featured-tours',
                 type: 'GET',
                 success: function(response) {
-                    console.log('Featured Tours response:', response);
                     if (response.success && response.data) {
                         renderFeaturedTours(response.data.tours);
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error loading Featured Tours:', xhr);
+                    // Error handling
                 }
             });
         }
@@ -394,13 +403,12 @@
                 url: '/api/FeaturedDailyTours/daily-tours',
                 type: 'GET',
                 success: function(response) {
-                    console.log('Daily Tours response:', response);
                     if (response.success && response.data) {
                         renderDailyTours(response.data.tours);
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error loading Daily Tours:', xhr);
+                    // Error handling
                 }
             });
         }
@@ -411,15 +419,12 @@
                 url: '/api/HomePage/ways-to-travel',
                 type: 'GET',
                 success: function(response) {
-                    console.log('Ways to Travel response:', response);
-                    console.log('Categories data:', response.data?.categories);
                     if (response.success && response.data) {
-                        console.log('First category:', response.data.categories[0]);
                         renderWaysToTravelSection(response.data.categories);
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error loading Ways to Travel:', xhr);
+                    // Error handling
                 }
             });
         }
@@ -435,8 +440,9 @@
             
             tours.forEach(function(tour) {
                 const cardClass = tour.cardClass || '';
+                const tourSlug = tour.slug || '';
                 const cardHtml = `
-                    <div class="tour-card ${cardClass}">
+                    <div class="tour-card ${cardClass}" data-tour-slug="${tourSlug}" style="cursor: pointer;">
                         <div class="card-background" style="background-image: url('${tour.imageUrl}');"></div>
                         <div class="card-overlay"></div>
                         <div class="card-content">
@@ -448,6 +454,16 @@
                     </div>
                 `;
                 container.append(cardHtml);
+            });
+
+            // Add click event for featured tour cards
+            $('.tour-card[data-tour-slug]').on('click', function(e) {
+                if (!$(e.target).closest('.book-btn').length) {
+                    const slug = $(this).data('tour-slug');
+                    if (slug) {
+                        window.location.href = `/tours/${slug}`;
+                    }
+                }
             });
         }
 
@@ -589,11 +605,6 @@
                 const tourCount = category.totalTours || 0;
                 const categorySlug = category.slug || '';
                 
-                console.log('📊 Rendering category:', category.categoryName);
-                console.log('   - categoryId:', category.categoryId);
-                console.log('   - slug:', category.slug);
-                console.log('   - final categorySlug:', categorySlug);
-                
                 container.append(`
                     <div class="travel-item" 
                          data-category-id="${category.categoryId}" 
@@ -616,8 +627,7 @@
                 if (categorySlug) {
                     window.location.href = `/categories/${categorySlug}`;
                 } else {
-                    // No slug available - stay on page, show message
-                    console.warn('⚠️ Category has no slug, cannot navigate');
+                    // No slug available - stay on page
                 }
             });
 
@@ -639,11 +649,6 @@
             tours.forEach(function(tour) {
                 const cardClass = tour.cardClass || '';
                 const categorySlug = tour.slug || '';
-                
-                console.log('📊 Rendering daily tour:', tour.categoryName);
-                console.log('   - categoryId:', tour.categoryId);
-                console.log('   - slug:', tour.slug);
-                console.log('   - final categorySlug:', categorySlug);
                 
                 const card = $(`
                     <div class="daily-tour-card ${cardClass}" 
@@ -669,7 +674,6 @@
                         window.location.href = `/categories/${categorySlug}`;
                     } else {
                         // No slug - stay on page
-                        console.warn('⚠️ Daily tour category has no slug, cannot navigate');
                     }
                 });
                 
@@ -693,9 +697,11 @@
                 const imageUrl = tour.images && tour.images[0] ? tour.images[0] : '/ui-user-template/images/home_background.jpg';
                 const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
+                const tourSlug = tour.slug || '';
+                const tourHref = tourSlug ? `/tours/${tourSlug}` : '#';
                 
                 html += `
-                    <div class="product-card">
+                    <div class="product-card" data-tour-slug="${tourSlug}" style="cursor: pointer;">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
                             <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
@@ -708,12 +714,12 @@
                                 <a href="#">${section.categoryName}</a>
                             </p>
                             <h3 class="product-title">
-                                <a href="#">${tour.title}</a>
+                                <a href="${tourHref}">${tour.title}</a>
                             </h3>
                             <div class="product-price">
                                 <span class="amount">${price}</span>
                             </div>
-                            <a href="#" class="read-more-btn">Read more</a>
+                            <a href="${tourHref}" class="read-more-btn">Read more</a>
                         </div>
                     </div>
                 `;
@@ -781,9 +787,11 @@
                 const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
                 const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
+                const tourSlug = tour.slug || '';
+                const tourHref = tourSlug ? `/tours/${tourSlug}` : '#';
                 
                 html += `
-                    <div class="product-card">
+                    <div class="product-card" data-tour-slug="${tourSlug}" style="cursor: pointer;">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
                             <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
@@ -796,12 +804,12 @@
                                 <a href="#">${categoryName}</a>
                             </p>
                             <h3 class="product-title">
-                                <a href="#">${tour.title}</a>
+                                <a href="${tourHref}">${tour.title}</a>
                             </h3>
                             <div class="product-price">
                                 <span class="amount">${price}</span>
                             </div>
-                            <a href="#" class="read-more-btn">Read more</a>
+                            <a href="${tourHref}" class="read-more-btn">Read more</a>
                         </div>
                     </div>
                 `;
@@ -895,9 +903,11 @@
                 const galleryImageUrl = tour.images && tour.images[1] ? tour.images[1] : imageUrl;
                 const price = formatPrice(tour.pricePerPerson);
                 const categoryName = section.primaryCategoryName || (section.categoryNames && section.categoryNames[0]) || '';
+                const tourSlug = tour.slug || '';
+                const tourHref = tourSlug ? `/tours/${tourSlug}` : '#';
                 
                 html += `
-                    <div class="product-card">
+                    <div class="product-card" data-tour-slug="${tourSlug}" style="cursor: pointer;">
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" alt="${tour.title}" class="main-image">
                             <img src="${galleryImageUrl}" alt="Gallery Image" class="gallery-image">
@@ -910,12 +920,12 @@
                                 <a href="#">${categoryName}</a>
                             </p>
                             <h3 class="product-title">
-                                <a href="#">${tour.title}</a>
+                                <a href="${tourHref}">${tour.title}</a>
                             </h3>
                             <div class="product-price">
                                 <span class="amount">${price}</span>
                             </div>
-                            <a href="#" class="read-more-btn">Read more</a>
+                            <a href="${tourHref}" class="read-more-btn">Read more</a>
                         </div>
                     </div>
                 `;
@@ -1038,5 +1048,5 @@
     <script src="~/ui-user-template/libs/globe-gl/globe.gl.min.js"></script>
 
     <!-- Globe Hero Logic -->
-    <script src="~/ui-user-template/globe-hero.js?v=1.2"></script>
+    <script src="~/ui-user-template/globe-hero.js?v=1.3"></script>
 }
